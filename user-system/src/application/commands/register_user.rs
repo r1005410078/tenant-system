@@ -1,0 +1,51 @@
+use std::sync::Arc;
+
+use event_bus::AsyncEventBus;
+
+use crate::{
+    application::repositories::user::UserAggregateRepository,
+    domain::user::aggregates::user::UserAggregate,
+};
+
+pub struct RegisterUserCommand {
+    pub username: String,
+    pub email: Option<String>,
+    pub phone: Option<String>,
+    pub password: String,
+}
+
+pub struct UserRegistrationHandler {
+    event_bus: Arc<AsyncEventBus>,
+    user_repo: Arc<dyn UserAggregateRepository>,
+}
+
+impl UserRegistrationHandler {
+    pub fn new(event_bus: Arc<AsyncEventBus>, user_repo: Arc<dyn UserAggregateRepository>) -> Self {
+        UserRegistrationHandler {
+            event_bus,
+            user_repo,
+        }
+    }
+
+    pub async fn handle(&self, command: RegisterUserCommand) -> anyhow::Result<UserAggregate> {
+        // 用户是否存在
+        if self.user_repo.exists(command.username.as_str()).await {
+            return Err(anyhow::anyhow!("用户名不可用"));
+        }
+
+        let (user, event) = UserAggregate::register_user(
+            command.username,
+            command.email,
+            command.phone,
+            command.password,
+        )?;
+
+        // 保存用户聚合
+        self.user_repo.save(&user).await?;
+
+        // 发布事件到事件总线（简化的逻辑）
+        self.event_bus.publish(event.clone()).await;
+
+        Ok(user)
+    }
+}

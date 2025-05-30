@@ -1,0 +1,25 @@
+[package]
+name = "user-system"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.17.0", features = ["v4"] }
+event_bus = { path = "../crates/event_bus" }
+tokio = { version = "1", features = ["full"] }
+anyhow = "1.0.68"
+async-trait = { version = "0.1" }
+sea-orm = { version = "1.1.12", features = [
+    "debug-print",
+    "runtime-async-std-native-tls",
+    "sqlx-mysql",
+]}
+futures = "0.3"
+dotenvy = "0.15.7"
+log = { path = "../crates/log" }
+tracing = "0.1"
+argon2 = "0.5.3"
+serde = { version = "1.0", features = ["derive"] }
+jsonwebtoken = "9.3.1"
+time = "0.3.21"

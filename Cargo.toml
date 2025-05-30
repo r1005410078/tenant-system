@@ -1,0 +1,36 @@
+[package]
+name = "tenant-system"
+version = "0.1.0"
+edition = "2024"
+
+[workspace]
+members = [
+    "crates/event_bus", "crates/log",
+    "user-system",
+]
+
+[dependencies]
+chrono = { version = "0.4", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1", features = ["full"] }
+actix-web = "4"
+uuid = { version = "1.17.0", features = ["v4"] }
+async-trait = { version = "0.1" }
+event_bus = { path = "crates/event_bus" }
+anyhow = "1.0.68"
+sea-orm = { version = "1.1.12", features = [
+    "debug-print",
+    "runtime-async-std-native-tls",
+    "sqlx-mysql",
+]}
+dotenvy = "0.15.7"
+futures = "0.3"
+log = { path = "crates/log" }
+tracing = "0.1"
+argon2 = "0.5.3"
+time = "0.3.21"
+jsonwebtoken = "9.3.1"
+[[bin]]
+name = "user-system"
+path = "user-system/src/main.rs"

@@ -1,9 +1,10 @@
 [package]
 name = "log"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
+base64ct="<1.8.0"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "json", "env-filter"] }
 tracing-log = "0.2"

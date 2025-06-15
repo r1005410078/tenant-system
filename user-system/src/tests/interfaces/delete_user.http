@@ -1,0 +1,3 @@
+## 删除
+POST http://localhost:3001/api/user/delete/e65814ca-b22b-4e9b-8339-3e40a7164f5f
+Content-Type: application/json

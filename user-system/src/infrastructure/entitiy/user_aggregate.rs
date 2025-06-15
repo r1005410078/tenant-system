@@ -16,6 +16,7 @@ pub struct Model {
     pub account_status: String,
     pub register_time: DateTimeUtc,
     pub last_login_time: Option<DateTimeUtc>,
+    pub deleted_at: Option<DateTimeUtc>,
     pub created_at: Option<DateTime>,
     pub updated_at: Option<DateTime>,
 }

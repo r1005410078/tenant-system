@@ -1,8 +1,8 @@
-use tracing_subscriber::EnvFilter;
 use tracing_subscriber::fmt::format::FmtSpan;
+use tracing_subscriber::EnvFilter;
 
 pub fn init_tracing() {
-    let filter = EnvFilter::new("info") // 设置全局日志级别为 debug
+    let filter = EnvFilter::new("debug") // 设置全局日志级别为 debug
         .add_directive("my_app::db=warn".parse().unwrap()) // 单独设置模块日志级别
         .add_directive("tokio=info".parse().unwrap()); // 设定 tokio 相关日志级别
 

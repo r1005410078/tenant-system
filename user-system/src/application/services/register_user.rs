@@ -6,11 +6,11 @@ use crate::{
 };
 
 pub struct RegisterUserService {
-    register_user_handler: Arc<UserRegistrationHandler>,
+    register_user_handler: UserRegistrationHandler,
 }
 
 impl RegisterUserService {
-    pub fn new(register_user_handler: Arc<UserRegistrationHandler>) -> Self {
+    pub fn new(register_user_handler: UserRegistrationHandler) -> Self {
         Self {
             register_user_handler,
         }

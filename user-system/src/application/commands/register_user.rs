@@ -1,12 +1,14 @@
 use std::sync::Arc;
 
 use event_bus::AsyncEventBus;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     application::repositories::user::UserAggregateRepository,
-    domain::user::aggregates::user::UserAggregate,
+    domain::{password::argon::Argon, user::aggregates::user::UserAggregate},
 };
 
+#[derive(Serialize, Deserialize)]
 pub struct RegisterUserCommand {
     pub username: String,
     pub email: Option<String>,
@@ -29,7 +31,7 @@ impl UserRegistrationHandler {
 
     pub async fn handle(&self, command: RegisterUserCommand) -> anyhow::Result<UserAggregate> {
         // 用户是否存在
-        if self.user_repo.exists(command.username.as_str()).await {
+        if self.user_repo.exists(command.username.as_str()).await? {
             return Err(anyhow::anyhow!("用户名不可用"));
         }
 
@@ -37,11 +39,11 @@ impl UserRegistrationHandler {
             command.username,
             command.email,
             command.phone,
-            command.password,
+            Argon::password_hash(&command.password),
         )?;
 
-        // 保存用户聚合
-        self.user_repo.save(&user).await?;
+        // 创建新的用户聚合
+        self.user_repo.create(&user).await?;
 
         // 发布事件到事件总线（简化的逻辑）
         self.event_bus.publish(event.clone()).await;

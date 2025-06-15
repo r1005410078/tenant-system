@@ -1,22 +1,21 @@
-use crate::{
-    application::repositories::user,
-    domain::{
-        self,
-        password::argon::Argon,
-        user::{
-            events::{
-                login::{LoginEvent, LoginEventFail, LoginEventSuccess},
-                user_registered::UserRegisteredEvent,
-            },
-            value_objects::account_status::AccountStatus,
+use crate::domain::{
+    password::argon::Argon,
+    user::{
+        events::{
+            login::{LoginEvent, LoginEventFail, LoginEventSuccess},
+            user_deleted::UserDeletedEvent,
+            user_registered::UserRegisteredEvent,
+            user_updated::UserUpdatedEvent,
         },
+        value_objects::account_status::AccountStatus,
     },
 };
 use anyhow::Ok;
 use chrono::{DateTime, Utc};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct UserAggregate {
     pub id: Uuid,
     // 用户名
@@ -35,6 +34,8 @@ pub struct UserAggregate {
     pub register_time: DateTime<Utc>,
     // 最后登录时间
     pub last_login_time: Option<DateTime<Utc>>,
+    // 删除时间
+    pub deleted_at: Option<DateTime<Utc>>,
 }
 
 impl UserAggregate {
@@ -55,6 +56,7 @@ impl UserAggregate {
             account_status: AccountStatus::Active,
             register_time: Utc::now(),
             last_login_time: None,
+            deleted_at: None,
         };
 
         user.validate()?;
@@ -76,6 +78,29 @@ impl UserAggregate {
         Ok(())
     }
 
+    // 用户更新
+    pub fn update(
+        &mut self,
+        username: Option<String>,
+        email: Option<String>,
+        phone: Option<String>,
+        password: Option<String>,
+    ) -> UserUpdatedEvent {
+        self.username = username.unwrap_or(self.username.clone());
+        self.email = email.or(self.email.clone());
+        self.phone = phone.or(self.phone.clone());
+        self.password = Argon::password_hash(&password.unwrap_or(self.password.clone()));
+
+        UserUpdatedEvent {
+            id: self.id.to_string().clone(),
+            username: self.username.clone(),
+            email: self.email.clone(),
+            phone: self.phone.clone(),
+            account_status: self.account_status.to_string(),
+            role: self.role.clone(),
+        }
+    }
+
     pub fn login(&mut self, username: &str, password: &str) -> LoginEvent {
         let login_time = Utc::now();
         self.last_login_time = Some(login_time);
@@ -92,6 +117,14 @@ impl UserAggregate {
                 password.to_string(),
                 login_time,
             ))
+        }
+    }
+
+    // 删除用户
+    pub fn delete(&mut self) -> UserDeletedEvent {
+        self.deleted_at = Some(Utc::now());
+        UserDeletedEvent {
+            id: self.id.to_string(),
         }
     }
 }

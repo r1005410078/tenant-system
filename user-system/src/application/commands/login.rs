@@ -1,8 +1,11 @@
 use crate::application::repositories::user::UserAggregateRepository;
 use crate::application::services::claims::Claims;
+use crate::domain::user::events::login::LoginEvent;
 use event_bus::AsyncEventBus;
+use serde::Deserialize;
 use std::sync::Arc;
 
+#[derive(Debug, Deserialize)]
 pub struct LoginCommand {
     pub username: String,
     pub password: String,
@@ -43,15 +46,18 @@ impl LoginCommandHandler {
         // 发送事件
         self.event_bus.publish(login_event.clone()).await;
 
-        // 生成token
-        let claims = Claims::new(
-            user.id.to_string(),
-            user.username.clone(),
-            user.role.clone(),
-        );
+        if let LoginEvent::Success(_) = login_event {
+            // 生成token
+            let claims = Claims::new(
+                user.id.to_string(),
+                user.username.clone(),
+                user.role.clone(),
+            );
 
-        // 保存会话 TODO
-
-        Ok(claims.get_token())
+            // 保存会话 TODO
+            Ok(claims.get_token())
+        } else {
+            Err(anyhow::anyhow!("密码错误!"))
+        }
     }
 }

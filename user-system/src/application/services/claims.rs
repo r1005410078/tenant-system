@@ -1,6 +1,6 @@
 use anyhow::anyhow;
 use jsonwebtoken::errors::ErrorKind;
-use jsonwebtoken::{DecodingKey, EncodingKey, Header, Validation, decode, encode};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Deserialize, Serialize};
 use time::{Duration, OffsetDateTime};
 
@@ -47,6 +47,19 @@ impl Claims {
                 ErrorKind::InvalidIssuer => Err(anyhow!("Issuer is invalid")), // Example on how to handle a specific error
                 _ => Err(anyhow!("Some other errors")),
             },
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::application::services::claims::Claims;
+
+    #[test]
+    fn validate_token_test() {
+        match Claims::validate("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMjkyMWJlNWEtODIxNC00YTgyLWE1NzMtOWMwN2MxYmFjZmIyIiwidXNlcm5hbWUiOiJyb25ndHM1IiwicnVsZSI6InVzZXIiLCJleHAiOjE3NTAwNTYxMzksImlhdCI6MTc0OTk2OTczOX0.gRwMj7dIF2h-BxJLzTrf-jxGxNs25jJyKdEuCz6K_Po") {
+            Ok(c) => println!("c: {c:?}"),
+            Err(err) => println!("err: {err:?}"),
         }
     }
 }

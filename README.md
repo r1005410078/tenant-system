@@ -13,3 +13,9 @@
 ## 待优化
 
 事件流改成 event_outbox
+
+## 生成实体
+
+```bash
+sea-orm-cli generate entity -o user-system/src/infrastructure/entitiy
+```

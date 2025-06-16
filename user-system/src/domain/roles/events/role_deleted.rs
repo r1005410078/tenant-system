@@ -1,1 +1,9 @@
-pub struct RoleDeleted {}
+pub struct RoleDeletedEvent {
+    pub id: String,
+}
+
+impl RoleDeletedEvent {
+    pub fn new(id: String) -> Self {
+        Self { id }
+    }
+}

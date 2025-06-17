@@ -2,7 +2,8 @@ use std::sync::Arc;
 
 use crate::{
     application::repositories::user::UserAggregateRepository,
-    domain::user::aggregates::user::UserAggregate, infrastructure::entitiy,
+    domain::user::aggregates::user::UserAggregate,
+    infrastructure::entitiy::{self, casbin_rules},
 };
 use sea_orm::*;
 
@@ -13,6 +14,18 @@ pub struct MySqlUserAggregateRepository {
 impl MySqlUserAggregateRepository {
     pub fn new(pool: Arc<DbConn>) -> Self {
         MySqlUserAggregateRepository { pool }
+    }
+
+    // 获取用户绑定的角色列表
+    async fn get_roles_by_user_id(&self, user_id: &str) -> Vec<String> {
+        casbin_rules::Entity::find()
+            .filter(casbin_rules::Column::V0.eq(user_id))
+            .all(self.pool.as_ref())
+            .await
+            .unwrap()
+            .into_iter()
+            .map(|x| x.v1.unwrap())
+            .collect::<Vec<String>>()
     }
 }
 
@@ -32,9 +45,9 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
             deleted_at: Set(user.deleted_at),
             ..Default::default()
         };
-
+        // Todo
+        // 保存用户绑定的角色
         user.insert(self.pool.as_ref()).await?;
-
         Ok(())
     }
 
@@ -52,7 +65,8 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
             deleted_at: Set(user.deleted_at),
             ..Default::default()
         };
-
+        // Todo
+        // 保存用户绑定的角色
         user.update(self.pool.as_ref()).await?;
         Ok(())
     }
@@ -80,6 +94,7 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
             .one(self.pool.as_ref())
             .await;
 
+        // Todo 角色
         match res {
             Ok(data) => data.map(Into::into),
             Err(_) => None,

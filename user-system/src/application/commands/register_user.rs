@@ -8,12 +8,13 @@ use crate::{
     domain::{password::argon::Argon, user::aggregates::user::UserAggregate},
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct RegisterUserCommand {
     pub username: String,
     pub email: Option<String>,
     pub phone: Option<String>,
     pub password: String,
+    pub roles: Option<Vec<String>>,
 }
 
 pub struct UserRegistrationHandler {

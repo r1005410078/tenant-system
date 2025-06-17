@@ -6,3 +6,4 @@ pub mod permission_granted_to_role;
 pub mod register_user;
 pub mod update_role;
 pub mod update_user;
+pub mod user_binded_to_roles;

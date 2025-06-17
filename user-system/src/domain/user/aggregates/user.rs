@@ -3,6 +3,7 @@ use crate::domain::{
     user::{
         events::{
             login::{LoginEvent, LoginEventFail, LoginEventSuccess},
+            user_binded_to_roles::UserBindedToRolesEvent,
             user_deleted::UserDeletedEvent,
             user_registered::UserRegisteredEvent,
             user_updated::UserUpdatedEvent,
@@ -27,7 +28,7 @@ pub struct UserAggregate {
     // 密码
     pub password: String,
     // 角色
-    pub role: String,
+    pub role: Vec<String>,
     // 账户状态
     pub account_status: AccountStatus,
     // 注册时间
@@ -52,7 +53,7 @@ impl UserAggregate {
             email,
             phone,
             password,
-            role: "user".to_string(),
+            role: vec![],
             account_status: AccountStatus::Active,
             register_time: Utc::now(),
             last_login_time: None,
@@ -67,7 +68,7 @@ impl UserAggregate {
             email: user.email.clone(),
             phone: user.phone.clone(),
             account_status: user.account_status.to_string(),
-            role: user.role.clone(),
+            role: vec![],
         };
 
         Ok((user, event))
@@ -97,7 +98,7 @@ impl UserAggregate {
             email: self.email.clone(),
             phone: self.phone.clone(),
             account_status: self.account_status.to_string(),
-            role: self.role.clone(),
+            role: vec![],
         }
     }
 
@@ -125,6 +126,15 @@ impl UserAggregate {
         self.deleted_at = Some(Utc::now());
         UserDeletedEvent {
             id: self.id.to_string(),
+        }
+    }
+
+    // 为用户绑定角色
+    pub fn bind_roles(&mut self, roles: Vec<String>) -> UserBindedToRolesEvent {
+        self.role = roles;
+        UserBindedToRolesEvent {
+            user_id: self.id.to_string(),
+            roles: self.role.clone(),
         }
     }
 }

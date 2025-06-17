@@ -26,7 +26,6 @@ impl UserEventListener {
                         username: sea_orm::ActiveValue::Set(event.username.clone()),
                         email: sea_orm::ActiveValue::Set(event.email.clone()),
                         phone: sea_orm::ActiveValue::Set(event.phone.clone()),
-                        role: sea_orm::ActiveValue::Set(event.role.clone()),
                         account_status: sea_orm::ActiveValue::Set(event.account_status.to_string()),
                         ..Default::default()
                     };

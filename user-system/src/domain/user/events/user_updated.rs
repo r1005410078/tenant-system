@@ -5,5 +5,5 @@ pub struct UserUpdatedEvent {
     pub email: Option<String>,
     pub phone: Option<String>,
     pub account_status: String,
-    pub role: String,
+    pub role: Vec<String>,
 }

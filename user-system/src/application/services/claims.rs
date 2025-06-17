@@ -8,7 +8,7 @@ use time::{Duration, OffsetDateTime};
 pub struct Claims {
     pub user_id: String,
     pub username: String,
-    pub rule: String,
+    pub rule: Vec<String>,
     pub exp: i64,
     pub iat: i64,
 }
@@ -16,7 +16,7 @@ pub struct Claims {
 const KEY: &[u8] = b"2778205";
 
 impl Claims {
-    pub fn new(user_id: String, username: String, rule: String) -> Self {
+    pub fn new(user_id: String, username: String, rule: Vec<String>) -> Self {
         let iat = OffsetDateTime::now_utc();
         Claims {
             iat: iat.unix_timestamp(),

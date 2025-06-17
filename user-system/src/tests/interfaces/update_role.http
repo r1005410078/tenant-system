@@ -1,0 +1,8 @@
+POST http://localhost:3001/api/role/update
+Content-Type: application/json
+
+{
+  "id": "f4f14b8d-029f-4714-b259-c302070d5d8d",
+  "name": "admin",
+  "description": "超级管理员"
+}

@@ -11,18 +11,18 @@ use sea_orm::EntityTrait;
 use sea_orm::QueryFilter;
 use sea_orm::{ActiveValue::Set, DbConn};
 
-pub struct MysqlUserRoleAggregateRepository {
+pub struct MySqlRoleAggregateRepository {
     pool: Arc<DbConn>,
 }
 
-impl MysqlUserRoleAggregateRepository {
+impl MySqlRoleAggregateRepository {
     pub fn new(pool: Arc<DbConn>) -> Self {
-        MysqlUserRoleAggregateRepository { pool }
+        MySqlRoleAggregateRepository { pool }
     }
 }
 
 #[async_trait::async_trait]
-impl RoleRepository for MysqlUserRoleAggregateRepository {
+impl RoleRepository for MySqlRoleAggregateRepository {
     async fn create(&self, command: &RoleAggregate) -> anyhow::Result<RoleAggregate> {
         let model = role_aggregate::ActiveModel {
             id: Set(command.id.clone()),
@@ -40,6 +40,7 @@ impl RoleRepository for MysqlUserRoleAggregateRepository {
             id: Set(command.id.clone()),
             name: Set(command.name.clone()),
             description: Set(command.description.clone()),
+            deleted_at: Set(command.deleted_at.clone()),
             ..Default::default()
         };
 
@@ -48,13 +49,12 @@ impl RoleRepository for MysqlUserRoleAggregateRepository {
     }
 
     async fn find_by_id(&self, id: &str) -> anyhow::Result<RoleAggregate> {
+        println!("find_by_id {}", id);
         let model = role_aggregate::Entity::find()
             .filter(
-                Condition::all().add(
-                    role_aggregate::Column::Id
-                        .eq(id)
-                        .add(role_aggregate::Column::DeletedAt.is_null()),
-                ),
+                Condition::all()
+                    .add(role_aggregate::Column::Id.eq(id))
+                    .add(role_aggregate::Column::DeletedAt.is_null()),
             )
             .one(self.pool.as_ref())
             .await?

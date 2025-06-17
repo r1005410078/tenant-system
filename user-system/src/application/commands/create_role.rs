@@ -35,8 +35,7 @@ impl CreateRoleCommandHandler {
 
     pub async fn handle(&self, command: CreateRoleCommand) -> anyhow::Result<String> {
         let (role, event) = RoleAggregate::create(command.name, command.description);
-
-        self.role_repository.save(&role).await?;
+        self.role_repository.create(&role).await?;
         self.event_bus.publish(event).await;
 
         Ok(role.id)

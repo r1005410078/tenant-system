@@ -8,24 +8,30 @@ use std::{env, sync::Arc};
 use crate::{
     application::{
         commands::{
+            create_role::CreateRoleCommandHandler, delete_role::DeleteRoleCommandHandler,
             delete_user::DeleteUserCommandHandler, login::LoginCommandHandler,
-            register_user::UserRegistrationHandler, update_user::UpdateUserCommandHandler,
+            register_user::UserRegistrationHandler, update_role::UpdateRoleCommandHandler,
+            update_user::UpdateUserCommandHandler,
         },
         services::{
+            create_role::CreateRoleService, delete_role::DeleteRoleService,
             delete_user::DeleteUserService, login::LoginService,
-            register_user::RegisterUserService, update_user::UpdateUserService,
+            register_user::RegisterUserService, update_role::UpdateRoleService,
+            update_user::UpdateUserService,
         },
     },
     infrastructure::{
         mysql_pool::create_mysql_pool,
+        role::role_aggregate_repository::MySqlRoleAggregateRepository,
         user::user_aggregate_repository::MySqlUserAggregateRepository,
     },
-    interfaces::controllers::user::{delete_user, login, register, update_user},
+    interfaces::controllers::{
+        role::{create_role, delete_role, update_role},
+        user::{delete_user, login, register, update_user},
+    },
 };
 use actix_web::{web, App, HttpServer};
-use event_bus::{AsyncEventBus, Event};
-use sea_orm::Update;
-use serde::de;
+use event_bus::AsyncEventBus;
 
 #[derive(Debug, Clone)]
 pub struct OrderPlacedEvent {
@@ -67,18 +73,45 @@ async fn main() -> std::io::Result<()> {
         event_bus.clone(),
     )));
 
+    // 角色仓储层
+    let role_repo = Arc::new(MySqlRoleAggregateRepository::new(pool.clone()));
+
+    // 创建角色
+    let create_role_services = web::Data::new(CreateRoleService::new(
+        CreateRoleCommandHandler::new(role_repo.clone(), event_bus.clone()),
+    ));
+
+    // 删除角色
+    let delete_role_services = web::Data::new(DeleteRoleService::new(
+        DeleteRoleCommandHandler::new(role_repo.clone(), event_bus.clone()),
+    ));
+
+    // 更新角色
+    let update_role_services = web::Data::new(UpdateRoleService::new(
+        UpdateRoleCommandHandler::new(role_repo.clone(), event_bus.clone()),
+    ));
+
     HttpServer::new(move || {
         App::new()
             .app_data(register_user_services.clone())
             .app_data(delete_user_services.clone())
             .app_data(update_user_services.clone())
             .app_data(login_services.clone())
+            .app_data(create_role_services.clone())
+            .app_data(delete_role_services.clone())
+            .app_data(update_role_services.clone())
             .service(
                 web::scope("/api/user")
                     .service(register)
                     .service(delete_user)
                     .service(update_user)
                     .service(login),
+            )
+            .service(
+                web::scope("/api/role")
+                    .service(create_role)
+                    .service(delete_role)
+                    .service(update_role),
             )
     })
     .bind(server_url)?

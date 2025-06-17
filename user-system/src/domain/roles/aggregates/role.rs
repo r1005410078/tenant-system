@@ -2,7 +2,10 @@ use chrono::Utc;
 use sea_orm::prelude::DateTimeUtc;
 
 use crate::domain::roles::events::{
-    role_created::RoleCreatedEvent, role_deleted::RoleDeletedEvent, role_updated::RoleUpdatedEvent,
+    permission_granted_to_role::{self, Permission, PermissionGrantedToRoleEvent},
+    role_created::RoleCreatedEvent,
+    role_deleted::RoleDeletedEvent,
+    role_updated::RoleUpdatedEvent,
 };
 
 #[derive(Debug, Clone)]
@@ -11,9 +14,8 @@ pub struct RoleAggregate {
     pub name: String,
     pub description: Option<String>,
     // 授权信息
-    pub permissions: Vec<String>,
-    // 绑定用户
-    pub users: Vec<String>,
+    // vec["p, admin, data1, read", "p, admin, data1, write", "p, admin, data2, red"]
+    pub permissions: Vec<Permission>,
     pub deleted_at: Option<DateTimeUtc>,
 }
 
@@ -24,7 +26,6 @@ impl RoleAggregate {
             name,
             description,
             permissions: Vec::new(),
-            users: Vec::new(),
             deleted_at: None,
         }
     }
@@ -42,24 +43,27 @@ impl RoleAggregate {
         RoleDeletedEvent::new(self.id.clone())
     }
 
-    pub fn is_deleted(&self) -> bool {
-        self.deleted_at.is_some()
-    }
-
     pub fn update(
         &mut self,
         name: Option<String>,
         description: Option<String>,
-        permissions: Option<Vec<String>>,
     ) -> RoleUpdatedEvent {
         self.name = name.unwrap_or(self.name.clone());
         self.description = description.clone();
-        self.permissions = permissions.unwrap_or(self.permissions.clone());
 
         RoleUpdatedEvent::new(
             self.id.clone(),
             Some(self.name.clone()),
             self.description.clone(),
         )
+    }
+
+    // 为角色授权
+    pub fn grant_permissions(
+        &mut self,
+        permissions: Vec<Permission>,
+    ) -> PermissionGrantedToRoleEvent {
+        self.permissions = permissions;
+        PermissionGrantedToRoleEvent::new(self.id.clone(), self.permissions.clone())
     }
 }

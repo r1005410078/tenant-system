@@ -1,5 +1,7 @@
 use std::sync::Arc;
 
+use crate::domain::roles::events::permission_granted_to_role::Permission;
+use crate::infrastructure::entitiy::casbin_rules;
 use crate::{
     application::repositories::role::RoleRepository,
     domain::roles::aggregates::role::RoleAggregate, infrastructure::entitiy::role_aggregate,
@@ -19,6 +21,18 @@ impl MySqlRoleAggregateRepository {
     pub fn new(pool: Arc<DbConn>) -> Self {
         MySqlRoleAggregateRepository { pool }
     }
+
+    async fn get_permissions_by_role_id(&self, role_id: &str) -> anyhow::Result<Vec<Permission>> {
+        let models = casbin_rules::Entity::find()
+            .filter(casbin_rules::Column::V0.eq(role_id))
+            .all(self.pool.as_ref())
+            .await?
+            .into_iter()
+            .map(Into::into)
+            .collect::<Vec<Permission>>();
+
+        Ok(models)
+    }
 }
 
 #[async_trait::async_trait]
@@ -31,8 +45,22 @@ impl RoleRepository for MySqlRoleAggregateRepository {
             ..Default::default()
         };
 
-        let result = model.insert(self.pool.as_ref()).await?;
-        Ok(result.into())
+        let mut result: RoleAggregate = model.insert(self.pool.as_ref()).await?.into();
+        // 创建权限
+        for p in command.permissions.iter() {
+            // 创建权限关联
+            let model = casbin_rules::ActiveModel {
+                ptype: Set("p".to_string()),
+                v0: Set(Some(command.id.clone())),
+                v1: Set(Some(p.resouce.clone())),
+                v2: Set(Some(p.permission.clone())),
+                ..Default::default()
+            };
+            model.insert(self.pool.as_ref()).await?;
+        }
+
+        result.permissions = self.get_permissions_by_role_id(&command.id).await?;
+        Ok(result)
     }
 
     async fn save(&self, command: &RoleAggregate) -> anyhow::Result<RoleAggregate> {
@@ -44,13 +72,33 @@ impl RoleRepository for MySqlRoleAggregateRepository {
             ..Default::default()
         };
 
-        let result = model.update(self.pool.as_ref()).await?;
-        Ok(result.into())
+        let mut result: RoleAggregate = model.update(self.pool.as_ref()).await?.into();
+
+        // 删除旧的权限
+        casbin_rules::Entity::delete_many()
+            .filter(casbin_rules::Column::V0.eq(command.id.clone()))
+            .exec(self.pool.as_ref())
+            .await?;
+
+        // 更新权限
+        for p in command.permissions.iter() {
+            // 创建权限关联
+            let model = casbin_rules::ActiveModel {
+                ptype: Set("p".to_string()),
+                v0: Set(Some(command.id.to_string())),
+                v1: Set(Some(p.resouce.clone())),
+                v2: Set(Some(p.permission.clone())),
+                ..Default::default()
+            };
+            model.insert(self.pool.as_ref()).await?;
+        }
+
+        result.permissions = self.get_permissions_by_role_id(&command.id).await?;
+        Ok(result)
     }
 
     async fn find_by_id(&self, id: &str) -> anyhow::Result<RoleAggregate> {
-        println!("find_by_id {}", id);
-        let model = role_aggregate::Entity::find()
+        let mut model: RoleAggregate = role_aggregate::Entity::find()
             .filter(
                 Condition::all()
                     .add(role_aggregate::Column::Id.eq(id))
@@ -58,9 +106,11 @@ impl RoleRepository for MySqlRoleAggregateRepository {
             )
             .one(self.pool.as_ref())
             .await?
-            .ok_or(anyhow::anyhow!("role not found"));
+            .ok_or(anyhow::anyhow!("role not found"))?
+            .into();
 
-        model.map(Into::into)
+        model.permissions = self.get_permissions_by_role_id(&model.id).await?;
+        Ok(model)
     }
 }
 
@@ -71,8 +121,16 @@ impl From<role_aggregate::Model> for RoleAggregate {
             name: model.name,
             description: model.description,
             permissions: Vec::new(),
-            users: Vec::new(),
             deleted_at: model.deleted_at,
+        }
+    }
+}
+
+impl From<casbin_rules::Model> for Permission {
+    fn from(model: casbin_rules::Model) -> Self {
+        Permission {
+            resouce: model.v1.unwrap(),
+            permission: model.v2.unwrap(),
         }
     }
 }

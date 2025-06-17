@@ -10,6 +10,7 @@ use crate::{
         commands::{
             create_role::CreateRoleCommandHandler, delete_role::DeleteRoleCommandHandler,
             delete_user::DeleteUserCommandHandler, login::LoginCommandHandler,
+            permission_granted_to_role::PermissionGrantedToRoleCommandHandler,
             register_user::UserRegistrationHandler, update_role::UpdateRoleCommandHandler,
             update_user::UpdateUserCommandHandler,
         },
@@ -89,6 +90,7 @@ async fn main() -> std::io::Result<()> {
     // 更新角色
     let update_role_services = web::Data::new(UpdateRoleService::new(
         UpdateRoleCommandHandler::new(role_repo.clone(), event_bus.clone()),
+        PermissionGrantedToRoleCommandHandler::new(role_repo.clone(), event_bus.clone()),
     ));
 
     HttpServer::new(move || {

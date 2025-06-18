@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "id": "0475cffe-0833-4a38-a843-0134aa9f2cb9",
-  "email": "1005410788@qq.com"
+  "email": "1005410788@qq.com",
+  "roles": ["admin", "super_admin"]
 }
-
 

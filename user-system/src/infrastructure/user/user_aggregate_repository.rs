@@ -31,42 +31,68 @@ impl MySqlUserAggregateRepository {
 
 #[async_trait::async_trait]
 impl UserAggregateRepository for MySqlUserAggregateRepository {
-    async fn create(&self, user: &UserAggregate) -> anyhow::Result<()> {
+    async fn create(&self, input_user: &UserAggregate) -> anyhow::Result<()> {
         // 保存用户聚合
         let user = entitiy::user_aggregate::ActiveModel {
-            id: Set(user.id.to_string()),
-            username: Set(user.username.clone()),
-            email: Set(user.email.clone()),
-            phone: Set(user.phone.clone()),
-            password: Set(user.password.clone()),
-            account_status: Set(user.account_status.to_string()),
-            register_time: Set(user.register_time),
-            last_login_time: Set(user.last_login_time),
-            deleted_at: Set(user.deleted_at),
+            id: Set(input_user.id.to_string()),
+            username: Set(input_user.username.clone()),
+            email: Set(input_user.email.clone()),
+            phone: Set(input_user.phone.clone()),
+            password: Set(input_user.password.clone()),
+            account_status: Set(input_user.account_status.to_string()),
+            register_time: Set(input_user.register_time),
+            last_login_time: Set(input_user.last_login_time),
+            deleted_at: Set(input_user.deleted_at),
             ..Default::default()
         };
-        // Todo
-        // 保存用户绑定的角色
+
+        for role in input_user.roles.iter() {
+            // 保存用户绑定的角色
+            let model = casbin_rules::ActiveModel {
+                ptype: Set("p".to_string()),
+                v0: Set(Some(input_user.id.to_string())),
+                v1: Set(Some(role.to_string())),
+                ..Default::default()
+            };
+            model.insert(self.pool.as_ref()).await?;
+        }
+
         user.insert(self.pool.as_ref()).await?;
         Ok(())
     }
 
-    async fn save(&self, user: &UserAggregate) -> anyhow::Result<()> {
+    async fn save(&self, input_user: &UserAggregate) -> anyhow::Result<()> {
         // 保存用户聚合
         let user = entitiy::user_aggregate::ActiveModel {
-            id: Set(user.id.to_string()),
-            username: Set(user.username.clone()),
-            email: Set(user.email.clone()),
-            phone: Set(user.phone.clone()),
-            password: Set(user.password.clone()),
-            account_status: Set(user.account_status.to_string()),
-            register_time: Set(user.register_time),
-            last_login_time: Set(user.last_login_time),
-            deleted_at: Set(user.deleted_at),
+            id: Set(input_user.id.to_string()),
+            username: Set(input_user.username.clone()),
+            email: Set(input_user.email.clone()),
+            phone: Set(input_user.phone.clone()),
+            password: Set(input_user.password.clone()),
+            account_status: Set(input_user.account_status.to_string()),
+            register_time: Set(input_user.register_time),
+            last_login_time: Set(input_user.last_login_time),
+            deleted_at: Set(input_user.deleted_at),
             ..Default::default()
         };
-        // Todo
+
+        // 批量删除用户绑定的角色
+        casbin_rules::Entity::delete_many()
+            .filter(casbin_rules::Column::V0.eq(input_user.id.to_string()))
+            .exec(self.pool.as_ref())
+            .await?;
+
         // 保存用户绑定的角色
+        for role in input_user.roles.iter() {
+            let model = casbin_rules::ActiveModel {
+                ptype: Set("p".to_string()),
+                v0: Set(Some(input_user.id.to_string())),
+                v1: Set(Some(role.to_string())),
+                ..Default::default()
+            };
+            model.insert(self.pool.as_ref()).await?;
+        }
+
         user.update(self.pool.as_ref()).await?;
         Ok(())
     }
@@ -84,21 +110,20 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
             .unwrap()
     }
 
-    async fn find_by_id(&self, user_id: &str) -> Option<UserAggregate> {
-        let res = entitiy::user_aggregate::Entity::find()
+    async fn find_by_id(&self, user_id: &str) -> anyhow::Result<UserAggregate> {
+        let mut user: UserAggregate = entitiy::user_aggregate::Entity::find()
             .filter(
                 Condition::all()
                     .add(entitiy::user_aggregate::Column::Id.eq(user_id))
                     .add(entitiy::user_aggregate::Column::DeletedAt.is_null()),
             )
             .one(self.pool.as_ref())
-            .await;
+            .await?
+            .ok_or(anyhow::anyhow!("user not found"))?
+            .into();
 
-        // Todo 角色
-        match res {
-            Ok(data) => data.map(Into::into),
-            Err(_) => None,
-        }
+        user.roles = self.get_roles_by_user_id(user_id).await;
+        Ok(user)
     }
 
     // 用户是否存在
@@ -124,7 +149,7 @@ impl From<entitiy::user_aggregate::Model> for UserAggregate {
             email: model.email,
             phone: model.phone,
             password: model.password,
-            role: vec![],
+            roles: vec![],
             account_status: model.account_status.into(),
             register_time: model.register_time,
             last_login_time: model.last_login_time,

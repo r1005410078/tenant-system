@@ -31,11 +31,7 @@ impl DeleteUserCommandHandler {
     }
 
     pub async fn handle(&self, command: DeleteUserCommand) -> anyhow::Result<()> {
-        let mut user_aggregate = self
-            .user_poll
-            .find_by_id(&command.user_id)
-            .await
-            .ok_or(anyhow::anyhow!("用户不存在"))?;
+        let mut user_aggregate = self.user_poll.find_by_id(&command.user_id).await?;
 
         let user_deleted_event = user_aggregate.delete();
 

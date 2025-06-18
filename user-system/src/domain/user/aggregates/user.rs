@@ -28,7 +28,7 @@ pub struct UserAggregate {
     // 密码
     pub password: String,
     // 角色
-    pub role: Vec<String>,
+    pub roles: Vec<String>,
     // 账户状态
     pub account_status: AccountStatus,
     // 注册时间
@@ -53,7 +53,7 @@ impl UserAggregate {
             email,
             phone,
             password,
-            role: vec![],
+            roles: vec![],
             account_status: AccountStatus::Active,
             register_time: Utc::now(),
             last_login_time: None,
@@ -131,10 +131,10 @@ impl UserAggregate {
 
     // 为用户绑定角色
     pub fn bind_roles(&mut self, roles: Vec<String>) -> UserBindedToRolesEvent {
-        self.role = roles;
+        self.roles = roles;
         UserBindedToRolesEvent {
             user_id: self.id.to_string(),
-            roles: self.role.clone(),
+            roles: self.roles.clone(),
         }
     }
 }

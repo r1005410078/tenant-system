@@ -51,7 +51,7 @@ impl LoginCommandHandler {
             let claims = Claims::new(
                 user.id.to_string(),
                 user.username.clone(),
-                user.role.clone(),
+                user.roles.clone(),
             );
 
             // 保存会话 TODO

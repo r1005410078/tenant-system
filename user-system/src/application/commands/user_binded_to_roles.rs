@@ -21,14 +21,18 @@ pub struct UserBindedToRolesHandler {
 }
 
 impl UserBindedToRolesHandler {
-    pub async fn handle(&self, command: UserBindedToRolesCommand) -> anyhow::Result<()> {
-        let mut user_aggregate = self
-            .user_pool
-            .find_by_id(&command.user_id)
-            .await
-            .ok_or(anyhow::anyhow!("用户不存在"))?;
+    pub fn new(user_pool: Arc<dyn UserAggregateRepository>, event_bus: Arc<AsyncEventBus>) -> Self {
+        Self {
+            user_pool,
+            event_bus,
+        }
+    }
 
+    pub async fn handle(&self, command: UserBindedToRolesCommand) -> anyhow::Result<()> {
+        let mut user_aggregate = self.user_pool.find_by_id(&command.user_id).await?;
         let event = user_aggregate.bind_roles(command.roles.clone());
+
+        user_aggregate.bind_roles(command.roles);
 
         self.user_pool.save(&user_aggregate).await?;
         self.event_bus.publish(event).await;

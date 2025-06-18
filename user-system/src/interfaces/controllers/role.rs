@@ -2,10 +2,7 @@ use actix_web::{post, web, HttpResponse};
 
 use crate::{
     application::{
-        commands::{
-            create_role::CreateRoleCommand, delete_role::DeleteRoleCommand,
-            update_role::UpdateRoleCommand,
-        },
+        commands::{create_role::CreateRoleCommand, update_role::UpdateRoleCommand},
         services::{
             create_role::CreateRoleService, delete_role::DeleteRoleService,
             update_role::UpdateRoleService,

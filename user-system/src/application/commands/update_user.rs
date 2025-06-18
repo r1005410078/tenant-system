@@ -4,18 +4,17 @@ use event_bus::AsyncEventBus;
 use serde::Deserialize;
 
 use crate::{
-    application::{listeners::user_event, repositories::user::UserAggregateRepository},
+    application::repositories::user::UserAggregateRepository,
     domain::user::aggregates::user::UserAggregate,
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct UpdateUserCommand {
-    id: String,
-    username: Option<String>,
-    email: Option<String>,
-    phone: Option<String>,
-    account_status: Option<String>,
-    role: Option<String>,
+    pub id: String,
+    pub username: Option<String>,
+    pub email: Option<String>,
+    pub phone: Option<String>,
+    pub roles: Option<Vec<String>>,
 }
 
 pub struct UpdateUserCommandHandler {
@@ -32,11 +31,7 @@ impl UpdateUserCommandHandler {
     }
 
     pub async fn handle(&self, command: UpdateUserCommand) -> anyhow::Result<UserAggregate> {
-        let mut user_aggregate = self
-            .user_pool
-            .find_by_id(&command.id)
-            .await
-            .ok_or(anyhow::anyhow!("用户不存在"))?;
+        let mut user_aggregate = self.user_pool.find_by_id(&command.id).await?;
 
         let user_event =
             user_aggregate.update(command.username, command.email, command.phone, None);

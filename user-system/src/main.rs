@@ -12,7 +12,7 @@ use crate::{
             delete_user::DeleteUserCommandHandler, login::LoginCommandHandler,
             permission_granted_to_role::PermissionGrantedToRoleCommandHandler,
             register_user::UserRegistrationHandler, update_role::UpdateRoleCommandHandler,
-            update_user::UpdateUserCommandHandler,
+            update_user::UpdateUserCommandHandler, user_binded_to_roles::UserBindedToRolesHandler,
         },
         services::{
             create_role::CreateRoleService, delete_role::DeleteRoleService,
@@ -53,19 +53,27 @@ async fn main() -> std::io::Result<()> {
     // 创建用户仓储
     let user_repo = Arc::new(MySqlUserAggregateRepository::new(pool.clone()));
 
+    // 用户绑定角色
+    let user_binded_to_roles_command_handler = Arc::new(UserBindedToRolesHandler::new(
+        user_repo.clone(),
+        event_bus.clone(),
+    ));
+
     // 注册用户
     let register_user_services = web::Data::new(RegisterUserService::new(
         UserRegistrationHandler::new(event_bus.clone(), user_repo.clone()),
-    ));
-
-    // 删除用户
-    let delete_user_services = web::Data::new(DeleteUserService::new(
-        DeleteUserCommandHandler::new(user_repo.clone(), event_bus.clone()),
+        user_binded_to_roles_command_handler.clone(),
     ));
 
     // 更新用户
     let update_user_services = web::Data::new(UpdateUserService::new(
         UpdateUserCommandHandler::new(user_repo.clone(), event_bus.clone()),
+        user_binded_to_roles_command_handler.clone(),
+    ));
+
+    // 删除用户
+    let delete_user_services = web::Data::new(DeleteUserService::new(
+        DeleteUserCommandHandler::new(user_repo.clone(), event_bus.clone()),
     ));
 
     // 登录用户

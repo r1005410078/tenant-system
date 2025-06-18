@@ -974,6 +974,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "domus"
+version = "0.1.0"
+dependencies = [
+ "sea-orm",
+]
+
+[[package]]
 name = "dotenvy"
 version = "0.15.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3688,7 +3695,6 @@ dependencies = [
  "anyhow",
  "argon2",
  "async-trait",
- "base64ct",
  "casbin",
  "chrono",
  "dotenvy",

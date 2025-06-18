@@ -5,12 +5,32 @@ edition = "2021"
 
 [workspace]
 members = [
-    "crates/event_bus", "crates/log",
+    "crates/event_bus", "crates/log", "domus",
     "user-system",
 ]
 
 [dependencies]
 base64ct="<1.8.0"
+casbin = { workspace = true }
+chrono= { workspace = true }
+uuid = { workspace = true }
+event_bus = { workspace = true }
+tokio = { workspace = true }
+anyhow = { workspace = true }
+async-trait= { workspace = true }
+sea-orm = { workspace = true }
+futures = { workspace = true }
+dotenvy  = { workspace = true }
+log = { workspace = true }
+tracing = { workspace = true }
+argon2  = { workspace = true }
+serde  = { workspace = true }
+jsonwebtoken  = { workspace = true }
+time = { workspace = true }
+actix-web  = { workspace = true }
+serde_json = { workspace = true }
+
+[workspace.dependencies]
 casbin = { version = "2.8.0", default-features = false, features = ["runtime-async-std", "logging", "incremental"] }
 chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
@@ -33,6 +53,11 @@ tracing = "0.1"
 argon2 = "0.5.3"
 time = "0.3.21"
 jsonwebtoken = "9.3.1"
+
 [[bin]]
 name = "user-system"
 path = "user-system/src/main.rs"
+
+[[bin]]
+name = "domus"
+path = "domus/src/main.rs"

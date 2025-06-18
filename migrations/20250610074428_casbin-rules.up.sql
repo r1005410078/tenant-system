@@ -4,6 +4,5 @@ create table if not exists casbin_rules (
     ptype varchar(255) not null,
     v0 varchar(255),
     v1 varchar(255),
-    v2 varchar(255),
-    v3 varchar(255)
+    v2 varchar(255)
 );

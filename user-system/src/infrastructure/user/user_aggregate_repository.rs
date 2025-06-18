@@ -49,7 +49,7 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
         for role in input_user.roles.iter() {
             // 保存用户绑定的角色
             let model = casbin_rules::ActiveModel {
-                ptype: Set("p".to_string()),
+                ptype: Set("g".to_string()),
                 v0: Set(Some(input_user.id.to_string())),
                 v1: Set(Some(role.to_string())),
                 ..Default::default()
@@ -85,7 +85,7 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
         // 保存用户绑定的角色
         for role in input_user.roles.iter() {
             let model = casbin_rules::ActiveModel {
-                ptype: Set("p".to_string()),
+                ptype: Set("g".to_string()),
                 v0: Set(Some(input_user.id.to_string())),
                 v1: Set(Some(role.to_string())),
                 ..Default::default()

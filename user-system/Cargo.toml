@@ -5,6 +5,7 @@ edition = "2021"
 
 [dependencies]
 base64ct="<1.8.0"
+casbin = { version = "2.8.0", default-features = false, features = ["runtime-async-std", "logging", "incremental"] }
 chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "1.17.0", features = ["v4"] }
 event_bus = { path = "../crates/event_bus" }

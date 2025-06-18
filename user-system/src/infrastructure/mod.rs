@@ -1,3 +1,4 @@
+pub mod casbin;
 pub mod entitiy;
 pub mod mysql_pool;
 pub mod role;

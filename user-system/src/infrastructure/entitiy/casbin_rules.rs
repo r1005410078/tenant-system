@@ -11,7 +11,6 @@ pub struct Model {
     pub v0: Option<String>,
     pub v1: Option<String>,
     pub v2: Option<String>,
-    pub v3: Option<String>,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

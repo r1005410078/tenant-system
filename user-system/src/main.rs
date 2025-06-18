@@ -22,7 +22,7 @@ use crate::{
         },
     },
     infrastructure::{
-        mysql_pool::create_mysql_pool,
+        casbin::init_casbin::init_casbin, mysql_pool::create_mysql_pool,
         role::role_aggregate_repository::MySqlRoleAggregateRepository,
         user::user_aggregate_repository::MySqlUserAggregateRepository,
     },
@@ -32,6 +32,7 @@ use crate::{
     },
 };
 use actix_web::{web, App, HttpServer};
+use casbin::{CoreApi, Enforcer};
 use event_bus::AsyncEventBus;
 
 #[derive(Debug, Clone)]
@@ -50,6 +51,8 @@ async fn main() -> std::io::Result<()> {
     let server_url = format!("{host}:{port}");
     let event_bus = Arc::new(AsyncEventBus::new());
     let pool = create_mysql_pool().await;
+    let enforcer = Arc::new(init_casbin(pool.clone()).await);
+
     // 创建用户仓储
     let user_repo = Arc::new(MySqlUserAggregateRepository::new(pool.clone()));
 
@@ -110,6 +113,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(create_role_services.clone())
             .app_data(delete_role_services.clone())
             .app_data(update_role_services.clone())
+            .app_data(enforcer.clone())
             .service(
                 web::scope("/api/user")
                     .service(register)

@@ -1,2 +1,2 @@
 pub mod aggregates;
-pub mod community;
+pub mod events;

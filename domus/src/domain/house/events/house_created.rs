@@ -1,7 +1,9 @@
-use crate::domain::house::value_objects::house::{
-    ApartmentType, Community, DoorNumber, FloorRange, HouseOwner, Stairs,
+use crate::domain::{
+    house::value_objects::house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
+    owner::value_objects::owner::HouseOwner,
 };
 
+#[derive(Debug, Clone)]
 pub struct HouseCreatedEvent {
     pub house_id: String,
     // 房源标题

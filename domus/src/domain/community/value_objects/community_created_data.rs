@@ -1,17 +1,16 @@
-use crate::domain::community::value_objects::community_updated_data::CommunityUpdateData;
+use crate::domain::community::events::community_created::CommunityCreatedEvent;
 
-pub struct UpdateCommunityCommand {
-    pub community_id: String,
+pub struct CommunityCreateData {
     // 小区名称
-    pub name: Option<String>,
+    pub name: String,
     // 小区地址
-    pub address: Option<String>,
+    pub address: String,
     // 城市
-    pub city: Option<String>,
+    pub city: String,
     // 小区年限
-    pub year_built: Option<i16>,
+    pub year_built: i16,
     // 小区类型
-    pub community_type: Option<String>,
+    pub community_type: String,
     // 小区描述
     pub description: Option<String>,
     // 小区图片
@@ -20,10 +19,10 @@ pub struct UpdateCommunityCommand {
     pub location: Option<String>,
 }
 
-impl UpdateCommunityCommand {
-    pub fn to_data(&self) -> CommunityUpdateData {
-        CommunityUpdateData {
-            community_id: self.community_id.clone(),
+impl CommunityCreateData {
+    pub fn to_event(&self, community_id: &str) -> CommunityCreatedEvent {
+        CommunityCreatedEvent {
+            community_id: community_id.to_string(),
             name: self.name.clone(),
             address: self.address.clone(),
             city: self.city.clone(),

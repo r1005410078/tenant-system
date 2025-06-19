@@ -1,12 +1,12 @@
 use crate::domain::{
-    house::value_objects::{
-        house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
-        house_create_data::HouseCreateData,
+    house::{
+        events::house_created::HouseCreatedEvent,
+        value_objects::house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
     },
     owner::value_objects::owner::HouseOwner,
 };
 
-pub struct CreateHouseCommand {
+pub struct HouseCreateData {
     // 房源标题
     pub title: Option<String>,
     // 用途
@@ -112,9 +112,10 @@ pub struct CreateHouseCommand {
     pub remark: Option<String>,
 }
 
-impl CreateHouseCommand {
-    pub fn to_data(&self) -> HouseCreateData {
-        HouseCreateData {
+impl HouseCreateData {
+    pub fn to_event(&self, house_id: String) -> HouseCreatedEvent {
+        HouseCreatedEvent {
+            house_id,
             // 房源标题
             title: self.title.clone(),
             // 用途
@@ -219,5 +220,19 @@ impl CreateHouseCommand {
             // 备注
             remark: self.remark.clone(),
         }
+    }
+
+    pub fn get_address(&self) -> String {
+        // 小区地址 + 栋 + 楼层 + 门牌号
+        let mut address = String::new();
+
+        if let Some(c) = &self.community {
+            address = c.address.clone().unwrap();
+        }
+
+        address = format!("{},{}", address, &self.floor_range.to_string());
+        address = format!("{},{}", address, &self.door_number.to_string());
+
+        address
     }
 }

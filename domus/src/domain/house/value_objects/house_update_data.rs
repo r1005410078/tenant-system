@@ -1,12 +1,14 @@
+use sea_orm::value;
+
 use crate::domain::{
-    house::value_objects::{
-        house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
-        house_update_data::HouseUpdateData,
+    house::{
+        events::house_updated::HouseUpdatedEvent,
+        value_objects::house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
     },
     owner::value_objects::owner::HouseOwner,
 };
 
-pub struct UpdateHouseCommand {
+pub struct HouseUpdateData {
     pub house_id: String,
     // 房源标题
     pub title: Option<String>,
@@ -113,113 +115,138 @@ pub struct UpdateHouseCommand {
     pub remark: Option<String>,
 }
 
-impl UpdateHouseCommand {
-    pub fn to_data(&self) -> HouseUpdateData {
-        HouseUpdateData {
-            house_id: self.house_id.clone(),
+impl HouseUpdateData {
+    pub fn to_event(&self) -> HouseUpdatedEvent {
+        self.into()
+    }
+
+    pub fn get_address(&self) -> String {
+        // 小区地址 + 栋 + 楼层 + 门牌号
+        let mut address = String::new();
+
+        if let Some(c) = &self.community {
+            address = c.address.clone().unwrap();
+        }
+
+        if let Some(f) = &self.floor_range {
+            address = format!("{},{}", address, f.to_string());
+        }
+
+        if let Some(d) = &self.door_number {
+            address = format!("{},{}", address, d.to_string());
+        }
+
+        address
+    }
+}
+
+impl From<&HouseUpdateData> for HouseUpdatedEvent {
+    fn from(value: &HouseUpdateData) -> Self {
+        Self {
+            house_id: value.house_id.clone(),
             // 房源标题
-            title: self.title.clone(),
+            title: value.title.clone(),
             // 用途
-            purpose: self.purpose.clone(),
+            purpose: value.purpose.clone(),
             // 交易类型
-            transaction_type: self.transaction_type.clone(),
+            transaction_type: value.transaction_type.clone(),
             // 状态
-            house_status: self.house_status.clone(),
+            house_status: value.house_status.clone(),
             // 楼层
-            floor_range: self.floor_range.clone(),
+            floor_range: value.floor_range.clone(),
             // 门牌号
-            door_number: self.door_number.clone(),
+            door_number: value.door_number.clone(),
             // 户型
-            apartment_type: self.apartment_type.clone(),
+            apartment_type: value.apartment_type.clone(),
             // 建筑面积
-            building_area: self.building_area.clone(),
+            building_area: value.building_area.clone(),
             // 装修
-            house_decoration: self.house_decoration.clone(),
+            house_decoration: value.house_decoration.clone(),
             // 满减年限
-            discount_year_limit: self.discount_year_limit.clone(),
+            discount_year_limit: value.discount_year_limit.clone(),
             // 梯户
-            stairs: self.stairs.clone(),
+            stairs: value.stairs.clone(),
 
             // 业主
-            owner: self.owner.clone(),
+            owner: value.owner.clone(),
             // 小区
-            community: self.community.clone(),
+            community: value.community.clone(),
             // 位置
-            location: self.location.clone(),
+            location: value.location.clone(),
             // 推荐标签
-            tags: self.tags.clone(),
+            tags: value.tags.clone(),
             // 车位高度
-            car_height: self.car_height.clone(),
+            car_height: value.car_height.clone(),
             // 实率
-            actual_rate: self.actual_rate.clone(),
+            actual_rate: value.actual_rate.clone(),
             // 级别
-            level: self.level.clone(),
+            level: value.level.clone(),
             // 层高
-            floor_height: self.floor_height.clone(),
+            floor_height: value.floor_height.clone(),
             // 进深
-            progress_depth: self.progress_depth.clone(),
+            progress_depth: value.progress_depth.clone(),
             // 门宽
-            door_width: self.door_width.clone(),
+            door_width: value.door_width.clone(),
 
             // 使用面积
-            use_area: self.use_area.clone(),
+            use_area: value.use_area.clone(),
             // 售价
-            sale_price: self.sale_price.clone(),
+            sale_price: value.sale_price.clone(),
             // 租价
-            rent_price: self.rent_price.clone(),
+            rent_price: value.rent_price.clone(),
             // 出租低价
-            rent_low_price: self.rent_low_price.clone(),
+            rent_low_price: value.rent_low_price.clone(),
             // 首付
-            down_payment: self.down_payment.clone(),
+            down_payment: value.down_payment.clone(),
             // 出售低价
-            sale_low_price: self.sale_low_price.clone(),
+            sale_low_price: value.sale_low_price.clone(),
             // 房屋类型
-            house_type: self.house_type.clone(),
+            house_type: value.house_type.clone(),
             // 朝向
-            house_orientation: self.house_orientation.clone(),
+            house_orientation: value.house_orientation.clone(),
 
             // 看房方式
-            view_method: self.view_method.clone(),
+            view_method: value.view_method.clone(),
             // 付款方式
-            payment_method: self.payment_method.clone(),
+            payment_method: value.payment_method.clone(),
             // 房源税费
-            property_tax: self.property_tax.clone(),
+            property_tax: value.property_tax.clone(),
             // 建筑结构
-            building_structure: self.building_structure.clone(),
+            building_structure: value.building_structure.clone(),
             // 建筑年代
-            building_year: self.building_year.clone(),
+            building_year: value.building_year.clone(),
             // 产权性质
-            property_rights: self.property_rights.clone(),
+            property_rights: value.property_rights.clone(),
             // 产权年限
-            property_year_limit: self.property_year_limit.clone(),
+            property_year_limit: value.property_year_limit.clone(),
             // 产证日期
-            certificate_date: self.certificate_date.clone(),
+            certificate_date: value.certificate_date.clone(),
             // 交房日期
-            handover_date: self.handover_date.clone(),
+            handover_date: value.handover_date.clone(),
             // 学位
-            degree: self.degree.clone(),
+            degree: value.degree.clone(),
             // 户口
-            household: self.household.clone(),
+            household: value.household.clone(),
             // 来源
-            source: self.source.clone(),
+            source: value.source.clone(),
             // 委托编号
-            delegate_number: self.delegate_number.clone(),
+            delegate_number: value.delegate_number.clone(),
             // 唯一住房
-            unique_housing: self.unique_housing.clone(),
+            unique_housing: value.unique_housing.clone(),
             // 全款
-            full_payment: self.full_payment.clone(),
+            full_payment: value.full_payment.clone(),
             // 抵押
-            mortgage: self.mortgage.clone(),
+            mortgage: value.mortgage.clone(),
             // 急切
-            urgent: self.urgent.clone(),
+            urgent: value.urgent.clone(),
             // 配套
-            support: self.support.clone(),
+            support: value.support.clone(),
             // 现状
-            present_state: self.present_state.clone(),
+            present_state: value.present_state.clone(),
             // 外网同步
-            external_sync: self.external_sync.clone(),
+            external_sync: value.external_sync.clone(),
             // 备注
-            remark: self.remark.clone(),
+            remark: value.remark.clone(),
         }
     }
 }

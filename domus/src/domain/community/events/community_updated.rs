@@ -1,11 +1,20 @@
+#[derive(Debug, Clone)]
 pub struct CommunityUpdatedEvent {
-    pub id: i32,
+    pub community_id: String,
+    // 小区名称
     pub name: Option<String>,
+    // 小区地址
     pub address: Option<String>,
+    // 城市
     pub city: Option<String>,
-    pub state: Option<String>,
-    pub postal_code: Option<String>,
+    // 小区年限
     pub year_built: Option<i16>,
+    // 小区类型
     pub community_type: Option<String>,
+    // 小区描述
     pub description: Option<String>,
+    // 小区图片
+    pub image: Option<String>,
+    // 位置
+    pub location: Option<String>,
 }

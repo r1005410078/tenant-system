@@ -1,5 +1,6 @@
+#[derive(Debug, Clone)]
 pub struct CommunityCreatedEvent {
-    pub id: i32,
+    pub community_id: String,
     // 小区名称
     pub name: String,
     // 小区地址

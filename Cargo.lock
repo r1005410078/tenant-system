@@ -977,7 +977,12 @@ dependencies = [
 name = "domus"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "async-trait",
+ "chrono",
+ "event_bus",
  "sea-orm",
+ "uuid",
 ]
 
 [[package]]

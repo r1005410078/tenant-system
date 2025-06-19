@@ -1,3 +1,4 @@
+#[derive(Debug, Clone)]
 pub struct Community {
     pub id: Option<i32>,
     // 小区名称
@@ -18,17 +19,7 @@ pub struct Community {
     pub location: Option<String>,
 }
 
-pub struct HouseOwner {
-    // 业主姓名
-    pub name: String,
-    // 业主电话
-    pub phone: String,
-    // 业主身份证照片
-    pub id_card_images: Option<Vec<String>>,
-    // 业主情况
-    pub description: Option<String>,
-}
-
+#[derive(Debug, Clone)]
 pub struct Stairs {
     // 梯
     stairs: String,
@@ -36,6 +27,7 @@ pub struct Stairs {
     rooms: String,
 }
 
+#[derive(Debug, Clone)]
 pub struct DoorNumber {
     // 座栋
     pub building_number: i32,
@@ -45,6 +37,16 @@ pub struct DoorNumber {
     pub door_number: i32,
 }
 
+impl DoorNumber {
+    pub fn to_string(&self) -> String {
+        format!(
+            "{}-{}-{}",
+            self.building_number, self.unit_number, self.door_number
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct FloorRange {
     // 最小楼层
     pub door_number_from: i32,
@@ -52,6 +54,13 @@ pub struct FloorRange {
     pub door_number_to: i32,
 }
 
+impl FloorRange {
+    pub fn to_string(&self) -> String {
+        format!("{}-{}", self.door_number_from, self.door_number_to)
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct ApartmentType {
     // 室
     pub room: i32,

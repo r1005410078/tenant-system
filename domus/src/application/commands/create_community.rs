@@ -11,7 +11,7 @@ pub struct CreateCommunityCommand {
     // 城市
     pub city: String,
     // 小区年限
-    pub year_built: i16,
+    pub year_built: u16,
     // 小区类型
     pub community_type: String,
     // 小区描述

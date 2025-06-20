@@ -3,4 +3,5 @@
 pub mod prelude;
 
 pub mod community_aggregate;
+pub mod house_aggregate;
 pub mod owner;

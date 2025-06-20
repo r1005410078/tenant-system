@@ -1,10 +1,10 @@
 -- Add up migration script here
 
-create table owner (
-   `owner_id` CHAR(36) PRIMARY KEY NOT NULL COMMENT '业主ID',
-   `name` varchar(255) NOT NULL comment '业主姓名',
-   `phone` varchar(20) NOT NULL comment '业主手机号码',
-   `id_card` varchar(20) comment '业主身份证号',
+create table house_aggregate (
+   `house_id` CHAR(36) PRIMARY KEY NOT NULL COMMENT '房屋ID',
+   `address` varchar(255) not null comment '房屋地址',
+   `publish_at` TIMESTAMP comment '上架时间',
+   `unpublish_at` TIMESTAMP comment '下架时间',
    `deleted_at` TIMESTAMP comment '删除时间',
    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'

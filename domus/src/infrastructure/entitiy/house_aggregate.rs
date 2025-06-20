@@ -3,13 +3,13 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "owner")]
+#[sea_orm(table_name = "house_aggregate")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub owner_id: String,
-    pub name: String,
-    pub phone: String,
-    pub id_card: Option<String>,
+    pub house_id: String,
+    pub address: String,
+    pub publish_at: Option<DateTimeUtc>,
+    pub unpublish_at: Option<DateTimeUtc>,
     pub deleted_at: Option<DateTimeUtc>,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,

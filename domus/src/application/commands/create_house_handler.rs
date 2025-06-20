@@ -9,12 +9,12 @@ use crate::{
 };
 use event_bus::AsyncEventBus;
 
-pub struct UpdateCommunityHandler {
+pub struct CreateHouseCommandHandler {
     pub house_repository: Arc<dyn HouseRepositoryAggregate>,
     pub event_bus: Arc<AsyncEventBus>,
 }
 
-impl UpdateCommunityHandler {
+impl CreateHouseCommandHandler {
     pub fn new(
         house_repository: Arc<dyn HouseRepositoryAggregate>,
         event_bus: Arc<AsyncEventBus>,
@@ -27,6 +27,14 @@ impl UpdateCommunityHandler {
 
     pub async fn handle(&self, command: CreateHouseCommand) -> anyhow::Result<()> {
         let (aggregate, event) = HouseAggregate::create(&command.to_data());
+
+        if self
+            .house_repository
+            .exists_address(&aggregate.address, None)
+            .await?
+        {
+            return Err(anyhow::anyhow!("地址已存在"));
+        }
 
         self.house_repository.create(aggregate).await?;
         self.event_bus.publish(event).await;

@@ -4,6 +4,7 @@ use crate::domain::community::value_objects::community_updated_data::CommunityUp
 
 #[derive(Debug, Deserialize)]
 pub struct UpdateCommunityCommand {
+    // 小区id
     pub community_id: String,
     // 小区名称
     pub name: Option<String>,
@@ -12,7 +13,7 @@ pub struct UpdateCommunityCommand {
     // 城市
     pub city: Option<String>,
     // 小区年限
-    pub year_built: Option<i16>,
+    pub year_built: Option<u16>,
     // 小区类型
     pub community_type: Option<String>,
     // 小区描述

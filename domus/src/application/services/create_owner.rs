@@ -1,11 +1,13 @@
+use std::sync::Arc;
+
 use crate::application::commands::create_owner::{CreateOwnerCommand, CreateOwnerCommandHandler};
 
 pub struct CreateOwnerService {
-    create_owner_command_handler: CreateOwnerCommandHandler,
+    create_owner_command_handler: Arc<CreateOwnerCommandHandler>,
 }
 
 impl CreateOwnerService {
-    pub fn new(create_owner_command_handler: CreateOwnerCommandHandler) -> Self {
+    pub fn new(create_owner_command_handler: Arc<CreateOwnerCommandHandler>) -> Self {
         Self {
             create_owner_command_handler,
         }

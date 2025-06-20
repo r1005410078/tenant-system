@@ -1,6 +1,8 @@
-#[derive(Debug, Clone)]
+use serde::Deserialize;
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct Community {
-    pub id: Option<i32>,
+    pub id: Option<String>,
     // 小区名称
     pub name: Option<String>,
     // 小区地址
@@ -19,7 +21,50 @@ pub struct Community {
     pub location: Option<String>,
 }
 
-#[derive(Debug, Clone)]
+impl Community {
+    pub fn get_id(&self) -> anyhow::Result<String> {
+        self.id
+            .clone()
+            .ok_or_else(|| anyhow::anyhow!("小区ID不能为空"))
+    }
+
+    pub fn get_name(&self) -> anyhow::Result<String> {
+        self.name
+            .clone()
+            .ok_or_else(|| anyhow::anyhow!("小区名称不能为空"))
+    }
+
+    pub fn get_address(&self) -> anyhow::Result<String> {
+        self.address
+            .clone()
+            .ok_or_else(|| anyhow::anyhow!("小区地址不能为空"))
+    }
+
+    pub fn get_city(&self) -> anyhow::Result<String> {
+        self.city
+            .clone()
+            .ok_or_else(|| anyhow::anyhow!("城市不能为空"))
+    }
+
+    pub fn get_location(&self) -> anyhow::Result<String> {
+        self.location
+            .clone()
+            .ok_or_else(|| anyhow::anyhow!("位置不能为空"))
+    }
+
+    pub fn get_year_built(&self) -> anyhow::Result<u16> {
+        self.year_built
+            .ok_or_else(|| anyhow::anyhow!("小区年限不能为空"))
+    }
+
+    pub fn get_community_type(&self) -> anyhow::Result<String> {
+        self.community_type
+            .clone()
+            .ok_or_else(|| anyhow::anyhow!("小区类型不能为空"))
+    }
+}
+
+#[derive(Debug, Clone, Deserialize)]
 pub struct Stairs {
     // 梯
     stairs: String,
@@ -27,7 +72,7 @@ pub struct Stairs {
     rooms: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct DoorNumber {
     // 座栋
     pub building_number: i32,
@@ -46,7 +91,7 @@ impl DoorNumber {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct FloorRange {
     // 最小楼层
     pub door_number_from: i32,
@@ -60,7 +105,7 @@ impl FloorRange {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct ApartmentType {
     // 室
     pub room: i32,
@@ -71,7 +116,7 @@ pub struct ApartmentType {
     // 厨
     pub kitchen: i32,
     // 阳台
-    pub terrace: i32,
+    pub terrace: Option<i32>,
     // 阁楼
-    pub balcony: i32,
+    pub balcony: Option<i32>,
 }

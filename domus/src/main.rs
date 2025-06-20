@@ -11,16 +11,19 @@ use crate::{
     application::{
         commands::{
             create_community_handler::CreateCommunityCommandHandler,
+            create_house_handler::CreateHouseCommandHandler,
             create_owner::CreateOwnerCommandHandler,
             delete_community::DeleteCommunityCommandHandler,
             delete_owner::DeleteOwnerCommandHandler,
             update_community_handler::UpdateCommunityCommandHandler,
+            update_house_handler::UpdateHouseCommandHandler,
             update_owner::UpdateOwnerCommandHandler,
         },
         services::{
-            create_community::CreateCommunityService, create_owner::CreateOwnerService,
-            delete_community::DeleteCommunityService, delete_owner::DeleteOwnerService,
-            update_community::UpdateCommunityService, update_owner::UpdateOwnerService,
+            create_community::CreateCommunityService, create_house::CreateHouseService,
+            create_owner::CreateOwnerService, delete_community::DeleteCommunityService,
+            delete_owner::DeleteOwnerService, update_community::UpdateCommunityService,
+            update_house::UpdateHouseService, update_owner::UpdateOwnerService,
         },
     },
     infrastructure::{
@@ -28,10 +31,12 @@ use crate::{
             mysql_community_aggregate::MySqlCommunityAggregateRepository,
             mysql_owner_aggregate::MySqlOwnerAggregateRepository,
         },
+        house::mysql_house_repository_aggregate::{self, MysqlHouseRepositoryAggregate},
         mysql_pool::create_mysql_pool,
     },
     interfaces::controllers::{
         community::{create_community, delete_community, update_community},
+        house::{create_house, delete_house, update_house},
         owner::{create_owner, delete_owner, update_owner},
     },
 };
@@ -51,13 +56,23 @@ async fn main() -> std::io::Result<()> {
     let community_repo = Arc::new(MySqlCommunityAggregateRepository::new(pool.clone()));
 
     // 创建小区服务
+    let create_community_command_handler = Arc::new(CreateCommunityCommandHandler::new(
+        community_repo.clone(),
+        event_bus.clone(),
+    ));
+
     let create_community_service = web::Data::new(CreateCommunityService::new(
-        CreateCommunityCommandHandler::new(community_repo.clone(), event_bus.clone()),
+        create_community_command_handler.clone(),
     ));
 
     // 更新小区服务
+    let update_community_command_handler = Arc::new(UpdateCommunityCommandHandler::new(
+        community_repo.clone(),
+        event_bus.clone(),
+    ));
+
     let update_community_service = web::Data::new(UpdateCommunityService::new(
-        UpdateCommunityCommandHandler::new(community_repo.clone(), event_bus.clone()),
+        update_community_command_handler.clone(),
     ));
 
     // 删除小区服务
@@ -68,19 +83,45 @@ async fn main() -> std::io::Result<()> {
     // 创建 拥有者
     let owner_repo = Arc::new(MySqlOwnerAggregateRepository::new(pool.clone()));
 
+    let create_owner_command_handler = Arc::new(CreateOwnerCommandHandler::new(
+        owner_repo.clone(),
+        event_bus.clone(),
+    ));
+
     // 创建拥有者服务
     let create_owner_service = web::Data::new(CreateOwnerService::new(
-        CreateOwnerCommandHandler::new(owner_repo.clone(), event_bus.clone()),
+        create_owner_command_handler.clone(),
+    ));
+
+    let update_owner_command_handler = Arc::new(UpdateOwnerCommandHandler::new(
+        owner_repo.clone(),
+        event_bus.clone(),
     ));
 
     // 更新拥有者服务
     let update_owner_service = web::Data::new(UpdateOwnerService::new(
-        UpdateOwnerCommandHandler::new(owner_repo.clone(), event_bus.clone()),
+        update_owner_command_handler.clone(),
     ));
 
     // 删除拥有者服务
     let delete_owner_service = web::Data::new(DeleteOwnerService::new(
         DeleteOwnerCommandHandler::new(owner_repo.clone(), event_bus.clone()),
+    ));
+
+    // 创建房源
+    let mysql_house_repository_aggregate =
+        Arc::new(MysqlHouseRepositoryAggregate::new(pool.clone()));
+
+    let create_house_service = web::Data::new(CreateHouseService::new(
+        CreateHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone()),
+        create_community_command_handler.clone(),
+        create_owner_command_handler.clone(),
+    ));
+
+    let update_house_service = web::Data::new(UpdateHouseService::new(
+        UpdateHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone()),
+        update_community_command_handler.clone(),
+        update_owner_command_handler.clone(),
     ));
 
     HttpServer::new(move || {
@@ -91,6 +132,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(create_owner_service.clone())
             .app_data(update_owner_service.clone())
             .app_data(delete_owner_service.clone())
+            .app_data(create_house_service.clone())
+            .app_data(update_house_service.clone())
             .service(
                 web::scope("/api/community")
                     .service(create_community)
@@ -102,6 +145,12 @@ async fn main() -> std::io::Result<()> {
                     .service(create_owner)
                     .service(update_owner)
                     .service(delete_owner),
+            )
+            .service(
+                web::scope("/api/house")
+                    .service(create_house)
+                    .service(update_house)
+                    .service(delete_house),
             )
     })
     .bind(server_url)?

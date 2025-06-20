@@ -1,3 +1,5 @@
+use serde::Deserialize;
+
 use crate::domain::{
     house::value_objects::{
         house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
@@ -6,6 +8,7 @@ use crate::domain::{
     owner::value_objects::owner::HouseOwner,
 };
 
+#[derive(Debug, Clone, Deserialize)]
 pub struct CreateHouseCommand {
     // 房源标题
     pub title: Option<String>,

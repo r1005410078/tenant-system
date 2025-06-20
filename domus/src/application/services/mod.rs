@@ -1,6 +1,9 @@
 pub mod create_community;
+pub mod create_house;
 pub mod create_owner;
 pub mod delete_community;
+pub mod delete_house;
 pub mod delete_owner;
 pub mod update_community;
+pub mod update_house;
 pub mod update_owner;

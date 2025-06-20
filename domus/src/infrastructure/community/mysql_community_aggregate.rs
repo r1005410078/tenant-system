@@ -69,13 +69,17 @@ impl CommunityRepositoryAggregate for MySqlCommunityAggregateRepository {
     }
 
     // 判断小区是否重复
-    async fn exists(&self, address: &str) -> anyhow::Result<bool> {
+    async fn exists_address(&self, address: &str, self_id: Option<String>) -> anyhow::Result<bool> {
+        let mut condition = Condition::all()
+            .add(entitiy::community_aggregate::Column::Address.eq(address))
+            .add(entitiy::community_aggregate::Column::DeletedAt.is_null());
+
+        if let Some(id) = self_id {
+            condition = condition.add(entitiy::community_aggregate::Column::Id.ne(id));
+        }
+
         let count = entitiy::community_aggregate::Entity::find()
-            .filter(
-                Condition::all()
-                    .add(entitiy::community_aggregate::Column::Address.eq(address))
-                    .add(entitiy::community_aggregate::Column::DeletedAt.is_null()),
-            )
+            .filter(condition)
             .count(self.pool.as_ref())
             .await?;
 

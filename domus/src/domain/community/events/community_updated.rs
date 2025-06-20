@@ -8,7 +8,7 @@ pub struct CommunityUpdatedEvent {
     // 城市
     pub city: Option<String>,
     // 小区年限
-    pub year_built: Option<i16>,
+    pub year_built: Option<u16>,
     // 小区类型
     pub community_type: Option<String>,
     // 小区描述

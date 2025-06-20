@@ -1,10 +1,12 @@
+use std::sync::Arc;
+
 use crate::application::commands::update_owner::{UpdateOwenerCommand, UpdateOwnerCommandHandler};
 
 pub struct UpdateOwnerService {
-    update_owner_command_handler: UpdateOwnerCommandHandler,
+    update_owner_command_handler: Arc<UpdateOwnerCommandHandler>,
 }
 impl UpdateOwnerService {
-    pub fn new(update_owner_command_handler: UpdateOwnerCommandHandler) -> Self {
+    pub fn new(update_owner_command_handler: Arc<UpdateOwnerCommandHandler>) -> Self {
         Self {
             update_owner_command_handler,
         }

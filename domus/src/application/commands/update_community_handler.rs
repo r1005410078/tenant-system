@@ -25,8 +25,12 @@ impl UpdateCommunityCommandHandler {
 
     pub async fn handle(&self, command: UpdateCommunityCommand) -> anyhow::Result<()> {
         if let Some(address) = command.address.clone() {
-            if self.community_repository.exists(&address).await? {
-                return Err(anyhow::anyhow!("Community already exists"));
+            if self
+                .community_repository
+                .exists_address(&address, Some(command.community_id.clone()))
+                .await?
+            {
+                return Err(anyhow::anyhow!("小区地址已存在"));
             }
         }
 

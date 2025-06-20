@@ -10,12 +10,10 @@ use crate::{
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct CreateOwnerCommand {
-    // 业主ID
-    pub id: String,
     // 业主姓名
     pub name: String,
     // 业主电话
-    pub phone: Option<String>,
+    pub phone: String,
     // 业主身份证号
     pub id_card: Option<String>,
     // 业主身份证照片
@@ -27,9 +25,9 @@ pub struct CreateOwnerCommand {
 impl CreateOwnerCommand {
     fn to_data(&self) -> HouseOwner {
         HouseOwner {
-            id: Some(self.id.clone()),
+            id: None,
             name: Some(self.name.clone()),
-            phone: self.phone.clone(),
+            phone: Some(self.phone.clone()),
             id_card: self.id_card.clone(),
             id_card_images: self.id_card_images.clone(),
             description: self.description.clone(),
@@ -54,6 +52,22 @@ impl CreateOwnerCommandHandler {
     }
 
     pub async fn handle(&self, command: CreateOwnerCommand) -> anyhow::Result<()> {
+        // 身份证是否存在
+        if let Some(id_card) = &command.id_card {
+            if self.owner_repository.exists_id_card(id_card, None).await? {
+                return Err(anyhow::anyhow!("身份证号已存在"));
+            }
+        }
+
+        // 手机号是否存在
+        if self
+            .owner_repository
+            .exists_phone(&command.phone, None)
+            .await?
+        {
+            return Err(anyhow::anyhow!("手机号已存在"));
+        }
+
         let (aggregate, event) = OwnerAggregate::create(&command.to_data())?;
 
         self.owner_repository.create(aggregate).await?;

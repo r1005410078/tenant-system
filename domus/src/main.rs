@@ -30,7 +30,10 @@ use crate::{
         },
         mysql_pool::create_mysql_pool,
     },
-    interfaces::controllers::community::{create_community, delete_community, update_community},
+    interfaces::controllers::{
+        community::{create_community, delete_community, update_community},
+        owner::{create_owner, delete_owner, update_owner},
+    },
 };
 
 #[actix_web::main]
@@ -93,6 +96,12 @@ async fn main() -> std::io::Result<()> {
                     .service(create_community)
                     .service(update_community)
                     .service(delete_community),
+            )
+            .service(
+                web::scope("/api/owner")
+                    .service(create_owner)
+                    .service(update_owner)
+                    .service(delete_owner),
             )
     })
     .bind(server_url)?

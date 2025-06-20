@@ -24,6 +24,12 @@ impl UpdateCommunityCommandHandler {
     }
 
     pub async fn handle(&self, command: UpdateCommunityCommand) -> anyhow::Result<()> {
+        if let Some(address) = command.address.clone() {
+            if self.community_repository.exists(&address).await? {
+                return Err(anyhow::anyhow!("Community already exists"));
+            }
+        }
+
         let mut aggreagate = self
             .community_repository
             .find_by_id(&command.community_id)

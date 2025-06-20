@@ -56,6 +56,28 @@ impl UpdateOwnerCommandHandler {
     pub async fn handle(&self, command: UpdateOwenerCommand) -> anyhow::Result<()> {
         let mut aggregate = self.owner_repository.find_by_id(&command.id).await?;
 
+        // 身份证是否存在
+        if let Some(id_card) = &command.id_card {
+            if self
+                .owner_repository
+                .exists_id_card(id_card, Some(aggregate.owner_id.clone()))
+                .await?
+            {
+                return Err(anyhow::anyhow!("身份证号已存在"));
+            }
+        }
+
+        // 手机号是否存在
+        if let Some(phone) = &command.phone {
+            if self
+                .owner_repository
+                .exists_phone(phone, Some(aggregate.owner_id.clone()))
+                .await?
+            {
+                return Err(anyhow::anyhow!("手机号已存在"));
+            }
+        }
+
         let event = aggregate.update(&command.to_data())?;
 
         self.owner_repository.save(&aggregate).await?;

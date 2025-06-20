@@ -1,0 +1,3 @@
+
+POST http://localhost:3001/api/owner/delete/0e4ec30d-a790-4988-a290-86578b11ffea
+Content-Type: application/json

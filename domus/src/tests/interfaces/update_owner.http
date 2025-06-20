@@ -1,0 +1,11 @@
+
+POST http://localhost:3001/api/owner/update
+Content-Type: application/json
+
+{
+  "id": "0e4ec30d-a790-4988-a290-86578b11ffea",
+  "name": "1111",
+  "email": "john.doe@example.com1111",
+  "id_card": "22",
+  "phone": "123"
+}

@@ -10,14 +10,16 @@ pub struct OwnerAggregate {
     pub owner_id: String,
     pub name: String,
     pub id_card: Option<String>,
+    pub phone: String,
     pub deleted_at: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 impl OwnerAggregate {
-    pub fn new(owner_id: String, name: String, id_card: Option<String>) -> Self {
+    pub fn new(owner_id: String, name: String, phone: String, id_card: Option<String>) -> Self {
         Self {
             owner_id,
             name,
+            phone,
             id_card,
             deleted_at: None,
         }
@@ -29,12 +31,23 @@ impl OwnerAggregate {
             .name
             .clone()
             .ok_or(anyhow::anyhow!("Name is required"))?;
-        let owner = OwnerAggregate::new(owner_id.clone(), name.clone(), data.id_card.clone());
+
+        let phone = data
+            .phone
+            .clone()
+            .ok_or(anyhow::anyhow!("Phone is required"))?;
+
+        let owner = OwnerAggregate::new(
+            owner_id.clone(),
+            name.clone(),
+            phone.clone(),
+            data.id_card.clone(),
+        );
 
         let event = OwnerCreatedEvent {
             id: owner_id.clone(),
             name: name.clone(),
-            phone: data.phone.clone(),
+            phone: phone.clone(),
             id_card_images: data.id_card_images.clone(),
             description: data.description.clone(),
         };

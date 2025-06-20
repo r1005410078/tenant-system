@@ -8,6 +8,7 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub owner_id: String,
     pub name: String,
+    pub phone: String,           // 电话号码
     pub id_card: Option<String>, // 身份证号
     pub deleted_at: Option<DateTimeUtc>,
     pub created_at: DateTimeUtc,

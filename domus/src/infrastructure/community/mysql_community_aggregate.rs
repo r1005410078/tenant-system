@@ -1,8 +1,8 @@
-use std::sync::Arc;
-
+use sea_orm::PaginatorTrait;
 use sea_orm::{
     ActiveModelTrait, ActiveValue::Set, ColumnTrait, Condition, DbConn, EntityTrait, QueryFilter,
 };
+use std::sync::Arc;
 
 use crate::{
     application::repositories::community_repository_aggregate::CommunityRepositoryAggregate,
@@ -66,5 +66,19 @@ impl CommunityRepositoryAggregate for MySqlCommunityAggregateRepository {
             address: model.address,
             deleted_at: model.deleted_at,
         })
+    }
+
+    // 判断小区是否重复
+    async fn exists(&self, address: &str) -> anyhow::Result<bool> {
+        let count = entitiy::community_aggregate::Entity::find()
+            .filter(
+                Condition::all()
+                    .add(entitiy::community_aggregate::Column::Address.eq(address))
+                    .add(entitiy::community_aggregate::Column::DeletedAt.is_null()),
+            )
+            .count(self.pool.as_ref())
+            .await?;
+
+        Ok(count > 0)
     }
 }

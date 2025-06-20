@@ -1,0 +1,2 @@
+POST http://localhost:3001/api/community/delete/894dd551-f1c2-4c65-a440-ae74c2728397
+Content-Type: application/json

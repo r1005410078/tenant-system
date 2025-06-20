@@ -30,8 +30,12 @@ impl CreateCommunityCommandHandler {
         let (aggregate, event) = CommunityAggregate::create(&command.to_data());
 
         // 检查小区是否已存在
-        if self.community_repository.exists(&aggregate.address).await? {
-            return Err(anyhow::anyhow!("Community already exists"));
+        if self
+            .community_repository
+            .exists_address(&aggregate.address, None)
+            .await?
+        {
+            return Err(anyhow::anyhow!("Community already exists at this address"));
         }
 
         self.community_repository.create(aggregate).await?;

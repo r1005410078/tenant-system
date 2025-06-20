@@ -14,7 +14,7 @@ use crate::{
             create_house_handler::CreateHouseCommandHandler,
             create_owner::CreateOwnerCommandHandler,
             delete_community::DeleteCommunityCommandHandler,
-            delete_owner::DeleteOwnerCommandHandler,
+            delete_house::DeleteHouseCommandHandler, delete_owner::DeleteOwnerCommandHandler,
             update_community_handler::UpdateCommunityCommandHandler,
             update_house_handler::UpdateHouseCommandHandler,
             update_owner::UpdateOwnerCommandHandler,
@@ -22,8 +22,10 @@ use crate::{
         services::{
             create_community::CreateCommunityService, create_house::CreateHouseService,
             create_owner::CreateOwnerService, delete_community::DeleteCommunityService,
-            delete_owner::DeleteOwnerService, update_community::UpdateCommunityService,
-            update_house::UpdateHouseService, update_owner::UpdateOwnerService,
+            delete_house::DeleteHouseService, delete_owner::DeleteOwnerService,
+            save_community::SaveCommunityService, save_owner::SaveOwnerService,
+            update_community::UpdateCommunityService, update_house::UpdateHouseService,
+            update_owner::UpdateOwnerService,
         },
     },
     infrastructure::{
@@ -108,20 +110,35 @@ async fn main() -> std::io::Result<()> {
         DeleteOwnerCommandHandler::new(owner_repo.clone(), event_bus.clone()),
     ));
 
+    let save_community_service = Arc::new(SaveCommunityService::new(
+        create_community_command_handler.clone(),
+        update_community_command_handler.clone(),
+    ));
+
+    let save_owner_service = Arc::new(SaveOwnerService::new(
+        create_owner_command_handler.clone(),
+        update_owner_command_handler.clone(),
+    ));
+
     // 创建房源
     let mysql_house_repository_aggregate =
         Arc::new(MysqlHouseRepositoryAggregate::new(pool.clone()));
 
     let create_house_service = web::Data::new(CreateHouseService::new(
         CreateHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone()),
-        create_community_command_handler.clone(),
-        create_owner_command_handler.clone(),
+        save_community_service.clone(),
+        save_owner_service.clone(),
     ));
 
     let update_house_service = web::Data::new(UpdateHouseService::new(
         UpdateHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone()),
-        update_community_command_handler.clone(),
-        update_owner_command_handler.clone(),
+        save_community_service.clone(),
+        save_owner_service.clone(),
+    ));
+
+    // 删除房源
+    let delete_house_service = web::Data::new(DeleteHouseService::new(
+        DeleteHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone()),
     ));
 
     HttpServer::new(move || {
@@ -134,6 +151,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(delete_owner_service.clone())
             .app_data(create_house_service.clone())
             .app_data(update_house_service.clone())
+            .app_data(delete_house_service.clone())
             .service(
                 web::scope("/api/community")
                     .service(create_community)

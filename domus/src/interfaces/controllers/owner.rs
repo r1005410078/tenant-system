@@ -23,7 +23,7 @@ async fn create_owner(
 
 #[post("/update")]
 async fn update_owner(
-    body: web::Json<crate::application::commands::update_owner::UpdateOwenerCommand>,
+    body: web::Json<crate::application::commands::update_owner::UpdateOwnerCommand>,
     service: web::Data<crate::application::services::update_owner::UpdateOwnerService>,
 ) -> HttpResponse {
     let res = match service.execute(body.into_inner()).await {

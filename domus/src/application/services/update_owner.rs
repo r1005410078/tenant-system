@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::application::commands::update_owner::{UpdateOwenerCommand, UpdateOwnerCommandHandler};
+use crate::application::commands::update_owner::{UpdateOwnerCommand, UpdateOwnerCommandHandler};
 
 pub struct UpdateOwnerService {
     update_owner_command_handler: Arc<UpdateOwnerCommandHandler>,
@@ -12,7 +12,7 @@ impl UpdateOwnerService {
         }
     }
 
-    pub async fn execute(&self, command: UpdateOwenerCommand) -> anyhow::Result<()> {
+    pub async fn execute(&self, command: UpdateOwnerCommand) -> anyhow::Result<()> {
         self.update_owner_command_handler.handle(command).await
     }
 }

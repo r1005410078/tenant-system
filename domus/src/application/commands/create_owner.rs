@@ -23,7 +23,7 @@ pub struct CreateOwnerCommand {
 }
 
 impl CreateOwnerCommand {
-    fn to_data(&self) -> HouseOwner {
+    pub fn to_data(&self) -> HouseOwner {
         HouseOwner {
             id: None,
             name: Some(self.name.clone()),
@@ -32,6 +32,21 @@ impl CreateOwnerCommand {
             id_card_images: self.id_card_images.clone(),
             description: self.description.clone(),
         }
+    }
+
+    pub fn from(owner: &HouseOwner) -> anyhow::Result<CreateOwnerCommand> {
+        Ok(CreateOwnerCommand {
+            // 业主名称
+            name: owner.get_name()?,
+            // 业主身份证号
+            id_card: owner.id_card.clone(),
+            // 业主电话
+            phone: owner.get_phone()?,
+            // 业主身份证照片
+            id_card_images: owner.id_card_images.clone(),
+            // 业主描述
+            description: owner.description.clone(),
+        })
     }
 }
 

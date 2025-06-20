@@ -1,6 +1,9 @@
 use serde::{Deserialize, Serialize};
 
-use crate::domain::community::value_objects::community_updated_data::CommunityUpdateData;
+use crate::domain::{
+    community::value_objects::community_updated_data::CommunityUpdateData,
+    house::value_objects::house::Community,
+};
 
 #[derive(Debug, Deserialize)]
 pub struct UpdateCommunityCommand {
@@ -36,6 +39,29 @@ impl UpdateCommunityCommand {
             description: self.description.clone(),
             image: self.image.clone(),
             location: self.location.clone(),
+        }
+    }
+
+    pub fn from(community: &Community) -> Self {
+        UpdateCommunityCommand {
+            // 小区ID
+            community_id: community.id.clone().unwrap(),
+            // 小区名称
+            name: community.name.clone(),
+            // 小区地址
+            address: community.address.clone(),
+            // 城市
+            city: community.city.clone(),
+            // 小区年限
+            year_built: community.year_built.clone(),
+            // 小区类型
+            community_type: community.community_type.clone(),
+            // 小区描述
+            description: community.description.clone(),
+            // 小区图片
+            image: community.image.clone(),
+            // 位置
+            location: community.location.clone(),
         }
     }
 }

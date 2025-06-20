@@ -66,7 +66,7 @@ impl HouseRepositoryAggregate for MysqlHouseRepositoryAggregate {
                 unpublish_at: model.unpublish_at,
                 deleted_at: model.deleted_at,
             })
-            .ok_or_else(|| anyhow::anyhow!("HouseAggregate not found"))
+            .ok_or_else(|| anyhow::anyhow!("房源不存在"))
     }
 
     // 地址是否存在

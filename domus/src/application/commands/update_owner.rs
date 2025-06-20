@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone, Deserialize)]
-pub struct UpdateOwenerCommand {
+pub struct UpdateOwnerCommand {
     // 业主ID
     pub id: String,
     // 业主姓名
@@ -24,7 +24,7 @@ pub struct UpdateOwenerCommand {
     pub description: Option<String>,
 }
 
-impl UpdateOwenerCommand {
+impl UpdateOwnerCommand {
     pub fn to_data(&self) -> HouseOwner {
         HouseOwner {
             id: Some(self.id.clone()),
@@ -33,6 +33,23 @@ impl UpdateOwenerCommand {
             id_card: self.id_card.clone(),
             id_card_images: self.id_card_images.clone(),
             description: self.description.clone(),
+        }
+    }
+
+    pub fn from(owner: &HouseOwner) -> UpdateOwnerCommand {
+        UpdateOwnerCommand {
+            // 业主ID
+            id: owner.id.clone().unwrap(),
+            // 业主名称
+            name: owner.name.clone(),
+            // 业主身份证号
+            id_card: owner.id_card.clone(),
+            // 业主电话
+            phone: owner.phone.clone(),
+            // 业主身份证照片
+            id_card_images: owner.id_card_images.clone(),
+            // 业主描述
+            description: owner.description.clone(),
         }
     }
 }
@@ -53,7 +70,7 @@ impl UpdateOwnerCommandHandler {
         }
     }
 
-    pub async fn handle(&self, command: UpdateOwenerCommand) -> anyhow::Result<()> {
+    pub async fn handle(&self, command: UpdateOwnerCommand) -> anyhow::Result<()> {
         let mut aggregate = self.owner_repository.find_by_id(&command.id).await?;
 
         // 身份证是否存在

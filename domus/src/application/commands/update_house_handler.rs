@@ -25,6 +25,7 @@ impl UpdateHouseCommandHandler {
 
     pub async fn handle(&self, command: UpdateHouseCommand) -> anyhow::Result<()> {
         let mut aggreagate = self.house_repository.find_by_id(&command.house_id).await?;
+        let event = aggreagate.update(&command.to_data())?;
 
         if self
             .house_repository
@@ -33,8 +34,6 @@ impl UpdateHouseCommandHandler {
         {
             return Err(anyhow::anyhow!("地址已存在"));
         }
-
-        let event = aggreagate.update(&command.to_data())?;
 
         self.house_repository.save(&aggreagate).await?;
         self.event_bus.publish(event).await;

@@ -35,6 +35,7 @@ impl DeleteHouseCommandHandler {
 
         let event = aggreagate.delete();
 
+        self.house_repository.save(&aggreagate).await?;
         self.event_bus.publish(event).await;
 
         Ok(())

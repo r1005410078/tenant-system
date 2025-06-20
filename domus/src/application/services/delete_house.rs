@@ -3,11 +3,11 @@ use std::sync::Arc;
 use crate::application::commands::delete_house::{DeleteHouseCommand, DeleteHouseCommandHandler};
 
 pub struct DeleteHouseService {
-    delete_house_command_handler: Arc<DeleteHouseCommandHandler>,
+    delete_house_command_handler: DeleteHouseCommandHandler,
 }
 
 impl DeleteHouseService {
-    pub fn new(delete_house_command_handler: Arc<DeleteHouseCommandHandler>) -> Self {
+    pub fn new(delete_house_command_handler: DeleteHouseCommandHandler) -> Self {
         Self {
             delete_house_command_handler,
         }

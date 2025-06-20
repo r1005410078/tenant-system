@@ -26,7 +26,7 @@ sea-orm-cli generate entity -o user-system/src/infrastructure/entitiy
 # 生成数据库
 sqlx migrate add community -r --source doumus/migrations
 # 运行迁移
-sqlx migrate run --source doumus/migrations
+sqlx migrate run --source domus/migrations
 # 生成实体
 sea-orm-cli generate entity -o domus/src/infrastructure/entitiy
 ```

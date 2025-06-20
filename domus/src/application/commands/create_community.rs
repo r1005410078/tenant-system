@@ -1,5 +1,8 @@
+use serde::Deserialize;
+
 use crate::domain::community::value_objects::community_created_data::CommunityCreateData;
 
+#[derive(Debug, Deserialize)]
 pub struct CreateCommunityCommand {
     // 小区名称
     pub name: String,

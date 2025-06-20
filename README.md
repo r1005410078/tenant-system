@@ -19,3 +19,14 @@
 ```bash
 sea-orm-cli generate entity -o user-system/src/infrastructure/entitiy
 ```
+
+房源模块
+
+```bash
+# 生成数据库
+sqlx migrate add community -r --source doumus/migrations
+# 运行迁移
+sqlx migrate run --source doumus/migrations
+# 生成实体
+sea-orm-cli generate entity -o domus/src/infrastructure/entitiy
+```

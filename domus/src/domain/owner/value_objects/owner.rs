@@ -6,6 +6,8 @@ pub struct HouseOwner {
     pub name: Option<String>,
     // 业主电话
     pub phone: Option<String>,
+    // 业主身份证号
+    pub id_card: Option<String>,
     // 业主身份证照片
     pub id_card_images: Option<Vec<String>>,
     // 业主情况

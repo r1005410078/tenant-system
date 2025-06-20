@@ -32,14 +32,7 @@ use crate::{
     },
 };
 use actix_web::{web, App, HttpServer};
-use casbin::{CoreApi, Enforcer};
 use event_bus::AsyncEventBus;
-
-#[derive(Debug, Clone)]
-pub struct OrderPlacedEvent {
-    pub order_id: String,
-    pub amount: f32,
-}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

@@ -977,11 +977,23 @@ dependencies = [
 name = "domus"
 version = "0.1.0"
 dependencies = [
+ "actix-web",
  "anyhow",
+ "argon2",
  "async-trait",
+ "casbin",
  "chrono",
+ "dotenvy",
  "event_bus",
+ "futures",
+ "jsonwebtoken",
+ "log 0.1.0",
  "sea-orm",
+ "serde",
+ "serde_json",
+ "time",
+ "tokio",
+ "tracing",
  "uuid",
 ]
 

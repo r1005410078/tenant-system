@@ -7,12 +7,12 @@ use crate::application::{
     repositories::community_repository_aggregate::CommunityRepositoryAggregate,
 };
 
-pub struct UpdateCommunityHandler {
+pub struct UpdateCommunityCommandHandler {
     pub community_repository: Arc<dyn CommunityRepositoryAggregate>,
     pub event_bus: Arc<AsyncEventBus>,
 }
 
-impl UpdateCommunityHandler {
+impl UpdateCommunityCommandHandler {
     pub fn new(
         community_repository: Arc<dyn CommunityRepositoryAggregate>,
         event_bus: Arc<AsyncEventBus>,

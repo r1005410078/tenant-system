@@ -2,13 +2,14 @@
 
 use super::sea_orm_active_enums::Status;
 use sea_orm::entity::prelude::*;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize, Deserialize)]
 #[sea_orm(table_name = "user_login_history")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: u64,
-    pub user_id: Option<u64>,
+    pub user_id: String,
     pub username: String,
     pub status: Status,
     pub ip_address: Option<String>,

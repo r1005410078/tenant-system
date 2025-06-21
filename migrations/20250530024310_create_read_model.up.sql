@@ -13,10 +13,9 @@ CREATE TABLE user_details_read (
 );
 
 -- 用户登录历史查询模型：记录用户的登录 历史，用于审计和查询。
-
 CREATE TABLE `user_login_history` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
-  `user_id` BIGINT UNSIGNED DEFAULT NULL COMMENT '用户 ID，如果为 NULL 表示登录失败找不到用户',
+  `user_id` VARCHAR(36) NOT NULL COMMENT '用户 ID，如果为 NULL 表示登录失败找不到用户',
   `username` VARCHAR(64) NOT NULL COMMENT '尝试登录的用户名',
   `status` ENUM('SUCCESS', 'FAILURE') NOT NULL COMMENT '登录状态',
   `ip_address` VARCHAR(45) DEFAULT NULL COMMENT '登录 IP 地址 (支持 IPv6)',

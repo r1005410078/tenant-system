@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    application::repositories::user::UserAggregateRepository,
+    application::repositories::user_aggreate_repository::UserAggregateRepository,
     domain::user::aggregates::user::UserAggregate,
     infrastructure::entitiy::{self, casbin_rules},
 };

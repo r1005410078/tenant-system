@@ -1,130 +1,115 @@
-use std::any::Any;
-use std::future::Future;
-use std::pin::Pin;
-use std::sync::{Arc, Mutex};
+use std::{
+    any::{Any, TypeId},
+    collections::HashMap,
+    future::Future,
+    pin::Pin,
+    sync::{Arc, Mutex},
+};
 use tokio::sync::mpsc;
 
 pub trait Event: Any + Send + Sync + Clone {}
-
 impl<T> Event for T where T: Any + Send + Sync + Clone {}
 
-type AsyncCallback<T> = Box<dyn Fn(T) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + 'static>;
+type AsyncCallback<T> = Box<dyn Fn(T) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
 
 pub struct AsyncEventBus {
-    subscribers: Arc<Mutex<Vec<mpsc::Sender<Box<dyn Any + Send>>>>>,
+    subscribers: Arc<Mutex<HashMap<TypeId, Vec<AsyncCallbackBox>>>>,
 }
+
+type AsyncCallbackBox =
+    Box<dyn Fn(Box<dyn Any + Send>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
 
 impl AsyncEventBus {
     pub fn new() -> Self {
         Self {
-            subscribers: Arc::new(Mutex::new(Vec::new())),
+            subscribers: Arc::new(Mutex::new(HashMap::new())),
         }
     }
 
     pub async fn publish<T: Event>(&self, event: T) {
+        let type_id = TypeId::of::<T>();
         let subscribers = self.subscribers.lock().unwrap();
-        for subscriber in subscribers.iter() {
-            let _ = subscriber.send(Box::new(event.clone())).await;
-        }
-    }
-
-    pub async fn subscribe<T: Event>(&self, subscriber: AsyncCallback<T>) {
-        let (tx, mut rx) = mpsc::channel::<Box<dyn Any + Send>>(32);
-        self.subscribers.lock().unwrap().push(tx);
-
-        tokio::spawn(async move {
-            while let Some(event) = rx.recv().await {
-                if let Some(event) = event.downcast_ref::<T>() {
-                    let cloned_event = event.clone();
-                    subscriber(cloned_event).await;
-                }
+        if let Some(callbacks) = subscribers.get(&type_id) {
+            for callback in callbacks {
+                let event_box = Box::new(event.clone()) as Box<dyn Any + Send>;
+                callback(event_box).await;
             }
+        }
+    }
+
+    pub fn subscribe<T: Event + 'static>(&self, callback: AsyncCallback<T>) {
+        let type_id = TypeId::of::<T>();
+        let mut subscribers = self.subscribers.lock().unwrap();
+        let entry = subscribers.entry(type_id).or_insert_with(Vec::new);
+        // 包装成统一的 Box<dyn Fn(Box<dyn Any + Send>)>
+        let wrapper: AsyncCallbackBox = Box::new(move |event: Box<dyn Any + Send>| {
+            let event = *event.downcast::<T>().unwrap();
+            callback(event)
         });
+        entry.push(wrapper);
     }
 }
 
-pub struct SyncEventBus {
-    subscribers: Arc<Mutex<Vec<AsyncCallback<Box<dyn Any + Send + Sync>>>>>,
-}
+// 事件监听 trait
+#[async_trait::async_trait]
+pub trait EventListener<E: Event>: Send + Sync {
+    async fn handle(&self, event: E);
 
-impl SyncEventBus {
-    pub fn new() -> Self {
-        Self {
-            subscribers: Arc::new(Mutex::new(Vec::new())),
-        }
-    }
-
-    pub async fn publish<T: Event>(&self, event: T) {
-        let subscribers = self.subscribers.lock().unwrap();
-        let mut futures = Vec::new();
-        for subscriber in subscribers.iter() {
-            futures.push(subscriber(Box::new(event.clone())));
-        }
-
-        futures::future::join_all(futures).await;
-    }
-
-    pub fn subscribe<T: Event>(&self, subscriber: AsyncCallback<T>) {
-        let mut subs = self.subscribers.lock().unwrap();
-        // 适配 subscriber 的输入类型
-        let handler = Box::new(move |event: Box<dyn Any + Send + Sync>| {
-            let event = event.downcast_ref::<T>().unwrap().clone();
-            subscriber(event)
-        }) as AsyncCallback<Box<dyn Any + Send + Sync>>;
-        subs.push(handler);
+    fn subscribe(self: Arc<Self>, bus: Arc<AsyncEventBus>)
+    where
+        Self: Sized + 'static,
+        E: 'static,
+    {
+        let listener = self.clone();
+        bus.subscribe::<E>(Box::new(move |event: E| {
+            let listener = listener.clone();
+            Box::pin(async move {
+                listener.handle(event).await;
+            })
+        }));
     }
 }
 
+// ================== 测试 ==================
 #[cfg(test)]
 mod tests {
-    use tokio::time::sleep;
-
     use super::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use tokio::time::{sleep, Duration};
 
     #[derive(Debug, Clone)]
-    pub struct UserRegisteredEvent {
-        pub user_id: String,
+    struct UserRegisteredEvent {
         pub username: String,
-        pub email: String,
     }
 
-    #[derive(Debug, Clone)]
-    pub struct OrderPlacedEvent {
-        pub order_id: String,
-        pub amount: f32,
+    struct UserListener {
+        pub count: Arc<AtomicUsize>,
+    }
+
+    #[async_trait::async_trait]
+    impl EventListener<UserRegisteredEvent> for UserListener {
+        async fn handle(&self, event: UserRegisteredEvent) {
+            self.count.fetch_add(1, Ordering::SeqCst);
+
+            println!("User registered: {}", event.username);
+            sleep(Duration::from_millis(100)).await;
+        }
     }
 
     #[tokio::test]
-    async fn it_works() {
-        // 创建一个事件总线实例
-        let event_bus = Arc::new(AsyncEventBus::new());
+    async fn test_event_bus() {
+        let bus = Arc::new(AsyncEventBus::new());
+        let count = Arc::new(AtomicUsize::new(0));
+        let listener = Arc::new(UserListener {
+            count: count.clone(),
+        });
+        listener.subscribe(bus.clone());
 
-        // 订阅 UserRegisteredEvent
-        event_bus
-            .subscribe(Box::new(move |event: UserRegisteredEvent| {
-                Box::pin(async move {
-                    // 异步逻辑
-                })
-            }))
-            .await;
+        bus.publish(UserRegisteredEvent {
+            username: "alice".to_string(),
+        })
+        .await;
 
-        // 发布一个 UserRegisteredEvent
-        let user_event = UserRegisteredEvent {
-            user_id: "123".to_string(),
-            username: "john_doe".to_string(),
-            email: "john@example.com".to_string(),
-        };
-
-        event_bus.publish(user_event).await;
-
-        // 发布一个 OrderPlacedEvent
-        let order_event = OrderPlacedEvent {
-            order_id: "456".to_string(),
-            amount: 99.99,
-        };
-
-        event_bus.publish(order_event).await;
-
-        sleep(std::time::Duration::from_secs(1)).await;
+        assert_eq!(count.load(Ordering::SeqCst), 1);
     }
 }

@@ -14,6 +14,8 @@ use crate::{
             register_user::UserRegistrationHandler, update_role::UpdateRoleCommandHandler,
             update_user::UpdateUserCommandHandler, user_binded_to_roles::UserBindedToRolesHandler,
         },
+        listeners::{login::LoginEventListener, user::UserEventListener},
+        queries::user_query_service::UserQueryService,
         services::{
             create_role::CreateRoleService, delete_role::DeleteRoleService,
             delete_user::DeleteUserService, login::LoginService,
@@ -22,17 +24,22 @@ use crate::{
         },
     },
     infrastructure::{
-        casbin::init_casbin::init_casbin, mysql_pool::create_mysql_pool,
+        casbin::init_casbin::init_casbin,
+        mysql_pool::create_mysql_pool,
         role::role_aggregate_repository::MySqlRoleAggregateRepository,
-        user::user_aggregate_repository::MySqlUserAggregateRepository,
+        user::{
+            mysq_user_query_repository::MysqlUserQueryRepository,
+            user_aggregate_repository::MySqlUserAggregateRepository,
+        },
     },
     interfaces::controllers::{
         role::{create_role, delete_role, update_role},
         user::{delete_user, login, register, update_user},
+        user_query::get_login_history,
     },
 };
 use actix_web::{web, App, HttpServer};
-use event_bus::AsyncEventBus;
+use event_bus::{AsyncEventBus, EventListener};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -97,6 +104,20 @@ async fn main() -> std::io::Result<()> {
         PermissionGrantedToRoleCommandHandler::new(role_repo.clone(), event_bus.clone()),
     ));
 
+    // 用户读模型仓储
+    let user_read_repo = Arc::new(MysqlUserQueryRepository::new(pool.clone()));
+    // 用户读模型服务
+    let user_query_service = web::Data::new(UserQueryService::new(user_read_repo));
+
+    // 注册登陆事件
+    Arc::new(LoginEventListener::new(
+        user_query_service.clone().into_inner(),
+    ))
+    .subscribe(event_bus.clone());
+
+    // 注册用户绑定角色事件
+    Arc::new(UserEventListener::new(pool.clone())).subscribe(event_bus.clone());
+
     HttpServer::new(move || {
         App::new()
             .app_data(register_user_services.clone())
@@ -106,13 +127,15 @@ async fn main() -> std::io::Result<()> {
             .app_data(create_role_services.clone())
             .app_data(delete_role_services.clone())
             .app_data(update_role_services.clone())
+            .app_data(user_query_service.clone())
             .app_data(enforcer.clone())
             .service(
                 web::scope("/api/user")
                     .service(register)
                     .service(delete_user)
                     .service(update_user)
-                    .service(login),
+                    .service(login)
+                    .service(get_login_history),
             )
             .service(
                 web::scope("/api/role")

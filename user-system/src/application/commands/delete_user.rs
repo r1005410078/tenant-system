@@ -3,7 +3,7 @@ use std::sync::Arc;
 use event_bus::AsyncEventBus;
 
 use crate::{
-    application::repositories::user::UserAggregateRepository,
+    application::repositories::user_aggreate_repository::UserAggregateRepository,
     domain::user::events::user_deleted::{self, UserDeletedEvent},
 };
 

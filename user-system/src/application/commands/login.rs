@@ -1,4 +1,4 @@
-use crate::application::repositories::user::UserAggregateRepository;
+use crate::application::repositories::user_aggreate_repository::UserAggregateRepository;
 use crate::application::services::claims::Claims;
 use crate::domain::user::events::login::LoginEvent;
 use event_bus::AsyncEventBus;

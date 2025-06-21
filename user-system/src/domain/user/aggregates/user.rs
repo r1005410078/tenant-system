@@ -108,12 +108,14 @@ impl UserAggregate {
 
         if Argon::verify_password(password, &self.password) {
             LoginEvent::Success(LoginEventSuccess::new(
+                self.id.to_string(),
                 username.to_string(),
                 password.to_string(),
                 login_time,
             ))
         } else {
             LoginEvent::Fail(LoginEventFail::new(
+                self.id.to_string(),
                 username.to_string(),
                 password.to_string(),
                 login_time,

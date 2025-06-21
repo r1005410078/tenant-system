@@ -4,7 +4,7 @@ use event_bus::AsyncEventBus;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    application::repositories::user::UserAggregateRepository,
+    application::repositories::user_aggreate_repository::UserAggregateRepository,
     domain::{password::argon::Argon, user::aggregates::user::UserAggregate},
 };
 

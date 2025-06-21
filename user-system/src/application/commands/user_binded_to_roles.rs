@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use event_bus::AsyncEventBus;
 
-use crate::application::repositories::user::UserAggregateRepository;
+use crate::application::repositories::user_aggreate_repository::UserAggregateRepository;
 
 pub struct UserBindedToRolesCommand {
     pub user_id: String,

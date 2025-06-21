@@ -22,3 +22,4 @@ jsonwebtoken  = { workspace = true }
 time = { workspace = true }
 actix-web  = { workspace = true }
 serde_json = { workspace = true }
+shared_dto = { workspace = true }

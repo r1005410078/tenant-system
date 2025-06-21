@@ -1,2 +1,2 @@
 pub mod login;
-pub mod user_event;
+pub mod user;

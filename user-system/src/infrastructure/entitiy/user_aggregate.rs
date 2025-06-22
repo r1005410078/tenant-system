@@ -11,7 +11,6 @@ pub struct Model {
     pub email: Option<String>,
     pub phone: Option<String>,
     pub password: String,
-    pub role: String,
     pub account_status: String,
     pub register_time: DateTimeUtc,
     pub last_login_time: Option<DateTimeUtc>,

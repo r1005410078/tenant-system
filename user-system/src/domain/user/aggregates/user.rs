@@ -3,6 +3,7 @@ use crate::domain::{
     user::{
         events::{
             login::{LoginEvent, LoginEventFail, LoginEventSuccess},
+            user::UserEvent,
             user_binded_to_roles::UserBindedToRolesEvent,
             user_deleted::UserDeletedEvent,
             user_registered::UserRegisteredEvent,
@@ -46,7 +47,8 @@ impl UserAggregate {
         email: Option<String>,
         phone: Option<String>,
         password: String,
-    ) -> anyhow::Result<(UserAggregate, UserRegisteredEvent)> {
+        roles: Vec<String>,
+    ) -> anyhow::Result<(UserAggregate, UserEvent)> {
         let user = UserAggregate {
             id: Uuid::new_v4(),
             username,
@@ -62,14 +64,14 @@ impl UserAggregate {
 
         user.validate()?;
 
-        let event = UserRegisteredEvent {
+        let event = UserEvent::UserRegistered(UserRegisteredEvent {
             id: user.id.clone(),
             username: user.username.clone(),
             email: user.email.clone(),
             phone: user.phone.clone(),
             account_status: user.account_status.to_string(),
-            role: vec![],
-        };
+            roles,
+        });
 
         Ok((user, event))
     }
@@ -86,20 +88,21 @@ impl UserAggregate {
         email: Option<String>,
         phone: Option<String>,
         password: Option<String>,
-    ) -> UserUpdatedEvent {
+        roles: Option<Vec<String>>,
+    ) -> UserEvent {
         self.username = username.unwrap_or(self.username.clone());
         self.email = email.or(self.email.clone());
         self.phone = phone.or(self.phone.clone());
         self.password = Argon::password_hash(&password.unwrap_or(self.password.clone()));
 
-        UserUpdatedEvent {
-            id: self.id.to_string().clone(),
+        UserEvent::UserUpdated(UserUpdatedEvent {
+            id: self.id.to_string(),
             username: self.username.clone(),
             email: self.email.clone(),
             phone: self.phone.clone(),
             account_status: self.account_status.to_string(),
-            role: vec![],
-        }
+            roles: roles,
+        })
     }
 
     pub fn login(&mut self, username: &str, password: &str) -> LoginEvent {
@@ -124,19 +127,19 @@ impl UserAggregate {
     }
 
     // 删除用户
-    pub fn delete(&mut self) -> UserDeletedEvent {
+    pub fn delete(&mut self) -> UserEvent {
         self.deleted_at = Some(Utc::now());
-        UserDeletedEvent {
+        UserEvent::UserDeleted(UserDeletedEvent {
             id: self.id.to_string(),
-        }
+        })
     }
 
     // 为用户绑定角色
-    pub fn bind_roles(&mut self, roles: Vec<String>) -> UserBindedToRolesEvent {
+    pub fn bind_roles(&mut self, roles: Vec<String>) -> UserEvent {
         self.roles = roles;
-        UserBindedToRolesEvent {
+        UserEvent::UserBindedToRoles(UserBindedToRolesEvent {
             user_id: self.id.to_string(),
             roles: self.roles.clone(),
-        }
+        })
     }
 }

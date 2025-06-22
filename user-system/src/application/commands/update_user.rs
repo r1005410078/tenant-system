@@ -14,6 +14,7 @@ pub struct UpdateUserCommand {
     pub username: Option<String>,
     pub email: Option<String>,
     pub phone: Option<String>,
+    pub password: Option<String>,
     pub roles: Option<Vec<String>>,
 }
 
@@ -33,8 +34,13 @@ impl UpdateUserCommandHandler {
     pub async fn handle(&self, command: UpdateUserCommand) -> anyhow::Result<UserAggregate> {
         let mut user_aggregate = self.user_pool.find_by_id(&command.id).await?;
 
-        let user_event =
-            user_aggregate.update(command.username, command.email, command.phone, None);
+        let user_event = user_aggregate.update(
+            command.username,
+            command.email,
+            command.phone,
+            command.password,
+            command.roles,
+        );
 
         self.user_pool.save(&user_aggregate).await?;
         self.event_bus.publish(user_event).await;

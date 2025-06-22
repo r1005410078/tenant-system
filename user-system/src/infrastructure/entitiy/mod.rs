@@ -3,8 +3,6 @@
 pub mod prelude;
 
 pub mod casbin_rules;
-pub mod permission;
-pub mod permission_role;
 pub mod role_aggregate;
 pub mod role_user;
 pub mod sea_orm_active_enums;
@@ -12,3 +10,4 @@ pub mod user_aggregate;
 pub mod user_details_read;
 pub mod user_login_history;
 pub mod user_operation_log;
+pub mod user_query;

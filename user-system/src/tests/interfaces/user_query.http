@@ -1,0 +1,3 @@
+## 获取用户列表
+GET http://localhost:3001/api/user/list?page=1&page_size=10
+Content-Type: application/json

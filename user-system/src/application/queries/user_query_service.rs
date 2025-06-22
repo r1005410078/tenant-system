@@ -5,9 +5,13 @@ use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
 use crate::{
     application::repositories::user_query_repository::UserQueryRepository,
-    domain::user::events::login::LoginEvent,
+    domain::user::events::{
+        login::LoginEvent, user_binded_to_roles::UserBindedToRolesEvent,
+        user_registered::UserRegisteredEvent, user_updated::UserUpdatedEvent,
+    },
     infrastructure::{
-        dtos::user_login_history_dto::UserLoginHistoryDto, entitiy::sea_orm_active_enums::Status,
+        dtos::{user_login_history_dto::UserLoginHistoryDto, user_query_dto::UserQueryDto},
+        entitiy::sea_orm_active_enums::Status,
     },
 };
 
@@ -46,6 +50,47 @@ impl UserQueryService {
 
         self.user_query_repository
             .save_user_login_history(user_login_history_dto)
+            .await
+    }
+
+    // 保存用户信息
+    pub async fn save_user(&self, user: &UserRegisteredEvent) -> anyhow::Result<()> {
+        self.user_query_repository
+            .create_user(user.to_user_query_dto())
+            .await
+    }
+
+    // 删除用户信息
+    pub async fn delete_user(&self, user_id: &str) -> anyhow::Result<()> {
+        self.user_query_repository.delete_user(user_id).await
+    }
+
+    // 更新用户信息
+    pub async fn update_user(&self, user: &UserUpdatedEvent) -> anyhow::Result<()> {
+        self.user_query_repository
+            .update_user(user.to_user_query_dto())
+            .await
+    }
+
+    // 查询用户
+    pub async fn find_user(&self, user_id: &str) -> anyhow::Result<UserQueryDto> {
+        self.user_query_repository.find_user(user_id).await
+    }
+
+    // 查询所有用户
+    pub async fn get_user_list(
+        &self,
+        table_data_request: TableDataRequest,
+    ) -> anyhow::Result<TableDataResponse<UserQueryDto>> {
+        self.user_query_repository
+            .find_all_user(table_data_request)
+            .await
+    }
+
+    // 绑定角色
+    pub async fn bind_roles(&self, event: &UserBindedToRolesEvent) -> anyhow::Result<()> {
+        self.user_query_repository
+            .bind_roles(event.user_id.clone(), event.roles.clone())
             .await
     }
 }

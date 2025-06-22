@@ -35,7 +35,7 @@ use crate::{
     interfaces::controllers::{
         role::{create_role, delete_role, update_role},
         user::{delete_user, login, register, update_user},
-        user_query::get_login_history,
+        user_query::{get_login_history, get_user, get_user_list},
     },
 };
 use actix_web::{web, App, HttpServer};
@@ -116,7 +116,10 @@ async fn main() -> std::io::Result<()> {
     .subscribe(event_bus.clone());
 
     // 注册用户绑定角色事件
-    Arc::new(UserEventListener::new(pool.clone())).subscribe(event_bus.clone());
+    Arc::new(UserEventListener::new(
+        user_query_service.clone().into_inner(),
+    ))
+    .subscribe(event_bus.clone());
 
     HttpServer::new(move || {
         App::new()
@@ -135,7 +138,9 @@ async fn main() -> std::io::Result<()> {
                     .service(delete_user)
                     .service(update_user)
                     .service(login)
-                    .service(get_login_history),
+                    .service(get_login_history)
+                    .service(get_user_list)
+                    .service(get_user),
             )
             .service(
                 web::scope("/api/role")

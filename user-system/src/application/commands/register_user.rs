@@ -41,6 +41,7 @@ impl UserRegistrationHandler {
             command.email,
             command.phone,
             Argon::password_hash(&command.password),
+            command.roles.unwrap_or(vec![]),
         )?;
 
         // 创建新的用户聚合

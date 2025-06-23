@@ -1,8 +1,9 @@
 [package]
 name = "shared_dto"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
+base64ct="<1.8.0"
 serde_json = { workspace = true }
 serde = { workspace = true }

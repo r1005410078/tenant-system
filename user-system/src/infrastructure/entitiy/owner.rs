@@ -3,20 +3,16 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "user_aggregate")]
+#[sea_orm(table_name = "owner")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
-    pub id: String,
-    pub username: String,
-    pub email: Option<String>,
-    pub phone: Option<String>,
-    pub password: String,
-    pub account_status: String,
-    pub register_time: DateTimeUtc,
-    pub last_login_time: Option<DateTimeUtc>,
+    pub owner_id: String,
+    pub name: String,
+    pub phone: String,
+    pub id_card: Option<String>,
     pub deleted_at: Option<DateTimeUtc>,
-    pub created_at: Option<DateTime>,
-    pub updated_at: Option<DateTime>,
+    pub created_at: DateTimeUtc,
+    pub updated_at: DateTimeUtc,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]

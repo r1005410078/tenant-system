@@ -3,6 +3,7 @@ use sea_orm::prelude::DateTimeUtc;
 
 use crate::domain::roles::events::{
     permission_granted_to_role::{self, Permission, PermissionGrantedToRoleEvent},
+    role::RoleEvent,
     role_created::RoleCreatedEvent,
     role_deleted::RoleDeletedEvent,
     role_updated::RoleUpdatedEvent,
@@ -30,40 +31,44 @@ impl RoleAggregate {
         }
     }
 
-    pub fn create(name: String, description: Option<String>) -> (Self, RoleCreatedEvent) {
+    pub fn create(name: String, description: Option<String>) -> (Self, RoleEvent) {
         let role = RoleAggregate::new(uuid::Uuid::new_v4().to_string(), name, description);
         (
             role.clone(),
-            RoleCreatedEvent::new(role.id.clone(), role.name.clone(), role.description.clone()),
+            RoleEvent::RoleCreated(RoleCreatedEvent::new(
+                role.id.clone(),
+                role.name.clone(),
+                role.description.clone(),
+                Some(vec![]),
+            )),
         )
     }
 
-    pub fn delete(&mut self) -> RoleDeletedEvent {
+    pub fn delete(&mut self) -> RoleEvent {
         self.deleted_at = Some(Utc::now());
-        RoleDeletedEvent::new(self.id.clone())
+
+        RoleEvent::RoleDeleted(RoleDeletedEvent::new(self.id.clone()))
     }
 
-    pub fn update(
-        &mut self,
-        name: Option<String>,
-        description: Option<String>,
-    ) -> RoleUpdatedEvent {
+    pub fn update(&mut self, name: Option<String>, description: Option<String>) -> RoleEvent {
         self.name = name.unwrap_or(self.name.clone());
         self.description = description.clone();
 
-        RoleUpdatedEvent::new(
+        RoleEvent::RoleUpdated(RoleUpdatedEvent::new(
             self.id.clone(),
-            Some(self.name.clone()),
+            self.name.clone(),
             self.description.clone(),
-        )
+            Some(self.permissions.clone()),
+        ))
     }
 
     // 为角色授权
-    pub fn grant_permissions(
-        &mut self,
-        permissions: Vec<Permission>,
-    ) -> PermissionGrantedToRoleEvent {
+    pub fn grant_permissions(&mut self, permissions: Vec<Permission>) -> RoleEvent {
         self.permissions = permissions;
-        PermissionGrantedToRoleEvent::new(self.id.clone(), self.permissions.clone())
+
+        RoleEvent::PermissionGrantedToRole(PermissionGrantedToRoleEvent::new(
+            self.id.clone(),
+            self.permissions.clone(),
+        ))
     }
 }

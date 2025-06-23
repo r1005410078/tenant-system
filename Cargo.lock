@@ -2909,6 +2909,7 @@ dependencies = [
 name = "shared_dto"
 version = "0.1.0"
 dependencies = [
+ "base64ct",
  "serde",
  "serde_json",
 ]

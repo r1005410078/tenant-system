@@ -33,7 +33,7 @@ use crate::{
         },
     },
     interfaces::controllers::{
-        role::{create_role, delete_role, update_role},
+        role::{create_role, delete_role, detail_role, list_role, update_role},
         user::{delete_user, login, register, update_user},
         user_query::{get_login_history, get_user, get_user_list},
     },
@@ -146,7 +146,9 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api/role")
                     .service(create_role)
                     .service(delete_role)
-                    .service(update_role),
+                    .service(update_role)
+                    .service(detail_role)
+                    .service(list_role),
             )
     })
     .bind(server_url)?

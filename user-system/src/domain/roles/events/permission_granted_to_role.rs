@@ -1,23 +1,23 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct PermissionGrantedToRoleEvent {
     // 角色id
-    role_id: String,
+    pub role_id: String,
     // 权限
-    permission: Vec<Permission>,
+    pub permissions: Vec<Permission>,
 }
 
 impl PermissionGrantedToRoleEvent {
-    pub fn new(role_id: String, permission: Vec<Permission>) -> Self {
+    pub fn new(role_id: String, permissions: Vec<Permission>) -> Self {
         Self {
             role_id,
-            permission,
+            permissions,
         }
     }
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Permission {
     // 资源
     pub resouce: String,

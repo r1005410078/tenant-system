@@ -1,3 +1,4 @@
+#[derive(Debug, Clone)]
 pub struct RoleDeletedEvent {
     pub id: String,
 }

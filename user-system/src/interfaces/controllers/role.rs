@@ -1,8 +1,10 @@
-use actix_web::{post, web, HttpResponse};
+use actix_web::{get, post, web, HttpResponse};
+use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
         commands::{create_role::CreateRoleCommand, update_role::UpdateRoleCommand},
+        queries::role_query_service::RoleQueryService,
         services::{
             create_role::CreateRoleService, delete_role::DeleteRoleService,
             update_role::UpdateRoleService,
@@ -43,6 +45,32 @@ async fn update_role(
     service: web::Data<UpdateRoleService>,
 ) -> HttpResponse {
     let res = match service.execute(body.into_inner()).await {
+        Ok(data) => ResponseBody::success(data),
+        Err(err) => ResponseBody::error(err.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("/list")]
+async fn list_role(
+    query: web::Query<TableDataRequest>,
+    service: web::Data<RoleQueryService>,
+) -> HttpResponse {
+    let res = match service.find_all(query.into_inner()).await {
+        Ok(data) => ResponseBody::success(data),
+        Err(err) => ResponseBody::error(err.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("/detail/{role_id}")]
+async fn detail_role(
+    path: web::Path<String>,
+    service: web::Data<RoleQueryService>,
+) -> HttpResponse {
+    let res = match service.find(&path.into_inner()).await {
         Ok(data) => ResponseBody::success(data),
         Err(err) => ResponseBody::error(err.to_string()),
     };

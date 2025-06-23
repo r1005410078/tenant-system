@@ -1,6 +1,5 @@
 use std::sync::Arc;
 
-use sea_orm::sea_query::Table;
 use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
 use crate::{

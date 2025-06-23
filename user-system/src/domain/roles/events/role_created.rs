@@ -1,6 +1,8 @@
+use serde::Serialize;
+
 use crate::domain::roles::events::permission_granted_to_role::Permission;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct RoleCreatedEvent {
     pub id: String,
     pub name: String,

@@ -1,6 +1,7 @@
 use sea_orm::prelude::DateTimeUtc;
+use serde::Serialize;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct OwenerDeletedEvent {
     pub owner_id: String,
     pub deleted_at: DateTimeUtc,

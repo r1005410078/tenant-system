@@ -47,9 +47,9 @@ impl UpdateRoleCommandHandler {
 
     pub async fn handle(&self, command: UpdateRoleCommand) -> anyhow::Result<()> {
         let mut role = self.role_repository.find_by_id(&command.id).await?;
-        role.update(command.name, command.description);
+        let event = role.update(command.name, command.description);
         self.role_repository.save(&role).await?;
-        self.event_bus.publish(role).await;
+        self.event_bus.persist_and_publish(event).await?;
 
         Ok(())
     }

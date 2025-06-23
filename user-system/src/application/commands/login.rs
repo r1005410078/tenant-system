@@ -44,7 +44,9 @@ impl LoginCommandHandler {
         self.user_repo.save(&user).await?;
 
         // 发送事件
-        self.event_bus.publish(login_event.clone()).await;
+        self.event_bus
+            .persist_and_publish(login_event.clone())
+            .await?;
 
         if let LoginEvent::Success(_) = login_event {
             // 生成token

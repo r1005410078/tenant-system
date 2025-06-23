@@ -1,9 +1,9 @@
-use actix_web::web::Json;
+use serde::Serialize;
 use uuid::Uuid;
 
 use crate::infrastructure::dtos::user_query_dto::UserQueryDto;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct UserRegisteredEvent {
     pub id: Uuid,
     pub username: String,

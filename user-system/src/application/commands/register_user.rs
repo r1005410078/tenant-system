@@ -48,7 +48,7 @@ impl UserRegistrationHandler {
         self.user_repo.create(&user).await?;
 
         // 发布事件到事件总线（简化的逻辑）
-        self.event_bus.publish(event.clone()).await;
+        self.event_bus.persist_and_publish(event).await?;
 
         Ok(user)
     }

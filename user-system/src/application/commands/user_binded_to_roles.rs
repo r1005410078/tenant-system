@@ -35,7 +35,7 @@ impl UserBindedToRolesHandler {
         user_aggregate.bind_roles(command.roles);
 
         self.user_pool.save(&user_aggregate).await?;
-        self.event_bus.publish(event).await;
+        self.event_bus.persist_and_publish(event).await?;
         Ok(())
     }
 }

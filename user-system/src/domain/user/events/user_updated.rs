@@ -1,6 +1,8 @@
+use serde::Serialize;
+
 use crate::infrastructure::dtos::user_query_dto::UserQueryDto;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct UserUpdatedEvent {
     pub id: String,
     pub username: String,

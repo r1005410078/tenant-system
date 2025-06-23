@@ -36,7 +36,9 @@ impl DeleteUserCommandHandler {
         let user_deleted_event = user_aggregate.delete();
 
         self.user_poll.save(&user_aggregate).await?;
-        self.event_bus.publish(user_deleted_event).await;
+        self.event_bus
+            .persist_and_publish(user_deleted_event)
+            .await?;
         Ok(())
     }
 }

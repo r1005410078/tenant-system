@@ -1,6 +1,6 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Community {
     pub id: Option<String>,
     // 小区名称
@@ -64,7 +64,7 @@ impl Community {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Stairs {
     // 梯
     stairs: String,
@@ -72,7 +72,7 @@ pub struct Stairs {
     rooms: String,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DoorNumber {
     // 座栋
     pub building_number: i32,
@@ -91,7 +91,7 @@ impl DoorNumber {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FloorRange {
     // 最小楼层
     pub door_number_from: i32,
@@ -105,7 +105,7 @@ impl FloorRange {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ApartmentType {
     // 室
     pub room: i32,

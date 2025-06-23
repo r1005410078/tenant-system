@@ -1,9 +1,11 @@
+use serde::Serialize;
+
 use crate::domain::{
     house::value_objects::house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
     owner::value_objects::owner::HouseOwner,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct HouseCreatedEvent {
     pub house_id: String,
     // 房源标题

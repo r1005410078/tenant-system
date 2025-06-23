@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
+use serde::Serialize;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct LoginEventSuccess {
     pub user_id: String,
     pub username: String,
@@ -24,7 +25,7 @@ impl LoginEventSuccess {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct LoginEventFail {
     pub user_id: String,
     pub username: String,
@@ -48,7 +49,7 @@ impl LoginEventFail {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub enum LoginEvent {
     Success(LoginEventSuccess),
     Fail(LoginEventFail),

@@ -51,8 +51,8 @@ async fn main() -> std::io::Result<()> {
     let host = env::var("HOST").expect("HOST is not set in .env file");
     let port = env::var("PORT").expect("PORT is not set in .env file");
     let server_url = format!("{host}:{port}");
-    let event_bus = Arc::new(AsyncEventBus::new());
     let pool = create_mysql_pool().await;
+    let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
 
     // 创建小区仓储
     let community_repo = Arc::new(MySqlCommunityAggregateRepository::new(pool.clone()));

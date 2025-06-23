@@ -1082,7 +1082,11 @@ dependencies = [
  "async-trait",
  "base64ct",
  "futures",
+ "sea-orm",
+ "serde",
+ "serde_json",
  "tokio",
+ "uuid",
 ]
 
 [[package]]

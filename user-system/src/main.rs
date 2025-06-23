@@ -14,8 +14,8 @@ use crate::{
             register_user::UserRegistrationHandler, update_role::UpdateRoleCommandHandler,
             update_user::UpdateUserCommandHandler, user_binded_to_roles::UserBindedToRolesHandler,
         },
-        listeners::{login::LoginEventListener, user::UserEventListener},
-        queries::user_query_service::UserQueryService,
+        listeners::{login::LoginEventListener, role::RoleEventListener, user::UserEventListener},
+        queries::{role_query_service::RoleQueryService, user_query_service::UserQueryService},
         services::{
             create_role::CreateRoleService, delete_role::DeleteRoleService,
             delete_user::DeleteUserService, login::LoginService,
@@ -26,7 +26,10 @@ use crate::{
     infrastructure::{
         casbin::init_casbin::init_casbin,
         mysql_pool::create_mysql_pool,
-        role::role_aggregate_repository::MySqlRoleAggregateRepository,
+        role::{
+            mysql_role_query_repository::{self, MysqlRoleQueryRepository},
+            role_aggregate_repository::MySqlRoleAggregateRepository,
+        },
         user::{
             mysq_user_query_repository::MysqlUserQueryRepository,
             user_aggregate_repository::MySqlUserAggregateRepository,
@@ -49,8 +52,8 @@ async fn main() -> std::io::Result<()> {
     let host = env::var("HOST").expect("HOST is not set in .env file");
     let port = env::var("PORT").expect("PORT is not set in .env file");
     let server_url = format!("{host}:{port}");
-    let event_bus = Arc::new(AsyncEventBus::new());
     let pool = create_mysql_pool().await;
+    let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
     let enforcer = Arc::new(init_casbin(pool.clone()).await);
 
     // 创建用户仓储
@@ -121,6 +124,17 @@ async fn main() -> std::io::Result<()> {
     ))
     .subscribe(event_bus.clone());
 
+    // 角色仓储
+    let mysql_role_query_repository = Arc::new(MysqlRoleQueryRepository::new(pool.clone()));
+    // 角色服务
+    let role_query_service =
+        web::Data::new(RoleQueryService::new(mysql_role_query_repository.clone()));
+    // 注册角色事件
+    Arc::new(RoleEventListener::new(
+        role_query_service.clone().into_inner(),
+    ))
+    .subscribe(event_bus.clone());
+
     HttpServer::new(move || {
         App::new()
             .app_data(register_user_services.clone())
@@ -131,6 +145,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(delete_role_services.clone())
             .app_data(update_role_services.clone())
             .app_data(user_query_service.clone())
+            .app_data(role_query_service.clone())
             .app_data(enforcer.clone())
             .service(
                 web::scope("/api/user")

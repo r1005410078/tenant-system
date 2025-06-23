@@ -8,6 +8,10 @@ base64ct="<1.8.0"
 async-trait = {  workspace = true }
 tokio = { workspace = true }
 futures = { workspace = true }
+sea-orm = { workspace = true }
+serde_json = { workspace = true }
+serde = { workspace = true }
+uuid ={ workspace = true }
 
 [lib]
 path = "src/lib.rs"

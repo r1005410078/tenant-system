@@ -1,28 +1,34 @@
+pub mod entitiy;
 use std::{
-    any::{Any, TypeId},
+    any::{self, Any, TypeId},
     collections::HashMap,
     future::Future,
     pin::Pin,
     sync::{Arc, Mutex},
 };
-use tokio::sync::mpsc;
 
-pub trait Event: Any + Send + Sync + Clone {}
-impl<T> Event for T where T: Any + Send + Sync + Clone {}
+use sea_orm::{ActiveModelTrait, ActiveValue::Set, DbConn, DbErr};
+use serde::Serialize;
+use uuid::Uuid;
+
+pub trait Event: Any + Send + Sync + Clone + Serialize {}
+impl<T> Event for T where T: Any + Send + Sync + Clone + Serialize {}
 
 type AsyncCallback<T> = Box<dyn Fn(T) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
 
 pub struct AsyncEventBus {
     subscribers: Arc<Mutex<HashMap<TypeId, Vec<AsyncCallbackBox>>>>,
+    pool: Option<Arc<DbConn>>,
 }
 
 type AsyncCallbackBox =
     Box<dyn Fn(Box<dyn Any + Send>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
 
 impl AsyncEventBus {
-    pub fn new() -> Self {
+    pub fn new(pool: Option<Arc<DbConn>>) -> Self {
         Self {
             subscribers: Arc::new(Mutex::new(HashMap::new())),
+            pool,
         }
     }
 
@@ -47,6 +53,29 @@ impl AsyncEventBus {
             callback(event)
         });
         entry.push(wrapper);
+    }
+
+    pub async fn persist_and_publish<T: Event>(&self, event: T) -> Result<(), DbErr> {
+        self.persist(event.clone()).await?;
+        self.publish(event).await;
+        Ok(())
+    }
+
+    pub async fn persist<T: Event>(&self, event: T) -> Result<(), DbErr> {
+        if self.pool.is_none() {
+            return Ok(());
+        }
+
+        let model = entitiy::event_record::ActiveModel {
+            event_id: Set(Uuid::new_v4().to_string()),
+            event_type: Set(format!("{}", std::any::type_name::<T>())),
+            payload: Set(serde_json::to_value(&event).unwrap()),
+            status: Set("publish".to_string()),
+            ..Default::default()
+        };
+
+        model.insert(self.pool.as_ref().unwrap().as_ref()).await?;
+        Ok(())
     }
 }
 
@@ -77,7 +106,7 @@ mod tests {
     use std::sync::atomic::{AtomicUsize, Ordering};
     use tokio::time::{sleep, Duration};
 
-    #[derive(Debug, Clone)]
+    #[derive(Debug, Clone, Serialize)]
     struct UserRegisteredEvent {
         pub username: String,
     }
@@ -98,7 +127,7 @@ mod tests {
 
     #[tokio::test]
     async fn test_event_bus() {
-        let bus = Arc::new(AsyncEventBus::new());
+        let bus = Arc::new(AsyncEventBus::new(None));
         let count = Arc::new(AtomicUsize::new(0));
         let listener = Arc::new(UserListener {
             count: count.clone(),

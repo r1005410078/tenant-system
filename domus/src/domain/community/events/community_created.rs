@@ -1,4 +1,6 @@
-#[derive(Debug, Clone)]
+use serde::Serialize;
+
+#[derive(Debug, Clone, Serialize)]
 pub struct CommunityCreatedEvent {
     pub community_id: String,
     // 小区名称

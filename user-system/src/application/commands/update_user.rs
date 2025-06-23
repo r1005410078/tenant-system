@@ -43,7 +43,7 @@ impl UpdateUserCommandHandler {
         );
 
         self.user_pool.save(&user_aggregate).await?;
-        self.event_bus.publish(user_event).await;
+        self.event_bus.persist_and_publish(user_event).await?;
 
         Ok(user_aggregate)
     }

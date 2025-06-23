@@ -28,9 +28,10 @@ impl DeleteRoleCommandHandler {
 
     pub async fn handle(&self, command: DeleteRoleCommand) -> anyhow::Result<()> {
         let mut role = self.role_repository.find_by_id(&command.id).await?;
-        role.delete();
+        let event = role.delete();
+
         self.role_repository.save(&role).await?;
-        self.event_bus.publish(role).await;
+        self.event_bus.persist_and_publish(event).await?;
 
         Ok(())
     }

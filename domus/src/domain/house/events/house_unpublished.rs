@@ -1,6 +1,7 @@
 use sea_orm::prelude::DateTimeUtc;
+use serde::Serialize;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize)]
 pub struct HouseUnpublishedEvent {
     pub id: String,
     pub unpublish_at: DateTimeUtc,

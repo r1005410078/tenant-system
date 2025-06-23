@@ -45,7 +45,7 @@ impl PermissionGrantedToRoleCommandHandler {
         let event = role_aggregate.grant_permissions(command.permissions);
 
         self.role_repository.save(&role_aggregate).await?;
-        self.event_bus.publish(event).await;
+        self.event_bus.persist_and_publish(event).await?;
         Ok(())
     }
 }

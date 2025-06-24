@@ -8,6 +8,8 @@ pub struct OwnerCreatedEvent {
     pub name: String,
     // 业主电话
     pub phone: String,
+    //  业主身份证
+    pub id_card: Option<String>,
     // 业主身份证照片
     pub id_card_images: Option<Vec<String>>,
     // 业主情况

@@ -70,7 +70,7 @@ impl UpdateOwnerCommandHandler {
         }
     }
 
-    pub async fn handle(&self, command: UpdateOwnerCommand) -> anyhow::Result<()> {
+    pub async fn handle(&self, command: UpdateOwnerCommand) -> anyhow::Result<String> {
         let mut aggregate = self.owner_repository.find_by_id(&command.id).await?;
 
         // 身份证是否存在
@@ -100,6 +100,6 @@ impl UpdateOwnerCommandHandler {
         self.owner_repository.save(&aggregate).await?;
         self.event_bus.publish(event).await;
 
-        Ok(())
+        Ok(aggregate.owner_id)
     }
 }

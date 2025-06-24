@@ -26,7 +26,7 @@ impl CreateCommunityCommandHandler {
         }
     }
 
-    pub async fn handle(&self, command: CreateCommunityCommand) -> anyhow::Result<()> {
+    pub async fn handle(&self, command: CreateCommunityCommand) -> anyhow::Result<String> {
         let (aggregate, event) = CommunityAggregate::create(&command.to_data());
 
         // 检查小区是否已存在
@@ -38,9 +38,9 @@ impl CreateCommunityCommandHandler {
             return Err(anyhow::anyhow!("Community already exists at this address"));
         }
 
-        self.community_repository.create(aggregate).await?;
+        self.community_repository.create(aggregate.clone()).await?;
         self.event_bus.publish(event).await;
 
-        Ok(())
+        Ok(aggregate.community_id)
     }
 }

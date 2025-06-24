@@ -24,17 +24,15 @@ impl SaveOwnerService {
         }
     }
 
-    pub async fn save(&self, owner: &HouseOwner) -> anyhow::Result<()> {
+    pub async fn save(&self, owner: &HouseOwner) -> anyhow::Result<String> {
         if owner.id.is_some() {
             // 如果业主ID存在，则更新业主信息
             let command = UpdateOwnerCommand::from(owner);
-            self.update_owner_command_handler.handle(command).await?;
+            self.update_owner_command_handler.handle(command).await
         } else {
             // 创建业主
             let command = CreateOwnerCommand::from(owner)?;
-            self.create_owner_command_handler.handle(command).await?;
+            self.create_owner_command_handler.handle(command).await
         }
-
-        Ok(())
     }
 }

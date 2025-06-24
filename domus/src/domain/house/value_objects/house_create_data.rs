@@ -26,12 +26,12 @@ pub struct HouseCreateData {
     // 装修
     pub house_decoration: String,
     // 满减年限
-    pub discount_year_limit: String,
+    pub discount_year_limit: Option<String>,
     // 梯户
     pub stairs: Stairs,
 
     // 业主
-    pub owner: Option<HouseOwner>,
+    pub owner: HouseOwner,
     // 小区
     pub community: Option<Community>,
     // 位置
@@ -45,14 +45,14 @@ pub struct HouseCreateData {
     // 级别
     pub level: Option<String>,
     // 层高
-    pub floor_height: Option<f64>,
+    pub floor_height: Option<f32>,
     // 进深
     pub progress_depth: Option<f64>,
     // 门宽
     pub door_width: Option<f64>,
 
     // 使用面积
-    pub use_area: Option<f64>,
+    pub use_area: Option<f32>,
     // 售价
     pub sale_price: Option<f64>,
     // 租价
@@ -77,7 +77,7 @@ pub struct HouseCreateData {
     // 建筑结构
     pub building_structure: Option<String>,
     // 建筑年代
-    pub building_year: Option<u32>,
+    pub building_year: Option<i32>,
     // 产权性质
     pub property_rights: Option<String>,
     // 产权年限

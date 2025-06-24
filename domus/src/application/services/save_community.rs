@@ -7,7 +7,10 @@ use crate::{
         update_community::UpdateCommunityCommand,
         update_community_handler::UpdateCommunityCommandHandler,
     },
-    domain::house::value_objects::house::Community,
+    domain::{
+        community::aggregates::community::CommunityAggregate,
+        house::value_objects::house::Community,
+    },
 };
 
 pub struct SaveCommunityService {
@@ -26,21 +29,15 @@ impl SaveCommunityService {
         }
     }
 
-    pub async fn save(&self, community: &Community) -> anyhow::Result<()> {
+    pub async fn save(&self, community: &Community) -> anyhow::Result<String> {
         if community.id.is_some() {
             // 如果小区ID存在，则更新小区信息
             let command = UpdateCommunityCommand::from(community);
-            self.update_community_command_handler
-                .handle(command)
-                .await?;
+            self.update_community_command_handler.handle(command).await
         } else {
             // 创建小区
             let command = CreateCommunityCommand::from(community)?;
-            self.create_community_command_handler
-                .handle(command)
-                .await?;
+            self.create_community_command_handler.handle(command).await
         }
-
-        Ok(())
     }
 }

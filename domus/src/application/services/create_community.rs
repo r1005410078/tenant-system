@@ -16,7 +16,7 @@ impl CreateCommunityService {
         }
     }
 
-    pub async fn execute(&self, command: CreateCommunityCommand) -> anyhow::Result<()> {
+    pub async fn execute(&self, command: CreateCommunityCommand) -> anyhow::Result<String> {
         self.create_community_handler.handle(command).await
     }
 }

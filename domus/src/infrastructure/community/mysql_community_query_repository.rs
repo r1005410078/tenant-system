@@ -9,8 +9,8 @@ use crate::{
         dtos::community_query_read_model_dto::CommunityQueryReadModelDto, entitiy::community_query,
     },
 };
-use sea_orm::PaginatorTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue::Set, DbConn};
+use sea_orm::{ActiveValue::NotSet, PaginatorTrait};
 use sea_orm::{EntityTrait, QuerySelect};
 use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
@@ -54,8 +54,18 @@ impl CommunityQueryRepository for MySqlCommunityQueryRepository {
     }
     // 更新小区
     async fn update(&self, event: CommunityUpdatedEvent) -> anyhow::Result<()> {
-        let mut model = community_query::ActiveModel {
+        let model = community_query::ActiveModel {
             id: Set(event.community_id),
+            // 小区名称
+            name: event.name.map_or(NotSet, Set),
+            // 小区地址
+            address: event.address.map_or(NotSet, Set),
+            // 城市
+            city: event.city.map_or(NotSet, Set),
+            // 小区年限
+            year_built: event.year_built.map_or(NotSet, Set),
+            // 小区类型
+            community_type: event.community_type.map_or(NotSet, Set),
             // 小区描述
             description: Set(event.description),
             // 小区图片
@@ -64,26 +74,6 @@ impl CommunityQueryRepository for MySqlCommunityQueryRepository {
             location: Set(event.location),
             ..Default::default()
         };
-
-        if let Some(name) = event.name {
-            model.name = Set(name);
-        }
-
-        if let Some(address) = event.address {
-            model.address = Set(address);
-        }
-
-        if let Some(city) = event.city {
-            model.city = Set(city);
-        }
-
-        if let Some(year_built) = event.year_built {
-            model.year_built = Set(year_built);
-        }
-
-        if let Some(community_type) = event.community_type {
-            model.community_type = Set(community_type);
-        }
 
         model.update(self.pool.as_ref()).await?;
         Ok(())

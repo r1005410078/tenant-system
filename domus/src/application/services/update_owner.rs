@@ -12,7 +12,7 @@ impl UpdateOwnerService {
         }
     }
 
-    pub async fn execute(&self, command: UpdateOwnerCommand) -> anyhow::Result<()> {
+    pub async fn execute(&self, command: UpdateOwnerCommand) -> anyhow::Result<String> {
         self.update_owner_command_handler.handle(command).await
     }
 }

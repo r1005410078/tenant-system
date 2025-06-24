@@ -2,9 +2,12 @@ use std::sync::Arc;
 
 use event_bus::AsyncEventBus;
 
-use crate::application::{
-    commands::update_community::UpdateCommunityCommand,
-    repositories::community_repository_aggregate::CommunityRepositoryAggregate,
+use crate::{
+    application::{
+        commands::update_community::UpdateCommunityCommand,
+        repositories::community_repository_aggregate::CommunityRepositoryAggregate,
+    },
+    domain::community::aggregates::community::CommunityAggregate,
 };
 
 pub struct UpdateCommunityCommandHandler {
@@ -23,7 +26,7 @@ impl UpdateCommunityCommandHandler {
         }
     }
 
-    pub async fn handle(&self, command: UpdateCommunityCommand) -> anyhow::Result<()> {
+    pub async fn handle(&self, command: UpdateCommunityCommand) -> anyhow::Result<String> {
         if let Some(address) = command.address.clone() {
             if self
                 .community_repository
@@ -44,6 +47,6 @@ impl UpdateCommunityCommandHandler {
         self.community_repository.save(&aggreagate).await?;
         self.event_bus.publish(event).await;
 
-        Ok(())
+        Ok(aggreagate.community_id)
     }
 }

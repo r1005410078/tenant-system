@@ -66,7 +66,7 @@ impl CreateOwnerCommandHandler {
         }
     }
 
-    pub async fn handle(&self, command: CreateOwnerCommand) -> anyhow::Result<()> {
+    pub async fn handle(&self, command: CreateOwnerCommand) -> anyhow::Result<String> {
         // 身份证是否存在
         if let Some(id_card) = &command.id_card {
             if self.owner_repository.exists_id_card(id_card, None).await? {
@@ -85,9 +85,9 @@ impl CreateOwnerCommandHandler {
 
         let (aggregate, event) = OwnerAggregate::create(&command.to_data())?;
 
-        self.owner_repository.create(aggregate).await?;
+        self.owner_repository.create(aggregate.clone()).await?;
         self.event_bus.publish(event).await;
 
-        Ok(())
+        Ok(aggregate.owner_id)
     }
 }

@@ -5,7 +5,7 @@ mod interfaces;
 use std::{env, sync::Arc};
 
 use actix_web::{web, App, HttpServer};
-use event_bus::AsyncEventBus;
+use event_bus::{AsyncEventBus, EventListener};
 
 use crate::{
     application::{
@@ -19,6 +19,12 @@ use crate::{
             update_house_handler::UpdateHouseCommandHandler,
             update_owner::UpdateOwnerCommandHandler,
         },
+        listeners::{
+            community::CommunityEventListener, house::HouseEventListener, owner::OwnerEventListener,
+        },
+        queries::{
+            community::CommunityQueryService, house::HouseQueryService, owner::OwnerQueryService,
+        },
         services::{
             create_community::CreateCommunityService, create_house::CreateHouseService,
             create_owner::CreateOwnerService, delete_community::DeleteCommunityService,
@@ -29,10 +35,19 @@ use crate::{
         },
     },
     infrastructure::{
-        community::mysql_community_aggregate::MySqlCommunityAggregateRepository,
-        house::mysql_house_repository_aggregate::{self, MysqlHouseRepositoryAggregate},
+        community::{
+            mysql_community_aggregate::MySqlCommunityAggregateRepository,
+            mysql_community_query_repository::MySqlCommunityQueryRepository,
+        },
+        house::{
+            mysql_house_query_repository::MySqlHouseQueryRepository,
+            mysql_house_repository_aggregate::{self, MysqlHouseRepositoryAggregate},
+        },
         mysql_pool::create_mysql_pool,
-        owner::mysql_owner_aggregate::MySqlOwnerAggregateRepository,
+        owner::{
+            mysql_owner_aggregate::MySqlOwnerAggregateRepository,
+            mysql_owner_query_repository::MySqlOwnerQueryRepository,
+        },
     },
     interfaces::controllers::{
         community::{create_community, delete_community, update_community},
@@ -140,7 +155,32 @@ async fn main() -> std::io::Result<()> {
     ));
 
     // 小区仓储
-    // let community_query_repo = Arc::new(MySqlCommunityAggregateRepository::new(pool.clone()));
+    let community_query_repo = Arc::new(MySqlCommunityQueryRepository::new(pool.clone()));
+    let community_query_service =
+        web::Data::new(CommunityQueryService::new(community_query_repo.clone()));
+    // 小区事件
+    Arc::new(CommunityEventListener::new(
+        community_query_service.clone().into_inner(),
+    ))
+    .subscribe(event_bus.clone());
+
+    // 业主仓储
+    let owner_query_repo = Arc::new(MySqlOwnerQueryRepository::new(pool.clone()));
+    let owner_query_service = web::Data::new(OwnerQueryService::new(owner_query_repo.clone()));
+    // 业主事件
+    Arc::new(OwnerEventListener::new(
+        owner_query_service.clone().into_inner(),
+    ))
+    .subscribe(event_bus.clone());
+
+    // 房源仓储
+    let house_query_repo = Arc::new(MySqlHouseQueryRepository::new(pool.clone()));
+    let house_query_service = web::Data::new(HouseQueryService::new(house_query_repo.clone()));
+    // 房源事件
+    Arc::new(HouseEventListener::new(
+        house_query_service.clone().into_inner(),
+    ))
+    .subscribe(event_bus.clone());
 
     HttpServer::new(move || {
         App::new()
@@ -153,6 +193,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(create_house_service.clone())
             .app_data(update_house_service.clone())
             .app_data(delete_house_service.clone())
+            .app_data(community_query_service.clone())
+            .app_data(owner_query_service.clone())
+            .app_data(house_query_service.clone())
             .service(
                 web::scope("/api/community")
                     .service(create_community)

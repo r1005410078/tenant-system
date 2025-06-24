@@ -2,12 +2,16 @@
 
 use sea_orm::entity::prelude::*;
 
+use crate::infrastructure::entitiy::{community_query, owner_query};
+
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
 #[sea_orm(table_name = "house_query")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
     pub title: Option<String>,
+    pub community_id: String,
+    pub owner_id: String,
     pub purpose: String,
     pub transaction_type: String,
     pub house_status: String,
@@ -82,7 +86,25 @@ pub struct Model {
     pub updated_at: DateTimeUtc,
 }
 
-#[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {}
+#[derive(Copy, Clone, Debug, EnumIter)]
+pub enum Relation {
+    CommunityQuery,
+    OwnerQuery,
+}
+
+impl RelationTrait for Relation {
+    fn def(&self) -> RelationDef {
+        match self {
+            Self::CommunityQuery => Entity::belongs_to(community_query::Entity)
+                .from(Column::CommunityId)
+                .to(community_query::Column::Id)
+                .into(),
+            Self::OwnerQuery => Entity::belongs_to(owner_query::Entity)
+                .from(Column::OwnerId)
+                .to(owner_query::Column::Id)
+                .into(),
+        }
+    }
+}
 
 impl ActiveModelBehavior for ActiveModel {}

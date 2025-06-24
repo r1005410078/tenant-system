@@ -67,9 +67,9 @@ impl Community {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Stairs {
     // 梯
-    stairs: String,
+    pub stairs: Option<String>,
     // 户
-    rooms: String,
+    pub rooms: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

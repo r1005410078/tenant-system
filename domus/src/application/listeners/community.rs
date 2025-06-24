@@ -11,6 +11,14 @@ pub struct CommunityEventListener {
     community_query_service: Arc<CommunityQueryService>,
 }
 
+impl CommunityEventListener {
+    pub fn new(community_query_service: Arc<CommunityQueryService>) -> Self {
+        CommunityEventListener {
+            community_query_service,
+        }
+    }
+}
+
 #[async_trait::async_trait]
 impl EventListener<CommunityEvent> for CommunityEventListener {
     async fn handle(&self, event: CommunityEvent) {

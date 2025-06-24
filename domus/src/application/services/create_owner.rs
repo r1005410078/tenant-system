@@ -13,7 +13,7 @@ impl CreateOwnerService {
         }
     }
 
-    pub async fn execute(&self, command: CreateOwnerCommand) -> anyhow::Result<()> {
+    pub async fn execute(&self, command: CreateOwnerCommand) -> anyhow::Result<String> {
         self.create_owner_command_handler.handle(command).await
     }
 }

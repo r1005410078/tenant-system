@@ -6,6 +6,7 @@ use crate::domain::owner::{
     value_objects::owner::HouseOwner,
 };
 
+#[derive(Debug, Clone)]
 pub struct OwnerAggregate {
     pub owner_id: String,
     pub name: String,
@@ -48,6 +49,7 @@ impl OwnerAggregate {
             id: owner_id.clone(),
             name: name.clone(),
             phone: phone.clone(),
+            id_card: data.id_card.clone(),
             id_card_images: data.id_card_images.clone(),
             description: data.description.clone(),
         };

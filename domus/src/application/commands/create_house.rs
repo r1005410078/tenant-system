@@ -31,9 +31,9 @@ pub struct CreateHouseCommand {
     // 建筑面积
     pub building_area: f32,
     // 使用面积
-    pub use_area: Option<f64>,
+    pub use_area: Option<f32>,
     // 层高
-    pub floor_height: Option<f64>,
+    pub floor_height: Option<f32>,
     // 装修
     pub house_decoration: String,
 
@@ -55,7 +55,7 @@ pub struct CreateHouseCommand {
     // 建筑结构
     pub building_structure: Option<String>,
     // 建筑年代
-    pub building_year: Option<u32>,
+    pub building_year: Option<i32>,
     // 产权性质
     pub property_rights: Option<String>,
     // 产权年限
@@ -83,13 +83,13 @@ pub struct CreateHouseCommand {
 
     /// 附加属性
     // 满减年限
-    pub discount_year_limit: String,
+    pub discount_year_limit: Option<String>,
     // 梯户
     pub stairs: Stairs,
     // 业主
-    pub owner: Option<HouseOwner>,
+    pub owner: HouseOwner,
     // 小区
-    pub community: Option<Community>,
+    pub community: Community,
     // 出售低价
     pub sale_low_price: Option<f64>,
     // 看房方式
@@ -153,7 +153,7 @@ impl CreateHouseCommand {
             // 业主
             owner: self.owner.clone(),
             // 小区
-            community: self.community.clone(),
+            community: Some(self.community.clone()),
             // 位置
             location: self.location.clone(),
             // 推荐标签

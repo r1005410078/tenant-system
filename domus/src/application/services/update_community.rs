@@ -16,7 +16,7 @@ impl UpdateCommunityService {
         }
     }
 
-    pub async fn execute(&self, command: UpdateCommunityCommand) -> anyhow::Result<()> {
+    pub async fn execute(&self, command: UpdateCommunityCommand) -> anyhow::Result<String> {
         self.update_community_handler.handle(command).await
     }
 }

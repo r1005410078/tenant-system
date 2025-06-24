@@ -991,6 +991,7 @@ dependencies = [
  "sea-orm",
  "serde",
  "serde_json",
+ "shared_dto",
  "time",
  "tokio",
  "tracing",

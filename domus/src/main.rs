@@ -29,12 +29,10 @@ use crate::{
         },
     },
     infrastructure::{
-        community::{
-            mysql_community_aggregate::MySqlCommunityAggregateRepository,
-            mysql_owner_aggregate::MySqlOwnerAggregateRepository,
-        },
+        community::mysql_community_aggregate::MySqlCommunityAggregateRepository,
         house::mysql_house_repository_aggregate::{self, MysqlHouseRepositoryAggregate},
         mysql_pool::create_mysql_pool,
+        owner::mysql_owner_aggregate::MySqlOwnerAggregateRepository,
     },
     interfaces::controllers::{
         community::{create_community, delete_community, update_community},
@@ -82,7 +80,7 @@ async fn main() -> std::io::Result<()> {
         DeleteCommunityCommandHandler::new(community_repo.clone(), event_bus.clone()),
     ));
 
-    // 创建 拥有者
+    // 创建 业主
     let owner_repo = Arc::new(MySqlOwnerAggregateRepository::new(pool.clone()));
 
     let create_owner_command_handler = Arc::new(CreateOwnerCommandHandler::new(
@@ -90,7 +88,7 @@ async fn main() -> std::io::Result<()> {
         event_bus.clone(),
     ));
 
-    // 创建拥有者服务
+    // 创建业主服务
     let create_owner_service = web::Data::new(CreateOwnerService::new(
         create_owner_command_handler.clone(),
     ));
@@ -100,12 +98,12 @@ async fn main() -> std::io::Result<()> {
         event_bus.clone(),
     ));
 
-    // 更新拥有者服务
+    // 更新业主服务
     let update_owner_service = web::Data::new(UpdateOwnerService::new(
         update_owner_command_handler.clone(),
     ));
 
-    // 删除拥有者服务
+    // 删除业主服务
     let delete_owner_service = web::Data::new(DeleteOwnerService::new(
         DeleteOwnerCommandHandler::new(owner_repo.clone(), event_bus.clone()),
     ));
@@ -140,6 +138,9 @@ async fn main() -> std::io::Result<()> {
     let delete_house_service = web::Data::new(DeleteHouseService::new(
         DeleteHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone()),
     ));
+
+    // 小区仓储
+    // let community_query_repo = Arc::new(MySqlCommunityAggregateRepository::new(pool.clone()));
 
     HttpServer::new(move || {
         App::new()

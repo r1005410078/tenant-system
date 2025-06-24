@@ -20,42 +20,24 @@ pub struct CreateHouseCommand {
     pub house_status: String,
     // 楼层
     pub floor_range: FloorRange,
-    // 门牌号
+
+    // 门牌号结构
     pub door_number: DoorNumber,
-    // 户型
+
+    // 户型结构
     pub apartment_type: ApartmentType,
+
+    /// 面积与装修
     // 建筑面积
     pub building_area: f32,
-    // 装修
-    pub house_decoration: String,
-    // 满减年限
-    pub discount_year_limit: String,
-    // 梯户
-    pub stairs: Stairs,
-
-    // 业主
-    pub owner: Option<HouseOwner>,
-    // 小区
-    pub community: Option<Community>,
-    // 位置
-    pub location: Option<String>,
-    // 推荐标签
-    pub tags: Vec<String>,
-    // 车位高度
-    pub car_height: Option<f64>,
-    // 实率
-    pub actual_rate: Option<f64>,
-    // 级别
-    pub level: Option<String>,
-    // 层高
-    pub floor_height: Option<f64>,
-    // 进深
-    pub progress_depth: Option<f64>,
-    // 门宽
-    pub door_width: Option<f64>,
-
     // 使用面积
     pub use_area: Option<f64>,
+    // 层高
+    pub floor_height: Option<f64>,
+    // 装修
+    pub house_decoration: String,
+
+    //// 销售租赁信息
     // 售价
     pub sale_price: Option<f64>,
     // 租价
@@ -64,19 +46,12 @@ pub struct CreateHouseCommand {
     pub rent_low_price: Option<f64>,
     // 首付
     pub down_payment: Option<f64>,
-    // 出售低价
-    pub sale_low_price: Option<f64>,
+
+    //// 房屋结构与产权
     // 房屋类型
     pub house_type: Option<String>,
     // 朝向
     pub house_orientation: Option<String>,
-
-    // 看房方式
-    pub view_method: Option<String>,
-    // 付款方式
-    pub payment_method: Option<String>,
-    // 房源税费
-    pub property_tax: Option<String>,
     // 建筑结构
     pub building_structure: Option<String>,
     // 建筑年代
@@ -89,6 +64,40 @@ pub struct CreateHouseCommand {
     pub certificate_date: Option<String>,
     // 交房日期
     pub handover_date: Option<String>,
+
+    //// 标签和特征
+    // 推荐标签
+    pub tags: Vec<String>,
+    // 位置
+    pub location: Option<String>,
+    // 车位高度
+    pub car_height: Option<f64>,
+    // 实率
+    pub actual_rate: Option<f64>,
+    // 级别
+    pub level: Option<String>,
+    // 进深
+    pub progress_depth: Option<f64>,
+    // 门宽
+    pub door_width: Option<f64>,
+
+    /// 附加属性
+    // 满减年限
+    pub discount_year_limit: String,
+    // 梯户
+    pub stairs: Stairs,
+    // 业主
+    pub owner: Option<HouseOwner>,
+    // 小区
+    pub community: Option<Community>,
+    // 出售低价
+    pub sale_low_price: Option<f64>,
+    // 看房方式
+    pub view_method: Option<String>,
+    // 付款方式
+    pub payment_method: Option<String>,
+    // 房源税费
+    pub property_tax: Option<String>,
     // 学位
     pub degree: Option<String>,
     // 户口

@@ -1,3 +1,4 @@
+pub mod house;
 pub mod house_created;
 pub mod house_deleted;
 pub mod house_published;

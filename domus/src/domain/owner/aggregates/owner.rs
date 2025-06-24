@@ -1,6 +1,6 @@
 use crate::domain::owner::{
     events::{
-        owner_created::OwnerCreatedEvent, owner_deleted::OwenerDeletedEvent,
+        owner_created::OwnerCreatedEvent, owner_deleted::OwnerDeletedEvent,
         owner_updated::OwnerUpdatedEvent,
     },
     value_objects::owner::HouseOwner,
@@ -78,10 +78,10 @@ impl OwnerAggregate {
         })
     }
 
-    pub fn delete(&mut self) -> OwenerDeletedEvent {
+    pub fn delete(&mut self) -> OwnerDeletedEvent {
         let deleted_at = chrono::Utc::now();
         self.deleted_at = Some(deleted_at);
-        OwenerDeletedEvent::new(self.owner_id.clone(), deleted_at)
+        OwnerDeletedEvent::new(self.owner_id.clone(), deleted_at)
     }
 
     pub fn is_deleted(&self) -> bool {

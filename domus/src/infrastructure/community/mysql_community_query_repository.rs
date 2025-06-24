@@ -54,18 +54,8 @@ impl CommunityQueryRepository for MySqlCommunityQueryRepository {
     }
     // 更新小区
     async fn update(&self, event: CommunityUpdatedEvent) -> anyhow::Result<()> {
-        let model = community_query::ActiveModel {
+        let mut model = community_query::ActiveModel {
             id: Set(event.community_id),
-            // 小区名称
-            name: Set(event.name),
-            // 小区地址
-            address: Set(event.address),
-            // 城市
-            city: Set(event.city),
-            // 小区年限
-            year_built: Set(event.year_built),
-            // 小区类型
-            community_type: Set(event.community_type),
             // 小区描述
             description: Set(event.description),
             // 小区图片
@@ -74,6 +64,26 @@ impl CommunityQueryRepository for MySqlCommunityQueryRepository {
             location: Set(event.location),
             ..Default::default()
         };
+
+        if let Some(name) = event.name {
+            model.name = Set(name);
+        }
+
+        if let Some(address) = event.address {
+            model.address = Set(address);
+        }
+
+        if let Some(city) = event.city {
+            model.city = Set(city);
+        }
+
+        if let Some(year_built) = event.year_built {
+            model.year_built = Set(year_built);
+        }
+
+        if let Some(community_type) = event.community_type {
+            model.community_type = Set(community_type);
+        }
 
         model.update(self.pool.as_ref()).await?;
         Ok(())

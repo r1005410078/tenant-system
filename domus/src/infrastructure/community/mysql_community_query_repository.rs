@@ -99,7 +99,10 @@ impl CommunityQueryRepository for MySqlCommunityQueryRepository {
             .all(self.pool.as_ref())
             .await?;
 
-        let total = community_query::Entity::count(self.pool.as_ref()).await?;
+        let total = community_query::Entity::find()
+            .count(self.pool.as_ref())
+            .await?;
+
         let records = data
             .into_iter()
             .map(|community| CommunityQueryReadModelDto::from(community))

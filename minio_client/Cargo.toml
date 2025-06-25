@@ -1,0 +1,11 @@
+[package]
+name = "minio_client"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+minio = "0.3.0"
+tokio = { workspace = true }
+anyhow = { workspace = true }
+http = { workspace = true }
+log = { workspace = true }

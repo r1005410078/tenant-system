@@ -94,19 +94,17 @@ impl CommunityQueryRepository for MySqlCommunityQueryRepository {
         &self,
         table_data_request: TableDataRequest,
     ) -> anyhow::Result<TableDataResponse<CommunityQueryReadModelDto>> {
-        let data = community_query::Entity::find()
-            .offset((table_data_request.page - 1) * table_data_request.page_size)
-            .limit(table_data_request.page_size)
-            .all(self.pool.as_ref())
-            .await?;
+        let paginator = community_query::Entity::find()
+            .paginate(self.pool.as_ref(), table_data_request.page_size);
 
-        let total = community_query::Entity::find()
-            .count(self.pool.as_ref())
+        let total = paginator.num_items().await?;
+        let data = paginator
+            .fetch_page(table_data_request.page.saturating_sub(1))
             .await?;
 
         let records = data
             .into_iter()
-            .map(|community| CommunityQueryReadModelDto::from(community))
+            .map(CommunityQueryReadModelDto::from)
             .collect();
 
         Ok(TableDataResponse::new(records, total as u64))

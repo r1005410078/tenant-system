@@ -50,9 +50,9 @@ use crate::{
         },
     },
     interfaces::controllers::{
-        community::{create_community, delete_community, update_community},
-        house::{create_house, delete_house, update_house},
-        owner::{create_owner, delete_owner, update_owner},
+        community::{create_community, delete_community, list_community, update_community},
+        house::{create_house, delete_house, list_houses, update_house},
+        owner::{create_owner, delete_owner, owner_list, update_owner},
     },
 };
 
@@ -200,19 +200,22 @@ async fn main() -> std::io::Result<()> {
                 web::scope("/api/community")
                     .service(create_community)
                     .service(update_community)
-                    .service(delete_community),
+                    .service(delete_community)
+                    .service(list_community),
             )
             .service(
                 web::scope("/api/owner")
                     .service(create_owner)
                     .service(update_owner)
-                    .service(delete_owner),
+                    .service(delete_owner)
+                    .service(owner_list),
             )
             .service(
                 web::scope("/api/house")
                     .service(create_house)
                     .service(update_house)
-                    .service(delete_house),
+                    .service(delete_house)
+                    .service(list_houses),
             )
     })
     .bind(server_url)?

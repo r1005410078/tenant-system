@@ -1,8 +1,10 @@
-use actix_web::{post, web, HttpResponse};
+use actix_web::{get, post, web, HttpResponse};
+use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
         commands::{create_house::CreateHouseCommand, update_house::UpdateHouseCommand},
+        queries::house::HouseQueryService,
         services::{
             create_house::CreateHouseService, delete_house::DeleteHouseService,
             update_house::UpdateHouseService,
@@ -43,6 +45,19 @@ pub async fn delete_house(
     delete_house_service: web::Data<DeleteHouseService>,
 ) -> HttpResponse {
     let res = match delete_house_service.execute(path.into_inner()).await {
+        Ok(data) => ResponseBody::success(data),
+        Err(e) => ResponseBody::error(e.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("/list")]
+pub async fn list_houses(
+    query: web::Query<TableDataRequest>,
+    house_query_service: web::Data<HouseQueryService>,
+) -> HttpResponse {
+    let res = match house_query_service.find_all(query.into_inner()).await {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };

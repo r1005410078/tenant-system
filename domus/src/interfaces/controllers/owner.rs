@@ -1,8 +1,10 @@
-use actix_web::{post, web, HttpRequest, HttpResponse};
+use actix_web::{get, post, web, HttpRequest, HttpResponse};
+use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
         commands::{create_owner::CreateOwnerCommand, delete_owner::DeleteOwnerCommand},
+        queries::owner::OwnerQueryService,
         services::create_owner::CreateOwnerService,
     },
     interfaces::dtos::response::ResponseBody,
@@ -45,6 +47,19 @@ async fn delete_owner(
     };
 
     let res = match service.execute(command).await {
+        Ok(data) => ResponseBody::success(data),
+        Err(err) => ResponseBody::error(err.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("/list")]
+async fn owner_list(
+    table_data_request: web::Query<TableDataRequest>,
+    service: web::Data<OwnerQueryService>,
+) -> HttpResponse {
+    let res = match service.find_all(table_data_request.into_inner()).await {
         Ok(data) => ResponseBody::success(data),
         Err(err) => ResponseBody::error(err.to_string()),
     };

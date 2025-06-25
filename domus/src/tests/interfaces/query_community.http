@@ -1,0 +1,4 @@
+
+GET http://localhost:3001/api/community/list?page=1&page_size=5
+Content-Type: application/json
+

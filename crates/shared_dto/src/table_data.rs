@@ -8,12 +8,12 @@ pub struct TableDataRequest {
 
 #[derive(Serialize, Deserialize)]
 pub struct TableDataResponse<T: Serialize> {
-    pub data: Vec<T>,
+    pub list: Vec<T>,
     pub total: u64,
 }
 
 impl<T: Serialize> TableDataResponse<T> {
-    pub fn new(data: Vec<T>, total: u64) -> TableDataResponse<T> {
-        TableDataResponse { data, total }
+    pub fn new(list: Vec<T>, total: u64) -> TableDataResponse<T> {
+        TableDataResponse { list, total }
     }
 }

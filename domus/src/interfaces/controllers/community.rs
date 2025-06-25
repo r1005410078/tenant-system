@@ -1,10 +1,12 @@
-use actix_web::{post, web, HttpRequest, HttpResponse};
+use actix_web::{get, post, web, HttpRequest, HttpResponse};
+use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
         commands::{
             create_community::CreateCommunityCommand, update_community::UpdateCommunityCommand,
         },
+        queries::community::CommunityQueryService,
         services::{
             create_community::CreateCommunityService, delete_community::DeleteCommunityService,
             update_community::UpdateCommunityService,
@@ -49,6 +51,19 @@ async fn delete_community(
     let community_id = req.match_info().get("community_id").unwrap_or("");
     let res = match service.execute(community_id.to_string()).await {
         Ok(()) => ResponseBody::success(()),
+        Err(e) => ResponseBody::error(e.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("/list")]
+async fn list_community(
+    query: web::Query<TableDataRequest>,
+    service: web::Data<CommunityQueryService>,
+) -> HttpResponse {
+    let res = match service.find_all(query.into_inner()).await {
+        Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };
 

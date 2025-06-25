@@ -1,10 +1,7 @@
 use sea_orm::prelude::DateTimeUtc;
 
 use crate::domain::community::{
-    events::{
-        community::CommunityEvent, community_created::CommunityCreatedEvent,
-        community_deleted::CommunityDeletedEvent, community_updated::CommunityUpdatedEvent,
-    },
+    events::{community::CommunityEvent, community_deleted::CommunityDeletedEvent},
     value_objects::{
         community_created_data::CommunityCreateData, community_updated_data::CommunityUpdateData,
     },

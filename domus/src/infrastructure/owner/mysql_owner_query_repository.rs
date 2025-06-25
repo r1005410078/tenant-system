@@ -69,18 +69,16 @@ impl OwnerQueryRepository for MySqlOwnerQueryRepository {
         &self,
         table_data_request: TableDataRequest,
     ) -> anyhow::Result<TableDataResponse<OwnerQueryReadModelDto>> {
-        let data = owner_query::Entity::find()
-            .offset((table_data_request.page - 1) * table_data_request.page_size)
-            .limit(table_data_request.page_size)
-            .all(self.pool.as_ref())
+        let paginator =
+            owner_query::Entity::find().paginate(self.pool.as_ref(), table_data_request.page_size);
+
+        let total = paginator.num_items().await?;
+        let data = paginator
+            .fetch_page(table_data_request.page - 1)
             .await?
             .into_iter()
             .map(OwnerQueryReadModelDto::from)
             .collect::<Vec<OwnerQueryReadModelDto>>();
-
-        let total = owner_query::Entity::find()
-            .count(self.pool.as_ref())
-            .await?;
 
         Ok(TableDataResponse::new(data, total as u64))
     }

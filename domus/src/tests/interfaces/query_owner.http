@@ -1,0 +1,2 @@
+GET http://localhost:3001/api/owner/list?page=1&page_size=5
+Content-Type: application/json

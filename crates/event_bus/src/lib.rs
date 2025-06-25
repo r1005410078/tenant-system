@@ -4,7 +4,7 @@ use std::{
     collections::HashMap,
     future::Future,
     pin::Pin,
-    sync::{Arc, Mutex},
+    sync::{Arc, Mutex, RwLock},
 };
 
 use sea_orm::{ActiveModelTrait, ActiveValue::Set, DbConn, DbErr};
@@ -17,7 +17,7 @@ impl<T> Event for T where T: Any + Send + Sync + Clone + Serialize {}
 type AsyncCallback<T> = Box<dyn Fn(T) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
 
 pub struct AsyncEventBus {
-    subscribers: Arc<Mutex<HashMap<TypeId, Vec<AsyncCallbackBox>>>>,
+    subscribers: Arc<RwLock<HashMap<TypeId, Vec<AsyncCallbackBox>>>>,
     pool: Option<Arc<DbConn>>,
 }
 
@@ -27,14 +27,14 @@ type AsyncCallbackBox =
 impl AsyncEventBus {
     pub fn new(pool: Option<Arc<DbConn>>) -> Self {
         Self {
-            subscribers: Arc::new(Mutex::new(HashMap::new())),
+            subscribers: Arc::new(RwLock::new(HashMap::new())),
             pool,
         }
     }
 
     pub async fn publish<T: Event>(&self, event: T) {
         let type_id = TypeId::of::<T>();
-        let subscribers = self.subscribers.lock().unwrap();
+        let subscribers = self.subscribers.read().unwrap();
         if let Some(callbacks) = subscribers.get(&type_id) {
             for callback in callbacks {
                 let event_box = Box::new(event.clone()) as Box<dyn Any + Send>;
@@ -45,7 +45,7 @@ impl AsyncEventBus {
 
     pub fn subscribe<T: Event + 'static>(&self, callback: AsyncCallback<T>) {
         let type_id = TypeId::of::<T>();
-        let mut subscribers = self.subscribers.lock().unwrap();
+        let mut subscribers = self.subscribers.write().unwrap();
         let entry = subscribers.entry(type_id).or_insert_with(Vec::new);
         // 包装成统一的 Box<dyn Fn(Box<dyn Any + Send>)>
         let wrapper: AsyncCallbackBox = Box::new(move |event: Box<dyn Any + Send>| {

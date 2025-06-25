@@ -30,8 +30,8 @@ impl MySqlOwnerQueryRepository {
 impl OwnerQueryRepository for MySqlOwnerQueryRepository {
     // 创建业主
     async fn create(&self, event: OwnerCreatedEvent) -> anyhow::Result<()> {
-        let model = owner::ActiveModel {
-            owner_id: Set(event.id.clone()),
+        let model = owner_query::ActiveModel {
+            id: Set(event.id.clone()),
             name: Set(event.name.clone()),
             phone: Set(event.phone.clone()),
             id_card: Set(event.id_card.clone()),

@@ -3,7 +3,7 @@ POST http://localhost:3001/api/house/update
 Content-Type: application/json
 
 {
-  "house_id": "ae94b28b-515b-407d-855d-57aed190c6a0",
+  "house_id": "2d39c956-756b-4084-b877-61eb17ce7115",
   "purpose": "出租",
   "transaction_type": "出租",
   "house_status": "出租",
@@ -32,13 +32,13 @@ Content-Type: application/json
     "rooms": "2"
   },
   "owner": {
-    "id": "f57d4792-8046-4bf1-bf50-2012bde39b25",
+    "id": "0a657953-7c64-4542-ae1b-135b57209fe7",
     "name": "张三",
-    "phone": "13800000000"
+    "phone": "1111"
   },
   "community": {
-    "id": "761229ff-e64b-4259-af71-3a9591acd6cf",
-    "name": "回祥小区",
+    "id": "3609a301-3b8c-4d95-81b6-236178d964b9",
+    "name": "回祥小区11",
     "address": "北京市朝阳区幸福路2号",
     "city": "北京市",
     "year_built": 2020,

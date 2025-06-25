@@ -2,8 +2,8 @@ use sea_orm::prelude::DateTimeUtc;
 
 use crate::domain::community::{
     events::{
-        community_created::CommunityCreatedEvent, community_deleted::CommunityDeletedEvent,
-        community_updated::CommunityUpdatedEvent,
+        community::CommunityEvent, community_created::CommunityCreatedEvent,
+        community_deleted::CommunityDeletedEvent, community_updated::CommunityUpdatedEvent,
     },
     value_objects::{
         community_created_data::CommunityCreateData, community_updated_data::CommunityUpdateData,
@@ -29,14 +29,17 @@ impl CommunityAggregate {
         }
     }
 
-    pub fn create(data: &CommunityCreateData) -> (CommunityAggregate, CommunityCreatedEvent) {
+    pub fn create(data: &CommunityCreateData) -> (CommunityAggregate, CommunityEvent) {
         let aggregate: CommunityAggregate =
             CommunityAggregate::new(data.name.clone(), data.address.clone());
 
-        (aggregate.clone(), data.to_event(&aggregate.community_id))
+        (
+            aggregate.clone(),
+            CommunityEvent::Created(data.to_event(&aggregate.community_id)),
+        )
     }
 
-    pub fn update(&mut self, data: &CommunityUpdateData) -> anyhow::Result<CommunityUpdatedEvent> {
+    pub fn update(&mut self, data: &CommunityUpdateData) -> anyhow::Result<CommunityEvent> {
         if self.is_deleted() {
             return Err(anyhow::anyhow!("community is deleted"));
         }
@@ -44,12 +47,12 @@ impl CommunityAggregate {
         self.name = data.name.clone().unwrap_or(self.name.clone());
         self.address = data.address.clone().unwrap_or(self.address.clone());
 
-        Ok(data.to_event())
+        Ok(CommunityEvent::Updated(data.to_event()))
     }
 
-    pub fn delete(&mut self) -> CommunityDeletedEvent {
+    pub fn delete(&mut self) -> CommunityEvent {
         self.deleted_at = Some(chrono::Utc::now());
-        CommunityDeletedEvent::new(self.community_id.clone())
+        CommunityEvent::Deleted(CommunityDeletedEvent::new(self.community_id.clone()))
     }
 
     pub fn is_deleted(&self) -> bool {

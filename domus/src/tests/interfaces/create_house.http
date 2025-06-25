@@ -31,12 +31,10 @@ Content-Type: application/json
     "rooms": "2"
   },
   "owner": {
-    "id": "f57d4792-8046-4bf1-bf50-2012bde39b25",
     "name": "张三",
     "phone": "13800000000"
   },
   "community": {
-    "id": "761229ff-e64b-4259-af71-3a9591acd6cf",
     "name": "幸福社区",
     "address": "北京市朝阳区幸福路11",
     "city": "北京市",

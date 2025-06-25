@@ -29,6 +29,8 @@ CREATE TABLE `owner_query` (
 
 CREATE TABLE `house_query` (
   `id` CHAR(36) PRIMARY KEY NOT NULL COMMENT '房屋ID',
+  `community_id` CHAR(36) NOT NULL COMMENT '小区ID',
+  `owner_id` CHAR(36) DEFAULT NULL COMMENT '业主ID',
 
   -- 基本信息
   `title` VARCHAR(255) DEFAULT NULL COMMENT '房源标题',

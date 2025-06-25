@@ -1,6 +1,6 @@
 use crate::domain::owner::{
     events::{
-        owner_created::OwnerCreatedEvent, owner_deleted::OwnerDeletedEvent,
+        owner::OwnerEvent, owner_created::OwnerCreatedEvent, owner_deleted::OwnerDeletedEvent,
         owner_updated::OwnerUpdatedEvent,
     },
     value_objects::owner::HouseOwner,
@@ -26,7 +26,7 @@ impl OwnerAggregate {
         }
     }
 
-    pub fn create(data: &HouseOwner) -> anyhow::Result<(OwnerAggregate, OwnerCreatedEvent)> {
+    pub fn create(data: &HouseOwner) -> anyhow::Result<(OwnerAggregate, OwnerEvent)> {
         let owner_id = uuid::Uuid::new_v4().to_string();
         let name = data
             .name
@@ -54,11 +54,11 @@ impl OwnerAggregate {
             description: data.description.clone(),
         };
 
-        Ok((owner, event))
+        Ok((owner, OwnerEvent::Created(event)))
     }
 
     // 更新
-    pub fn update(&mut self, data: &HouseOwner) -> anyhow::Result<OwnerUpdatedEvent> {
+    pub fn update(&mut self, data: &HouseOwner) -> anyhow::Result<OwnerEvent> {
         if self.is_deleted() {
             return Err(anyhow::anyhow!("Cannot update a deleted owner"));
         }
@@ -70,20 +70,21 @@ impl OwnerAggregate {
             self.id_card = Some(id_card.clone());
         }
 
-        Ok(OwnerUpdatedEvent {
+        Ok(OwnerEvent::Updated(OwnerUpdatedEvent {
             id: self.owner_id.clone(),
             name: Some(self.name.clone()),
             phone: data.phone.clone(),
             id_card: self.id_card.clone(),
             id_card_images: data.id_card_images.clone(),
             description: data.description.clone(),
-        })
+        }))
     }
 
-    pub fn delete(&mut self) -> OwnerDeletedEvent {
+    pub fn delete(&mut self) -> OwnerEvent {
         let deleted_at = chrono::Utc::now();
         self.deleted_at = Some(deleted_at);
-        OwnerDeletedEvent::new(self.owner_id.clone(), deleted_at)
+
+        OwnerEvent::Deleted(OwnerDeletedEvent::new(self.owner_id.clone(), deleted_at))
     }
 
     pub fn is_deleted(&self) -> bool {

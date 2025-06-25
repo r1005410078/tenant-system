@@ -48,10 +48,10 @@ impl UserQueryRepository for MysqlUserQueryRepository {
             .count(self.pool.as_ref())
             .await?;
 
-        Ok(TableDataResponse {
+        Ok(TableDataResponse::new(
+            models.iter().map(|model| model.clone().into()).collect(),
             total,
-            data: models.iter().map(|model| model.clone().into()).collect(),
-        })
+        ))
     }
 
     // 保持用户登录历史
@@ -145,10 +145,10 @@ impl UserQueryRepository for MysqlUserQueryRepository {
             .count(self.pool.as_ref())
             .await?;
 
-        Ok(TableDataResponse {
+        Ok(TableDataResponse::new(
+            models.iter().map(|model| model.clone().into()).collect(),
             total,
-            data: models.iter().map(|model| model.clone().into()).collect(),
-        })
+        ))
     }
 
     // 绑定角色

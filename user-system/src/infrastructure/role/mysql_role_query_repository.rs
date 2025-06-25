@@ -88,7 +88,7 @@ impl RoleQueryRepository for MysqlRoleQueryRepository {
             .count(self.pool.as_ref())
             .await?;
 
-        Ok(TableDataResponse { total, data })
+        Ok(TableDataResponse::new(data, total))
     }
 
     // 绑定角色权限

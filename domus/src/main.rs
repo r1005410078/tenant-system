@@ -6,6 +6,7 @@ use std::{env, sync::Arc};
 
 use actix_web::{web, App, HttpServer};
 use event_bus::{AsyncEventBus, EventListener};
+use shared_utils::minio_client::Minio;
 
 use crate::{
     application::{
@@ -29,9 +30,9 @@ use crate::{
             create_community::CreateCommunityService, create_house::CreateHouseService,
             create_owner::CreateOwnerService, delete_community::DeleteCommunityService,
             delete_house::DeleteHouseService, delete_owner::DeleteOwnerService,
-            save_community::SaveCommunityService, save_owner::SaveOwnerService,
-            update_community::UpdateCommunityService, update_house::UpdateHouseService,
-            update_owner::UpdateOwnerService,
+            file_upload_service::FileUploadService, save_community::SaveCommunityService,
+            save_owner::SaveOwnerService, update_community::UpdateCommunityService,
+            update_house::UpdateHouseService, update_owner::UpdateOwnerService,
         },
     },
     infrastructure::{
@@ -51,7 +52,7 @@ use crate::{
     },
     interfaces::controllers::{
         community::{create_community, delete_community, list_community, update_community},
-        house::{create_house, delete_house, list_houses, update_house},
+        house::{create_house, delete_house, get_upload_url, list_houses, update_house},
         owner::{create_owner, delete_owner, owner_list, update_owner},
     },
 };
@@ -66,6 +67,21 @@ async fn main() -> std::io::Result<()> {
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
+
+    // minio_client
+    let minio_client = Arc::new(
+        Minio::new(
+            Some("http://127.0.0.1:9000".to_string()),
+            "minioadmin",
+            "minioadmin",
+        )
+        .create_client()
+        .await
+        .unwrap(),
+    );
+
+    // 上传文件服务
+    let file_upload_service = web::Data::new(FileUploadService::new(minio_client.clone()));
 
     // 创建小区仓储
     let community_repo = Arc::new(MySqlCommunityAggregateRepository::new(pool.clone()));
@@ -196,6 +212,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(community_query_service.clone())
             .app_data(owner_query_service.clone())
             .app_data(house_query_service.clone())
+            .app_data(file_upload_service.clone())
             .service(
                 web::scope("/api/community")
                     .service(create_community)
@@ -215,7 +232,8 @@ async fn main() -> std::io::Result<()> {
                     .service(create_house)
                     .service(update_house)
                     .service(delete_house)
-                    .service(list_houses),
+                    .service(list_houses)
+                    .service(get_upload_url),
             )
     })
     .bind(server_url)?

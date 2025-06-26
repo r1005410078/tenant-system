@@ -4,6 +4,7 @@ pub mod create_owner;
 pub mod delete_community;
 pub mod delete_house;
 pub mod delete_owner;
+pub mod file_upload_service;
 pub mod save_community;
 pub mod save_owner;
 pub mod update_community;

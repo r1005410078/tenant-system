@@ -5,7 +5,7 @@ edition = "2021"
 
 [workspace]
 members = [
-    "crates/event_bus", "crates/log", "crates/shared_dto", "domus", "minio_client",
+    "crates/event_bus", "crates/log", "crates/shared_dto", "crates/shared_utils", "domus",
     "user-system",
 ]
 
@@ -30,8 +30,8 @@ time = { workspace = true }
 actix-web  = { workspace = true }
 serde_json = { workspace = true }
 shared_dto = { workspace = true }
-minio = "0.3.0"
 http = { workspace = true }
+shared_utils = { workspace = true }
 
 [workspace.dependencies]
 casbin = { version = "2.8.0", default-features = false, features = ["runtime-async-std", "logging", "incremental"] }
@@ -53,11 +53,14 @@ dotenvy = "0.15.7"
 futures = "0.3"
 log = { path = "crates/log" }
 shared_dto ={ path = "crates/shared_dto" }
+shared_utils = { path = "crates/shared_utils" }
 tracing = "0.1"
 argon2 = "0.5.3"
 time = "0.3.21"
 jsonwebtoken = "9.3.1"
 http = "1.3.1"
+aws-config = "1.1.5"
+aws-sdk-s3 = "1.14.0"
 
 [[bin]]
 name = "user-system"

@@ -6,7 +6,7 @@ edition = "2021"
 [workspace]
 members = [
     "crates/event_bus", "crates/log", "crates/shared_dto", "crates/shared_utils", "domus",
-    "user-system",
+    "user_system",
 ]
 
 [dependencies]
@@ -32,6 +32,7 @@ serde_json = { workspace = true }
 shared_dto = { workspace = true }
 http = { workspace = true }
 shared_utils = { workspace = true }
+user_system = { workspace = true }
 
 [workspace.dependencies]
 casbin = { version = "2.8.0", default-features = false, features = ["runtime-async-std", "logging", "incremental"] }
@@ -54,6 +55,7 @@ futures = "0.3"
 log = { path = "crates/log" }
 shared_dto ={ path = "crates/shared_dto" }
 shared_utils = { path = "crates/shared_utils" }
+user_system = { path = "user_system" }
 tracing = "0.1"
 argon2 = "0.5.3"
 time = "0.3.21"
@@ -63,8 +65,8 @@ aws-config = "1.1.5"
 aws-sdk-s3 = "1.14.0"
 
 [[bin]]
-name = "user-system"
-path = "user-system/src/main.rs"
+name = "user_system"
+path = "user_system/src/main.rs"
 
 [[bin]]
 name = "domus"

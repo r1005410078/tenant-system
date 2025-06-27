@@ -1,0 +1,10 @@
+
+POST http://localhost:3001/api/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+# "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNTYyZTAzMTEtOWJkMy00YjJmLWJkZDMtNmEwZjhjY2U5N2RhIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGUiOltdLCJleHAiOjE3NTEwNzY1NDcsImlhdCI6MTc1MDk5MDE0N30.e9qJFigFLO96zIzAPv0cZqblqyOV3dedAQeIGdWbDBo"

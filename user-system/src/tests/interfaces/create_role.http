@@ -1,7 +1,0 @@
-POST http://localhost:3001/api/role/create
-Content-Type: application/json
-
-{
-  "name": "admin",
-  "description": "超级管理员"
-}

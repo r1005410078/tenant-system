@@ -1,4 +1,4 @@
-use sea_orm::{sqlx::pool, DbConn};
+use sea_orm::DbConn;
 use std::{env, sync::Arc};
 use user_system::shared::auth_middleware::AuthMiddleware;
 

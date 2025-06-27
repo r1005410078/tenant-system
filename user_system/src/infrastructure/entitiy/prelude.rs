@@ -2,11 +2,10 @@
 
 pub use super::casbin_rules::Entity as CasbinRules;
 pub use super::event_record::Entity as EventRecord;
+pub use super::permissions_detail::Entity as PermissionsDetail;
 pub use super::role_aggregate::Entity as RoleAggregate;
 pub use super::role_detail_read_model::Entity as RoleDetailReadModel;
-pub use super::role_user::Entity as RoleUser;
 pub use super::user_aggregate::Entity as UserAggregate;
-pub use super::user_details_read::Entity as UserDetailsRead;
 pub use super::user_login_history::Entity as UserLoginHistory;
 pub use super::user_operation_log::Entity as UserOperationLog;
 pub use super::user_query::Entity as UserQuery;

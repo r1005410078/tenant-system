@@ -1,7 +1,5 @@
 use std::sync::Arc;
 
-use actix_web::test;
-
 use crate::{
     application::commands::{
         register_user::{RegisterUserCommand, UserRegistrationHandler},

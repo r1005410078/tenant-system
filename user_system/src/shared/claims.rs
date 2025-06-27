@@ -4,11 +4,11 @@ use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation}
 use serde::{Deserialize, Serialize};
 use time::{Duration, OffsetDateTime};
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Claims {
     pub user_id: String,
     pub username: String,
-    pub rule: Vec<String>,
+    pub rules: Vec<String>,
     pub exp: i64,
     pub iat: i64,
 }
@@ -16,13 +16,13 @@ pub struct Claims {
 const KEY: &[u8] = b"2778205";
 
 impl Claims {
-    pub fn new(user_id: String, username: String, rule: Vec<String>) -> Self {
+    pub fn new(user_id: String, username: String, rules: Vec<String>) -> Self {
         let iat = OffsetDateTime::now_utc();
         Claims {
             iat: iat.unix_timestamp(),
             user_id,
             username,
-            rule,
+            rules,
             exp: (iat + Duration::days(1)).unix_timestamp(), //1723962788,
         }
     }

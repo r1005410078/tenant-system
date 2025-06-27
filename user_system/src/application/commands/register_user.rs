@@ -17,6 +17,18 @@ pub struct RegisterUserCommand {
     pub roles: Option<Vec<String>>,
 }
 
+impl RegisterUserCommand {
+    pub fn new(username: String, password: String, roles: Vec<String>) -> Self {
+        Self {
+            username,
+            email: None,
+            phone: None,
+            password,
+            roles: None,
+        }
+    }
+}
+
 pub struct UserRegistrationHandler {
     event_bus: Arc<AsyncEventBus>,
     user_repo: Arc<dyn UserAggregateRepository>,

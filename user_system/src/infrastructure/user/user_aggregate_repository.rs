@@ -97,17 +97,20 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
         Ok(())
     }
 
-    async fn find_by_username(&self, username: &str) -> Option<UserAggregate> {
-        entitiy::user_aggregate::Entity::find()
+    async fn find_by_username(&self, username: &str) -> anyhow::Result<UserAggregate> {
+        let mut user: UserAggregate = entitiy::user_aggregate::Entity::find()
             .filter(
                 Condition::all()
                     .add(entitiy::user_aggregate::Column::Username.eq(username))
                     .add(entitiy::user_aggregate::Column::DeletedAt.is_null()),
             )
             .one(self.pool.as_ref())
-            .await
-            .map(|user| user.map(|user| user.into()))
-            .unwrap()
+            .await?
+            .ok_or(anyhow::anyhow!("user not found"))?
+            .into();
+
+        user.roles = self.get_roles_by_user_id(&user.id.to_string()).await;
+        Ok(user)
     }
 
     async fn find_by_id(&self, user_id: &str) -> anyhow::Result<UserAggregate> {

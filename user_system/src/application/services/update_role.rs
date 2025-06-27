@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::application::commands::{
     permission_granted_to_role::{
         PermissionGrantedToRoleCommand, PermissionGrantedToRoleCommandHandler,
@@ -7,13 +9,13 @@ use crate::application::commands::{
 
 pub struct UpdateRoleService {
     update_role_command_handler: UpdateRoleCommandHandler,
-    permission_granted_to_role_command_handler: PermissionGrantedToRoleCommandHandler,
+    permission_granted_to_role_command_handler: Arc<PermissionGrantedToRoleCommandHandler>,
 }
 
 impl UpdateRoleService {
     pub fn new(
         update_role_command_handler: UpdateRoleCommandHandler,
-        permission_granted_to_role_command_handler: PermissionGrantedToRoleCommandHandler,
+        permission_granted_to_role_command_handler: Arc<PermissionGrantedToRoleCommandHandler>,
     ) -> Self {
         Self {
             update_role_command_handler,

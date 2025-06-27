@@ -1,6 +1,7 @@
 pub mod create_role;
 pub mod delete_role;
 pub mod delete_user;
+pub mod init_system;
 pub mod login;
 pub mod permission_granted_to_role;
 pub mod register_user;

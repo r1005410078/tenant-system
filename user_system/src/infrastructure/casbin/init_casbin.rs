@@ -23,8 +23,7 @@ pub async fn init_casbin(pool: Arc<DbConn>) -> Enforcer {
 
 #[cfg(test)]
 mod tests {
-    use crate::infrastructure::mysql_pool::create_mysql_pool;
-    use crate::init_casbin;
+    use crate::infrastructure::{casbin::init_casbin::init_casbin, mysql_pool::create_mysql_pool};
     use casbin::CoreApi;
     use std::sync::Arc;
 

@@ -3,8 +3,9 @@ POST http://localhost:3001/api/user/update
 Content-Type: application/json
 
 {
-  "id": "6e2dcbca-b8f0-4e4b-916a-e6008919d438",
-  "email": "11111@qq.com"
+  "id": "99285afd-6ee0-486c-868a-39a3d43035eb",
+  "email": "2222@qq.com",
+  "password": "admin"
 }
 
 

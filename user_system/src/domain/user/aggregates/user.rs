@@ -93,7 +93,11 @@ impl UserAggregate {
         self.username = username.unwrap_or(self.username.clone());
         self.email = email.or(self.email.clone());
         self.phone = phone.or(self.phone.clone());
-        self.password = Argon::password_hash(&password.unwrap_or(self.password.clone()));
+        self.password = password
+            .map(|p| Argon::password_hash(p.as_str()))
+            .unwrap_or(self.password.clone());
+
+        self.roles = roles.unwrap_or(self.roles.clone());
 
         UserEvent::UserUpdated(UserUpdatedEvent {
             id: self.id.to_string(),
@@ -101,7 +105,7 @@ impl UserAggregate {
             email: self.email.clone(),
             phone: self.phone.clone(),
             account_status: self.account_status.to_string(),
-            roles: roles,
+            roles: Some(self.roles.clone()),
         })
     }
 

@@ -1,8 +1,8 @@
 POST http://localhost:3001/api/role/create
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNTYyZTAzMTEtOWJkMy00YjJmLWJkZDMtNmEwZjhjY2U5N2RhIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGUiOltdLCJleHAiOjE3NTEwNzY1NDcsImlhdCI6MTc1MDk5MDE0N30.e9qJFigFLO96zIzAPv0cZqblqyOV3dedAQeIGdWbDBo
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiOTkyODVhZmQtNmVlMC00ODZjLTg2OGEtMzlhM2Q0MzAzNWViIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbImMyODc3NTQ4LTM0OTYtNDZmYi04YjkxLTFmYzU1Y2FiZDNjYiJdLCJleHAiOjE3NTEwODk5OTQsImlhdCI6MTc1MTAwMzU5NH0.UqpbtlHdf-b-3Q62yTySg-u3rkMeNIGiV4-pYwMDJU4
 
 {
-  "name": "admin",
-  "description": "超级管理员"
+  "name": "aaaa",
+  "description": "aaaa"
 }

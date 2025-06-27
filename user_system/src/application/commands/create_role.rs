@@ -4,19 +4,17 @@ use event_bus::AsyncEventBus;
 use serde::Deserialize;
 
 use crate::{
-    application::repositories::role::RoleRepository, domain::roles::aggregates::role::RoleAggregate,
+    application::repositories::role::RoleRepository,
+    domain::roles::{
+        aggregates::role::RoleAggregate, events::permission_granted_to_role::Permission,
+    },
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct CreateRoleCommand {
     pub name: String,
     pub description: Option<String>,
-}
-
-impl CreateRoleCommand {
-    pub fn new(name: String, description: Option<String>) -> Self {
-        Self { name, description }
-    }
+    pub permissions: Option<Vec<Permission>>,
 }
 
 pub struct CreateRoleCommandHandler {

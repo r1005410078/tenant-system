@@ -29,8 +29,7 @@ impl LoginCommandHandler {
         let mut user = self
             .user_repo
             .find_by_username(command.username.as_str())
-            .await
-            .ok_or(anyhow::anyhow!("密码错误或账号不存在"))?;
+            .await?;
 
         let login_event = user.login(command.username.as_str(), command.password.as_str());
 

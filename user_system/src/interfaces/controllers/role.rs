@@ -6,10 +6,13 @@ use crate::{
         commands::{create_role::CreateRoleCommand, update_role::UpdateRoleCommand},
         queries::role_query_service::RoleQueryService,
         services::{
-            create_role::CreateRoleService, delete_role::DeleteRoleService,
+            create_role::CreateRoleService,
+            delete_role::DeleteRoleService,
+            permissions_detail::{PermissionsDetailDto, PermissionsDetailService},
             update_role::UpdateRoleService,
         },
     },
+    domain::roles::events::permission_granted_to_role::Permission,
     interfaces::dtos::response::ResponseBody,
 };
 
@@ -71,6 +74,29 @@ async fn detail_role(
     service: web::Data<RoleQueryService>,
 ) -> HttpResponse {
     let res = match service.find(&path.into_inner()).await {
+        Ok(data) => ResponseBody::success(data),
+        Err(err) => ResponseBody::error(err.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("permissions_details/list")]
+async fn permissions_details_list(service: web::Data<PermissionsDetailService>) -> HttpResponse {
+    let res = match service.list().await {
+        Ok(data) => ResponseBody::success(data),
+        Err(err) => ResponseBody::error(err.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[post("permissions_details/save")]
+async fn save_permission_detail(
+    body: web::Json<PermissionsDetailDto>,
+    service: web::Data<PermissionsDetailService>,
+) -> HttpResponse {
+    let res = match service.save(body.into_inner()).await {
         Ok(data) => ResponseBody::success(data),
         Err(err) => ResponseBody::error(err.to_string()),
     };

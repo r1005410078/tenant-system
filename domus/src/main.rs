@@ -7,6 +7,7 @@ use std::{env, sync::Arc};
 use actix_web::{web, App, HttpServer};
 use event_bus::{AsyncEventBus, EventListener};
 use shared_utils::minio_client::Minio;
+use user_system::shared::{auth_middleware::AuthMiddleware, casbin::init_casbin::init_casbin};
 
 use crate::{
     application::{
@@ -67,6 +68,8 @@ async fn main() -> std::io::Result<()> {
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
+    let enforcer = Arc::new(init_casbin().await);
+    let auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
 
     // minio_client
     let minio_client = Arc::new(
@@ -215,6 +218,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(file_upload_service.clone())
             .service(
                 web::scope("/api/community")
+                    .wrap(auth_middleware.clone())
                     .service(create_community)
                     .service(update_community)
                     .service(delete_community)
@@ -222,6 +226,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(
                 web::scope("/api/owner")
+                    .wrap(auth_middleware.clone())
                     .service(create_owner)
                     .service(update_owner)
                     .service(delete_owner)
@@ -229,6 +234,7 @@ async fn main() -> std::io::Result<()> {
             )
             .service(
                 web::scope("/api/house")
+                    .wrap(auth_middleware.clone())
                     .service(create_house)
                     .service(update_house)
                     .service(delete_house)

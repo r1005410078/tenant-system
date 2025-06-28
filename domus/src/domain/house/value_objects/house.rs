@@ -22,12 +22,6 @@ pub struct Community {
 }
 
 impl Community {
-    pub fn get_id(&self) -> anyhow::Result<String> {
-        self.id
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("小区ID不能为空"))
-    }
-
     pub fn get_name(&self) -> anyhow::Result<String> {
         self.name
             .clone()
@@ -44,12 +38,6 @@ impl Community {
         self.city
             .clone()
             .ok_or_else(|| anyhow::anyhow!("城市不能为空"))
-    }
-
-    pub fn get_location(&self) -> anyhow::Result<String> {
-        self.location
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("位置不能为空"))
     }
 
     pub fn get_year_built(&self) -> anyhow::Result<u16> {

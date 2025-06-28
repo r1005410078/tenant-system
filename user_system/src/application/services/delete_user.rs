@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::application::commands::delete_user::{DeleteUserCommand, DeleteUserCommandHandler};
 
 pub struct DeleteUserService {

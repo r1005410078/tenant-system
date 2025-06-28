@@ -1,6 +1,6 @@
 use sea_orm::DbConn;
 use std::{env, sync::Arc};
-use user_system::shared::auth_middleware::AuthMiddleware;
+use user_system::shared::{auth_middleware::AuthMiddleware, casbin::init_casbin::init_casbin};
 
 use crate::{
     application::{
@@ -21,7 +21,6 @@ use crate::{
         },
     },
     infrastructure::{
-        casbin::init_casbin::init_casbin,
         mysql_pool::create_mysql_pool,
         role::{
             mysql_role_query_repository::MysqlRoleQueryRepository,

@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use sea_orm::{
-    sea_query::ExprTrait, ActiveModelTrait, ActiveValue::Set, ColumnTrait, Condition, DbConn,
-    EntityTrait, PaginatorTrait, QueryFilter,
+    ActiveModelTrait, ActiveValue::Set, ColumnTrait, Condition, DbConn, EntityTrait,
+    PaginatorTrait, QueryFilter,
 };
 
 use crate::{

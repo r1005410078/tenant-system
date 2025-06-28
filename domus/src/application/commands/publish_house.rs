@@ -8,6 +8,7 @@ pub struct PublishHouseCommand {
     pub id: String,
 }
 
+#[allow(dead_code)]
 impl PublishHouseCommand {
     pub fn new(id: String) -> Self {
         Self { id }
@@ -19,6 +20,7 @@ pub struct PublishHouseCommandHandler {
     event_bus: Arc<AsyncEventBus>,
 }
 
+#[allow(dead_code)]
 impl PublishHouseCommandHandler {
     pub fn new(
         house_repository: Arc<dyn HouseRepositoryAggregate>,

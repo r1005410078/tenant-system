@@ -7,6 +7,7 @@ pub struct HousePublishedEvent {
     pub published_at: chrono::DateTime<chrono::Utc>,
 }
 
+#[allow(dead_code)]
 impl HousePublishedEvent {
     pub fn new(house_id: String, published_at: DateTimeUtc) -> Self {
         Self {

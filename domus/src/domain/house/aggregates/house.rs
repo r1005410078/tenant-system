@@ -1,7 +1,6 @@
 use sea_orm::prelude::DateTimeUtc;
 
 use crate::domain::house::{
-    self,
     events::{
         house::HouseEvent, house_deleted::HouseDeletedEvent, house_published::HousePublishedEvent,
         house_unpublished::HouseUnpublishedEvent,

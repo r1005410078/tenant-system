@@ -42,7 +42,7 @@ use crate::{
         },
         house::{
             mysql_house_query_repository::MySqlHouseQueryRepository,
-            mysql_house_repository_aggregate::{self, MysqlHouseRepositoryAggregate},
+            mysql_house_repository_aggregate::MysqlHouseRepositoryAggregate,
         },
         mysql_pool::create_mysql_pool,
         owner::{

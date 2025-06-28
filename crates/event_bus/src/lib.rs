@@ -1,10 +1,10 @@
 pub mod entitiy;
 use std::{
-    any::{self, Any, TypeId},
+    any::{Any, TypeId},
     collections::HashMap,
     future::Future,
     pin::Pin,
-    sync::{Arc, Mutex, RwLock},
+    sync::{Arc, RwLock},
 };
 
 use sea_orm::{ActiveModelTrait, ActiveValue::Set, DbConn, DbErr};

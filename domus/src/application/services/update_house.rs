@@ -1,13 +1,7 @@
 use std::sync::Arc;
 
 use crate::application::{
-    commands::{
-        update_community::UpdateCommunityCommand,
-        update_community_handler::UpdateCommunityCommandHandler,
-        update_house::UpdateHouseCommand,
-        update_house_handler::UpdateHouseCommandHandler,
-        update_owner::{UpdateOwnerCommand, UpdateOwnerCommandHandler},
-    },
+    commands::{update_house::UpdateHouseCommand, update_house_handler::UpdateHouseCommandHandler},
     services::{save_community::SaveCommunityService, save_owner::SaveOwnerService},
 };
 

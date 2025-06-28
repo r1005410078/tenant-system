@@ -1,7 +1,6 @@
 use std::sync::Arc;
 
 use crate::domain::roles::events::permission_granted_to_role::Permission;
-use crate::infrastructure::entitiy::casbin_rules;
 use crate::{
     application::repositories::role::RoleRepository,
     domain::roles::aggregates::role::RoleAggregate, infrastructure::entitiy::role_aggregate,
@@ -12,6 +11,7 @@ use sea_orm::Condition;
 use sea_orm::EntityTrait;
 use sea_orm::QueryFilter;
 use sea_orm::{ActiveValue::Set, DbConn};
+use user_system::shared::entitiy::casbin_rules;
 
 pub struct MySqlRoleAggregateRepository {
     pool: Arc<DbConn>,

@@ -10,6 +10,7 @@ pub struct PublishHouseCommand {
     pub description: String,
 }
 
+#[allow(dead_code)]
 impl PublishHouseCommand {
     pub fn new(id: String, description: String) -> Self {
         Self { id, description }

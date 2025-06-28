@@ -2,12 +2,9 @@ use std::sync::Arc;
 
 use event_bus::AsyncEventBus;
 
-use crate::{
-    application::{
-        commands::update_community::UpdateCommunityCommand,
-        repositories::community_repository_aggregate::CommunityRepositoryAggregate,
-    },
-    domain::community::aggregates::community::CommunityAggregate,
+use crate::application::{
+    commands::update_community::UpdateCommunityCommand,
+    repositories::community_repository_aggregate::CommunityRepositoryAggregate,
 };
 
 pub struct UpdateCommunityCommandHandler {

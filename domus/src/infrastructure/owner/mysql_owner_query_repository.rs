@@ -4,17 +4,16 @@ use crate::{
     application::repositories::owner_query_repository::OwnerQueryRepository,
     domain::owner::events::{owner_created::OwnerCreatedEvent, owner_updated::OwnerUpdatedEvent},
     infrastructure::{
-        dtos::owner_query_read_model_dto::OwnerQueryReadModelDto,
-        entitiy::{owner, owner_query},
+        dtos::owner_query_read_model_dto::OwnerQueryReadModelDto, entitiy::owner_query,
     },
 };
+use sea_orm::EntityTrait;
 use sea_orm::PaginatorTrait;
 use sea_orm::{
     ActiveModelTrait,
     ActiveValue::{NotSet, Set},
     DbConn,
 };
-use sea_orm::{EntityTrait, QuerySelect};
 use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 pub struct MySqlOwnerQueryRepository {
     pool: Arc<DbConn>,

@@ -7,10 +7,7 @@ use crate::{
         update_community::UpdateCommunityCommand,
         update_community_handler::UpdateCommunityCommandHandler,
     },
-    domain::{
-        community::aggregates::community::CommunityAggregate,
-        house::value_objects::house::Community,
-    },
+    domain::house::value_objects::house::Community,
 };
 
 pub struct SaveCommunityService {

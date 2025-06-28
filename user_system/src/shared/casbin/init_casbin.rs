@@ -3,7 +3,7 @@ use std::sync::Arc;
 use casbin::{CoreApi, Enforcer};
 use sea_orm::DbConn;
 
-use crate::infrastructure::casbin::sea_orm_adapter::SeaORMTryIntoAdapter;
+use crate::shared::casbin::sea_orm_adapter::SeaORMTryIntoAdapter;
 
 pub async fn init_casbin(pool: Arc<DbConn>) -> Enforcer {
     let sea_orm_try_into_adapter = SeaORMTryIntoAdapter::new(pool.clone());
@@ -23,9 +23,12 @@ pub async fn init_casbin(pool: Arc<DbConn>) -> Enforcer {
 
 #[cfg(test)]
 mod tests {
-    use crate::infrastructure::{casbin::init_casbin::init_casbin, mysql_pool::create_mysql_pool};
     use casbin::CoreApi;
     use std::sync::Arc;
+
+    use crate::{
+        infrastructure::mysql_pool::create_mysql_pool, shared::casbin::init_casbin::init_casbin,
+    };
 
     #[actix_web::test]
     async fn test_init_casbin() {

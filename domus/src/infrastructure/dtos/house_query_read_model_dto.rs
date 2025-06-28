@@ -3,9 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
-    domain::house::value_objects::house::{
-        ApartmentType, Community, DoorNumber, FloorRange, Stairs,
-    },
+    domain::house::value_objects::house::{ApartmentType, DoorNumber, FloorRange, Stairs},
     infrastructure::{
         dtos::{
             community_query_read_model_dto::CommunityQueryReadModelDto,

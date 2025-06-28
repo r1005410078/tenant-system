@@ -8,19 +8,7 @@ use aws_sdk_s3::{
         endpoint::{Endpoint, EndpointFuture, Params, ResolveEndpoint},
     },
     presigning::PresigningConfig,
-    types::{BucketLocationConstraint, CreateBucketConfiguration},
 };
-
-#[derive(Debug)]
-struct StageResolver {
-    url: String,
-}
-
-impl ResolveEndpoint for StageResolver {
-    fn resolve_endpoint(&self, _params: &Params) -> EndpointFuture<'_> {
-        EndpointFuture::ready(Ok(Endpoint::builder().url(self.url.to_string()).build()))
-    }
-}
 
 pub struct Minio {
     url: Option<String>,

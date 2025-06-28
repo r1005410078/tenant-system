@@ -6,6 +6,7 @@ use crate::domain::house::events::{
     house_updated::HouseUpdatedEvent,
 };
 
+#[allow(dead_code)]
 #[derive(Debug, Clone, Serialize)]
 pub enum HouseEvent {
     Created(HouseCreatedEvent),

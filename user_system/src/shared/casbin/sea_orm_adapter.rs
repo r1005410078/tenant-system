@@ -1,10 +1,11 @@
 use std::sync::Arc;
 
-use crate::infrastructure::entitiy::casbin_rules;
 use casbin::Filter;
 use casbin::{error::AdapterError, Adapter, Model, Result, TryIntoAdapter};
 use sea_orm::ActiveModelTrait;
 use sea_orm::DatabaseConnection;
+
+use crate::shared::entitiy::casbin_rules;
 
 pub struct SeaORMTryIntoAdapter {
     db: Arc<DatabaseConnection>,

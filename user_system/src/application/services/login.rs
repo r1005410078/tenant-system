@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::application::commands::login::{LoginCommand, LoginCommandHandler};
 
 pub struct LoginService {

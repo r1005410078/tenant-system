@@ -1,5 +1,3 @@
-use sea_orm::value;
-
 use crate::domain::{
     house::{
         events::house_updated::HouseUpdatedEvent,

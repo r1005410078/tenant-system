@@ -9,6 +9,7 @@ pub struct HouseUnpublishedEvent {
     pub description: String,
 }
 
+#[allow(dead_code)]
 impl HouseUnpublishedEvent {
     pub fn new(id: String, unpublish_at: DateTimeUtc, description: &str) -> Self {
         Self {

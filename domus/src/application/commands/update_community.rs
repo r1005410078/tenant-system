@@ -5,7 +5,7 @@ use crate::domain::{
     house::value_objects::house::Community,
 };
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct UpdateCommunityCommand {
     // 小区id
     pub community_id: String,

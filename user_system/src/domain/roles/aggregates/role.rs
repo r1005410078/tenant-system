@@ -2,7 +2,7 @@ use chrono::Utc;
 use sea_orm::prelude::DateTimeUtc;
 
 use crate::domain::roles::events::{
-    permission_granted_to_role::{self, Permission, PermissionGrantedToRoleEvent},
+    permission_granted_to_role::{Permission, PermissionGrantedToRoleEvent},
     role::RoleEvent,
     role_created::RoleCreatedEvent,
     role_deleted::RoleDeletedEvent,

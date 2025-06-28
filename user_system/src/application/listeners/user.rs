@@ -1,5 +1,4 @@
 use event_bus::EventListener;
-use sea_orm::*;
 use std::sync::Arc;
 
 use crate::{

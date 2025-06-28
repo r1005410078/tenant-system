@@ -9,6 +9,7 @@ pub struct DeleteOwnerCommand {
     pub id: String,
 }
 
+#[allow(dead_code)]
 impl DeleteOwnerCommand {
     pub fn new(id: String) -> Self {
         Self { id }

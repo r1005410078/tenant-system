@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use crate::application::commands::delete_house::{DeleteHouseCommand, DeleteHouseCommandHandler};
 
 pub struct DeleteHouseService {

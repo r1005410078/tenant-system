@@ -9,10 +9,7 @@ use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 use crate::{
     application::repositories::user_query_repository::UserQueryRepository,
     infrastructure::{
-        dtos::{
-            user_login_history_dto::{self, UserLoginHistoryDto},
-            user_query_dto::UserQueryDto,
-        },
+        dtos::{user_login_history_dto::UserLoginHistoryDto, user_query_dto::UserQueryDto},
         entitiy::{self, user_login_history},
     },
 };

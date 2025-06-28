@@ -9,9 +9,9 @@ use crate::{
         dtos::community_query_read_model_dto::CommunityQueryReadModelDto, entitiy::community_query,
     },
 };
+use sea_orm::EntityTrait;
 use sea_orm::{ActiveModelTrait, ActiveValue::Set, DbConn};
 use sea_orm::{ActiveValue::NotSet, PaginatorTrait};
-use sea_orm::{EntityTrait, QuerySelect};
 use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
 pub struct MySqlCommunityQueryRepository {

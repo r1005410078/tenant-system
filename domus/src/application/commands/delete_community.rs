@@ -8,6 +8,7 @@ pub struct DeleteCommunityCommand {
     pub id: String,
 }
 
+#[allow(dead_code)]
 impl DeleteCommunityCommand {
     pub fn new(id: String) -> Self {
         Self { id }

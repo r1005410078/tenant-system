@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use crate::{
     application::repositories::user_aggreate_repository::UserAggregateRepository,
-    domain::user::aggregates::user::UserAggregate,
-    infrastructure::entitiy::{self, casbin_rules},
+    domain::user::aggregates::user::UserAggregate, infrastructure::entitiy,
 };
 use sea_orm::*;
+use user_system::shared::entitiy::casbin_rules;
 
 pub struct MySqlUserAggregateRepository {
     pool: Arc<DbConn>,

@@ -7,10 +7,8 @@ use crate::{
         commands::{create_house::CreateHouseCommand, update_house::UpdateHouseCommand},
         queries::house::HouseQueryService,
         services::{
-            create_house::CreateHouseService,
-            delete_house::DeleteHouseService,
-            file_upload_service::{self, FileUploadService},
-            update_house::UpdateHouseService,
+            create_house::CreateHouseService, delete_house::DeleteHouseService,
+            file_upload_service::FileUploadService, update_house::UpdateHouseService,
         },
     },
     interfaces::dtos::response::ResponseBody,

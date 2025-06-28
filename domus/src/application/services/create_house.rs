@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use crate::application::{
     commands::{create_house::CreateHouseCommand, create_house_handler::CreateHouseCommandHandler},
-    listeners::community,
     services::{save_community::SaveCommunityService, save_owner::SaveOwnerService},
 };
 

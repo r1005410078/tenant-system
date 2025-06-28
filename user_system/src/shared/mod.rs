@@ -1,4 +1,6 @@
+mod infrastructure;
+
 pub mod auth_middleware;
-pub mod casbin;
 pub mod claims;
-pub mod entitiy;
+pub use infrastructure::casbin;
+pub use infrastructure::entitiy;

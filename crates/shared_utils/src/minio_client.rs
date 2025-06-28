@@ -1,14 +1,7 @@
 use std::time::Duration;
 
 use aws_config::{BehaviorVersion, Region};
-use aws_sdk_s3::{
-    Client,
-    config::{
-        Credentials,
-        endpoint::{Endpoint, EndpointFuture, Params, ResolveEndpoint},
-    },
-    presigning::PresigningConfig,
-};
+use aws_sdk_s3::{Client, config::Credentials, presigning::PresigningConfig};
 
 pub struct Minio {
     url: Option<String>,

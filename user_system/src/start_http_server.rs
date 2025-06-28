@@ -51,7 +51,7 @@ pub async fn run() -> std::io::Result<()> {
     let port = env::var("PORT").expect("PORT is not set in .env file");
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
-    let enforcer = Arc::new(init_casbin(pool.clone()).await);
+    let enforcer = Arc::new(init_casbin().await);
 
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
     // 创建用户仓储

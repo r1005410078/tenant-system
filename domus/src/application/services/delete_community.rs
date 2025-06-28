@@ -1,9 +1,4 @@
-use crate::{
-    application::commands::delete_community::{
-        DeleteCommunityCommand, DeleteCommunityCommandHandler,
-    },
-    domain::community,
-};
+use crate::application::commands::delete_community::DeleteCommunityCommandHandler;
 
 pub struct DeleteCommunityService {
     delete_community_handler: DeleteCommunityCommandHandler,

@@ -5,7 +5,6 @@ mod init_system;
 mod interfaces;
 mod start_http_server;
 use clap::Parser;
-use event_bus::{AsyncEventBus, EventListener};
 
 use crate::application::commands::init_system::{Cli, InitSystemCommand};
 

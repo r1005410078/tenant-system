@@ -12,7 +12,6 @@ use crate::{
             update_role::UpdateRoleService,
         },
     },
-    domain::roles::events::permission_granted_to_role::Permission,
     interfaces::dtos::response::ResponseBody,
 };
 

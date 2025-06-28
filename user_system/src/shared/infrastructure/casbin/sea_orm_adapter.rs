@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use casbin::Filter;
 use casbin::{error::AdapterError, Adapter, Model, Result, TryIntoAdapter};
-use sea_orm::ActiveModelTrait;
 use sea_orm::DatabaseConnection;
+use sea_orm::{ActiveModelTrait, EntityTrait};
 
-use crate::shared::entitiy::casbin_rules;
+use crate::shared::infrastructure::entitiy::casbin_rules;
 
 pub struct SeaORMTryIntoAdapter {
     db: Arc<DatabaseConnection>,
@@ -38,8 +38,6 @@ impl SeaORMAdapter {
 impl Adapter for SeaORMAdapter {
     async fn load_policy(&mut self, m: &mut dyn Model) -> Result<()> {
         // 实现加载策略的逻辑
-        use sea_orm::EntityTrait;
-
         let rules = casbin_rules::Entity::find()
             .all(self.db.as_ref())
             .await

@@ -7,11 +7,9 @@ use sea_orm::DbConn;
 use crate::{
     application::{
         commands::{
-            create_role::CreateRoleCommandHandler,
-            init_system::{Cli, InitSystemCommandHandler},
+            create_role::CreateRoleCommandHandler, init_system::InitSystemCommandHandler,
             permission_granted_to_role::PermissionGrantedToRoleCommandHandler,
-            register_user::UserRegistrationHandler,
-            user_binded_to_roles::UserBindedToRolesHandler,
+            register_user::UserRegistrationHandler, user_binded_to_roles::UserBindedToRolesHandler,
         },
         listeners::{role::RoleEventListener, user::UserEventListener},
         queries::{role_query_service::RoleQueryService, user_query_service::UserQueryService},

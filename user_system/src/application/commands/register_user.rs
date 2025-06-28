@@ -18,13 +18,14 @@ pub struct RegisterUserCommand {
 }
 
 impl RegisterUserCommand {
+    #[allow(dead_code)]
     pub fn new(username: String, password: String, roles: Vec<String>) -> Self {
         Self {
             username,
             email: None,
             phone: None,
             password,
-            roles: None,
+            roles: Some(roles),
         }
     }
 }

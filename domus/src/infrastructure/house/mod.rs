@@ -1,2 +1,1 @@
-pub mod mysql_house_query_repository;
 pub mod mysql_house_repository_aggregate;

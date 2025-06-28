@@ -34,19 +34,9 @@ use crate::{
         },
     },
     infrastructure::{
-        community::{
-            mysql_community_aggregate::MySqlCommunityAggregateRepository,
-            mysql_community_query_repository::MySqlCommunityQueryRepository,
-        },
-        house::{
-            mysql_house_query_repository::MySqlHouseQueryRepository,
-            mysql_house_repository_aggregate::MysqlHouseRepositoryAggregate,
-        },
-        mysql_pool::create_mysql_pool,
-        owner::{
-            mysql_owner_aggregate::MySqlOwnerAggregateRepository,
-            mysql_owner_query_repository::MySqlOwnerQueryRepository,
-        },
+        community::mysql_community_aggregate::MySqlCommunityAggregateRepository,
+        house::mysql_house_repository_aggregate::MysqlHouseRepositoryAggregate,
+        mysql_pool::create_mysql_pool, owner::mysql_owner_aggregate::MySqlOwnerAggregateRepository,
     },
     interfaces::controllers::{
         community::{create_community, delete_community, list_community, update_community},
@@ -170,9 +160,7 @@ pub async fn execute() -> std::io::Result<()> {
     ));
 
     // 小区仓储
-    let community_query_repo = Arc::new(MySqlCommunityQueryRepository::new(pool.clone()));
-    let community_query_service =
-        web::Data::new(CommunityQueryService::new(community_query_repo.clone()));
+    let community_query_service = web::Data::new(CommunityQueryService::new(pool.clone()));
     // 小区事件
     Arc::new(CommunityEventListener::new(
         community_query_service.clone().into_inner(),
@@ -180,8 +168,7 @@ pub async fn execute() -> std::io::Result<()> {
     .subscribe(event_bus.clone());
 
     // 业主仓储
-    let owner_query_repo = Arc::new(MySqlOwnerQueryRepository::new(pool.clone()));
-    let owner_query_service = web::Data::new(OwnerQueryService::new(owner_query_repo.clone()));
+    let owner_query_service = web::Data::new(OwnerQueryService::new(pool.clone()));
     // 业主事件
     Arc::new(OwnerEventListener::new(
         owner_query_service.clone().into_inner(),
@@ -189,8 +176,7 @@ pub async fn execute() -> std::io::Result<()> {
     .subscribe(event_bus.clone());
 
     // 房源仓储
-    let house_query_repo = Arc::new(MySqlHouseQueryRepository::new(pool.clone()));
-    let house_query_service = web::Data::new(HouseQueryService::new(house_query_repo.clone()));
+    let house_query_service = web::Data::new(HouseQueryService::new(pool.clone()));
     // 房源事件
     Arc::new(HouseEventListener::new(
         house_query_service.clone().into_inner(),

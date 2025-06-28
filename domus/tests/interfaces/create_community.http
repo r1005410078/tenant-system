@@ -1,4 +1,4 @@
-POST http://localhost:3001/api/community/create
+POST http://localhost:9002/api/community/create
 Content-Type: application/json
 
 {

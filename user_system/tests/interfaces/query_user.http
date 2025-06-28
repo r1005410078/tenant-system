@@ -1,4 +1,4 @@
 ## 获取用户列表
-GET http://localhost:3001/api/user/list?page=1&page_size=10
+GET http://localhost:9001/api/user/list?page=1&page_size=10
 Content-Type: application/json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiY2I1ZDE3YzktZTYwYi00ZmJiLThiNmItODY2OWU5Nzk3ZjFjIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbIjAyZThlYTk5LTIzZmEtNDY3Zi1hNTcwLTgxMzc0M2VhYmZkZCJdLCJleHAiOjE3NTExMDE2NzYsImlhdCI6MTc1MTAxNTI3Nn0.HV8gsfWCzo1kpiziiNC2objYcjyYH4_ImuDwgrfpWyU

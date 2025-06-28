@@ -48,7 +48,7 @@ pub async fn run() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
 
     let host = env::var("HOST").expect("HOST is not set in .env file");
-    let port = env::var("PORT").expect("PORT is not set in .env file");
+    let port = env::var("USER_SYSTEM_PORT").expect("PORT is not set in .env file");
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
     let enforcer = Arc::new(init_casbin().await);

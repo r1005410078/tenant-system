@@ -64,7 +64,7 @@ async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
 
     let host = env::var("HOST").expect("HOST is not set in .env file");
-    let port = env::var("PORT").expect("PORT is not set in .env file");
+    let port = env::var("DOMUS_PORT").expect("PORT is not set in .env file");
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));

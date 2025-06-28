@@ -1,6 +1,6 @@
 
 
-POST http://localhost:3001/api/house/upload-url
+POST http://localhost:9002/api/house/upload-url
 Content-Type: application/json
 
 {

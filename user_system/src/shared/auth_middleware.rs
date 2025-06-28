@@ -10,13 +10,14 @@ use futures::future::{ok, LocalBoxFuture, Ready};
 use std::rc::Rc;
 use std::sync::Arc;
 use std::task::{Context, Poll};
+use tokio::sync::Mutex;
 
 pub struct AuthMiddleware {
-    enforcer: Arc<Enforcer>,
+    enforcer: Arc<Mutex<Enforcer>>,
 }
 
 impl AuthMiddleware {
-    pub fn new(enforcer: Arc<Enforcer>) -> AuthMiddleware {
+    pub fn new(enforcer: Arc<Mutex<Enforcer>>) -> AuthMiddleware {
         AuthMiddleware { enforcer }
     }
 }
@@ -42,7 +43,7 @@ where
 
 pub struct AuthMiddlewareImpl<S> {
     service: Rc<S>,
-    enforcer: Arc<Enforcer>,
+    enforcer: Arc<Mutex<Enforcer>>,
 }
 
 impl<S, B> Service<ServiceRequest> for AuthMiddlewareImpl<S>
@@ -97,6 +98,8 @@ where
                 let obj = req.path().to_string();
                 let act = req.method().as_str().to_string().to_uppercase();
                 let allowed = enforcer
+                    .lock()
+                    .await
                     .enforce((sub.clone(), obj.clone(), act.clone()))
                     .unwrap_or(false);
 

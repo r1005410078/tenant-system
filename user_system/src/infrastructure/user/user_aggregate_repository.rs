@@ -1,19 +1,21 @@
-use std::sync::Arc;
-
 use crate::{
     application::repositories::user_aggreate_repository::UserAggregateRepository,
     domain::user::aggregates::user::UserAggregate, infrastructure::entitiy,
 };
+use casbin::{CoreApi, MgmtApi};
 use sea_orm::*;
+use std::sync::Arc;
+use tokio::sync::Mutex;
 use user_system::shared::entitiy::casbin_rules;
 
 pub struct MySqlUserAggregateRepository {
     pool: Arc<DbConn>,
+    enforcer: Arc<Mutex<casbin::Enforcer>>,
 }
 
 impl MySqlUserAggregateRepository {
-    pub fn new(pool: Arc<DbConn>) -> Self {
-        MySqlUserAggregateRepository { pool }
+    pub fn new(pool: Arc<DbConn>, enforcer: Arc<Mutex<casbin::Enforcer>>) -> Self {
+        MySqlUserAggregateRepository { pool, enforcer }
     }
 
     // 获取用户绑定的角色列表
@@ -46,15 +48,11 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
             ..Default::default()
         };
 
-        for role in input_user.roles.iter() {
-            // 保存用户绑定的角色
-            let model = casbin_rules::ActiveModel {
-                ptype: Set("g".to_string()),
-                v0: Set(Some(input_user.id.to_string())),
-                v1: Set(Some(role.to_string())),
-                ..Default::default()
-            };
-            model.insert(self.pool.as_ref()).await?;
+        for role_id in input_user.roles.iter() {
+            let v0 = input_user.id.to_string();
+            let v1 = role_id.to_string();
+            let mut enforcer = self.enforcer.lock().await;
+            let _ = enforcer.add_grouping_policy(vec![v0, v1]).await?;
         }
 
         user.insert(self.pool.as_ref()).await?;
@@ -83,14 +81,11 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
             .await?;
 
         // 保存用户绑定的角色
-        for role in input_user.roles.iter() {
-            let model = casbin_rules::ActiveModel {
-                ptype: Set("g".to_string()),
-                v0: Set(Some(input_user.id.to_string())),
-                v1: Set(Some(role.to_string())),
-                ..Default::default()
-            };
-            model.insert(self.pool.as_ref()).await?;
+        for role_id in input_user.roles.iter() {
+            let v0 = input_user.id.to_string();
+            let v1 = role_id.to_string();
+            let mut enforcer = self.enforcer.lock().await;
+            let _ = enforcer.add_grouping_policy(vec![v0, v1]).await?;
         }
 
         user.update(self.pool.as_ref()).await?;

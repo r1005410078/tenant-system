@@ -31,16 +31,26 @@ impl PermissionsDetailService {
     }
 
     // 或者更新权限详情
-    pub async fn save(&self, data: PermissionsDetailDto) -> anyhow::Result<()> {
-        let model = permissions_detail::ActiveModel {
-            id: data.id.map_or(NotSet, Set),
-            name: data.name.map_or(NotSet, Set),
-            source: data.source.map_or(NotSet, Set),
-            action: data.action.map_or(NotSet, Set),
-            description: Set(data.description),
-            ..Default::default()
-        };
-        model.save(self.pool.as_ref()).await?;
+    pub async fn save(&self, data: Vec<PermissionsDetailDto>) -> anyhow::Result<()> {
+        for d in data {
+            let mut model = permissions_detail::ActiveModel {
+                id: d.id.map_or(NotSet, Set),
+                name: d.name.map_or(NotSet, Set),
+                source: d.source.map_or(NotSet, Set),
+                action: d.action.map_or(NotSet, Set),
+                description: Set(d.description),
+                ..Default::default()
+            };
+
+            if model.id.is_not_set() {
+                model.id = Set(uuid::Uuid::new_v4().to_string());
+                model.insert(self.pool.as_ref()).await?;
+                continue;
+            }
+
+            model.update(self.pool.as_ref()).await?;
+        }
+
         Ok(())
     }
 }

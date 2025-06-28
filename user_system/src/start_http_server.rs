@@ -1,5 +1,6 @@
 use sea_orm::DbConn;
 use std::{env, sync::Arc};
+use tokio::sync::Mutex;
 use user_system::shared::{auth_middleware::AuthMiddleware, casbin::init_casbin::init_casbin};
 
 use crate::{
@@ -51,11 +52,14 @@ pub async fn run() -> std::io::Result<()> {
     let port = env::var("USER_SYSTEM_PORT").expect("PORT is not set in .env file");
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
-    let enforcer = Arc::new(init_casbin().await);
+    let enforcer = Arc::new(Mutex::new(init_casbin().await));
 
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
     // 创建用户仓储
-    let user_repo = Arc::new(MySqlUserAggregateRepository::new(pool.clone()));
+    let user_repo = Arc::new(MySqlUserAggregateRepository::new(
+        pool.clone(),
+        enforcer.clone(),
+    ));
 
     // 用户绑定角色
     let user_binded_to_roles_command_handler = Arc::new(UserBindedToRolesHandler::new(
@@ -108,7 +112,7 @@ pub async fn run() -> std::io::Result<()> {
         DeleteRoleCommandHandler::new(role_repo.clone(), event_bus.clone()),
     ));
 
-    let permissions_detail_service = Arc::new(PermissionsDetailService::new(pool.clone()));
+    let permissions_detail_service = web::Data::new(PermissionsDetailService::new(pool.clone()));
     let auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
 
     let QueryService {
@@ -135,7 +139,8 @@ pub async fn run() -> std::io::Result<()> {
                     .service(update_user)
                     .service(get_login_history)
                     .service(get_user_list)
-                    .service(get_user),
+                    .service(get_user)
+                    .service(register),
             )
             .service(
                 web::scope("/api/role")
@@ -148,7 +153,7 @@ pub async fn run() -> std::io::Result<()> {
                     .service(permissions_details_list)
                     .service(save_permission_detail),
             )
-            .service(web::scope("/api").service(login).service(register))
+            .service(web::scope("/api").service(login))
     })
     .bind(server_url)?
     .run()

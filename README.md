@@ -26,7 +26,14 @@ sea-orm-cli generate entity -o user-system/src/infrastructure/entitiy
 # 生成数据库
 sqlx migrate add community -r --source doumus/migrations
 # 运行迁移
-sqlx migrate run --source domus/migrations
+sqlx migrate run --source domus/migrations --database-url mysql://root:123456@localhost/domus
+sqlx migrate run --source migrations --database-url mysql://root:123456@localhost/meida
 # 生成实体
 sea-orm-cli generate entity -o domus/src/infrastructure/entitiy
+```
+
+初始化用户系统
+
+```bash
+cargo run --bin user_system -- init-system
 ```

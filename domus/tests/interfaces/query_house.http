@@ -1,4 +1,4 @@
 
-GET http://localhost:9002/api/house/list?page=4&page_size=5
+GET http://localhost:9002/api/domus/query/house/list?page=4&page_size=5
 Content-Type: application/json
-
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYzUyYjQwNDItZTU0Ny00YTZjLTg2YmMtY2E4YzNiZjM1MzVkIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbImU1MWQzNmE3LTQ4NDItNDU3Ny1hNDFlLWU2OTRiYzNmN2M1OSJdLCJleHAiOjE3NTExNzUxNDIsImlhdCI6MTc1MTA4ODc0Mn0._B-rNbbp5Axq3Fdulmd1NVJozUF1GeFWsDicjZK8KUE

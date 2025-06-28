@@ -92,7 +92,7 @@ async fn permissions_details_list(service: web::Data<PermissionsDetailService>) 
 
 #[post("permissions_details/save")]
 async fn save_permission_detail(
-    body: web::Json<PermissionsDetailDto>,
+    body: web::Json<Vec<PermissionsDetailDto>>,
     service: web::Data<PermissionsDetailService>,
 ) -> HttpResponse {
     let res = match service.save(body.into_inner()).await {

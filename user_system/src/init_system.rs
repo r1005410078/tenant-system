@@ -3,6 +3,8 @@ use std::sync::Arc;
 use actix_web::web;
 use event_bus::{AsyncEventBus, EventListener};
 use sea_orm::DbConn;
+use tokio::sync::Mutex;
+use user_system::shared::casbin::init_casbin::init_casbin;
 
 use crate::{
     application::{
@@ -31,12 +33,13 @@ use crate::{
 pub async fn execute(admin_name: String, admin_password: String) -> std::io::Result<()> {
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
+    let enforcer = Arc::new(Mutex::new(init_casbin().await));
 
     // 创建服务
     let ServiceProvider {
         register_user_services,
         create_role_services,
-    } = ServiceProvider::config(pool.clone(), event_bus.clone());
+    } = ServiceProvider::config(pool.clone(), event_bus.clone(), enforcer.clone());
 
     // 注册事件
     register_event_handlers(pool.clone(), event_bus.clone());
@@ -59,9 +62,16 @@ struct ServiceProvider {
 }
 
 impl ServiceProvider {
-    pub fn config(pool: Arc<DbConn>, event_bus: Arc<AsyncEventBus>) -> Self {
+    pub fn config(
+        pool: Arc<DbConn>,
+        event_bus: Arc<AsyncEventBus>,
+        enforcer: Arc<Mutex<casbin::Enforcer>>,
+    ) -> Self {
         // 创建用户仓储
-        let user_repo = Arc::new(MySqlUserAggregateRepository::new(pool.clone()));
+        let user_repo = Arc::new(MySqlUserAggregateRepository::new(
+            pool.clone(),
+            enforcer.clone(),
+        ));
 
         // 用户绑定角色
         let user_binded_to_roles_command_handler = Arc::new(UserBindedToRolesHandler::new(

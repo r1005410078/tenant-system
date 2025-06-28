@@ -1,9 +1,24 @@
-use crate::application::repositories::user_aggreate_repository::UserAggregateRepository;
 use crate::domain::user::events::login::LoginEvent;
+use crate::{
+    application::repositories::user_aggreate_repository::UserAggregateRepository,
+    domain::user::aggregates::user::UserAggregate,
+};
 use event_bus::AsyncEventBus;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use user_system::shared::claims::Claims;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct LoginInfomation {
+    token: String,
+    user: UserAggregate,
+}
+
+impl LoginInfomation {
+    pub fn new(token: String, user: UserAggregate) -> Self {
+        Self { token, user }
+    }
+}
 
 #[derive(Debug, Deserialize)]
 pub struct LoginCommand {
@@ -24,7 +39,7 @@ impl LoginCommandHandler {
         }
     }
 
-    pub async fn handle(&self, command: LoginCommand) -> anyhow::Result<String> {
+    pub async fn handle(&self, command: LoginCommand) -> anyhow::Result<LoginInfomation> {
         // 查找用户聚合
         let mut user = self
             .user_repo
@@ -50,7 +65,7 @@ impl LoginCommandHandler {
             );
 
             // 保存会话 TODO
-            Ok(claims.get_token())
+            Ok(LoginInfomation::new(claims.get_token(), user))
         } else {
             Err(anyhow::anyhow!("密码错误!"))
         }

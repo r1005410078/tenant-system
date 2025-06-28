@@ -24,3 +24,6 @@ actix-web  = { workspace = true }
 serde_json = { workspace = true }
 shared_dto = { workspace = true }
 shared_utils = { workspace = true }
+user_system = { workspace = true }
+clap = {  workspace = true }
+reqwest = { workspace = true }

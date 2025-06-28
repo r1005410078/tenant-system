@@ -1,4 +1,4 @@
-use crate::application::commands::login::{LoginCommand, LoginCommandHandler};
+use crate::application::commands::login::{LoginCommand, LoginCommandHandler, LoginInfomation};
 
 pub struct LoginService {
     login_handler: LoginCommandHandler,
@@ -9,7 +9,7 @@ impl LoginService {
         Self { login_handler }
     }
 
-    pub async fn execute(&self, cmd: LoginCommand) -> anyhow::Result<String> {
+    pub async fn execute(&self, cmd: LoginCommand) -> anyhow::Result<LoginInfomation> {
         self.login_handler.handle(cmd).await
     }
 }

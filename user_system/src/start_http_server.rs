@@ -23,14 +23,8 @@ use crate::{
     },
     infrastructure::{
         mysql_pool::create_mysql_pool,
-        role::{
-            mysql_role_query_repository::MysqlRoleQueryRepository,
-            role_aggregate_repository::MySqlRoleAggregateRepository,
-        },
-        user::{
-            mysq_user_query_repository::MysqlUserQueryRepository,
-            user_aggregate_repository::MySqlUserAggregateRepository,
-        },
+        role::role_aggregate_repository::MySqlRoleAggregateRepository,
+        user::user_aggregate_repository::MySqlUserAggregateRepository,
     },
     interfaces::controllers::{
         role::{
@@ -167,10 +161,8 @@ struct QueryService {
 
 impl QueryService {
     fn register_event_handlers(pool: Arc<DbConn>, event_bus: Arc<AsyncEventBus>) -> QueryService {
-        // 用户读模型仓储
-        let user_read_repo = Arc::new(MysqlUserQueryRepository::new(pool.clone()));
         // 用户读模型服务
-        let user_query_service = web::Data::new(UserQueryService::new(user_read_repo));
+        let user_query_service = web::Data::new(UserQueryService::new(pool.clone()));
 
         // 注册登陆事件
         Arc::new(LoginEventListener::new(
@@ -184,11 +176,8 @@ impl QueryService {
         ))
         .subscribe(event_bus.clone());
 
-        // 角色仓储
-        let mysql_role_query_repository = Arc::new(MysqlRoleQueryRepository::new(pool.clone()));
         // 角色服务
-        let role_query_service =
-            web::Data::new(RoleQueryService::new(mysql_role_query_repository.clone()));
+        let role_query_service = web::Data::new(RoleQueryService::new(pool.clone()));
         // 注册角色事件
         Arc::new(RoleEventListener::new(
             role_query_service.clone().into_inner(),

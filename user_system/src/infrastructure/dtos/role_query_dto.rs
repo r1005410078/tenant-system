@@ -1,10 +1,7 @@
 use sea_orm::prelude::DateTimeUtc;
 use serde::{Deserialize, Serialize};
 
-use crate::{
-    domain::roles::events::permission_granted_to_role::Permission,
-    infrastructure::entitiy::role_detail_read_model,
-};
+use crate::infrastructure::entitiy::role_detail_read_model;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct RoleQueryReadModelDto {
@@ -14,24 +11,6 @@ pub struct RoleQueryReadModelDto {
     pub permissions: Option<serde_json::Value>,
     pub created_at: Option<DateTimeUtc>,
     pub updated_at: Option<DateTimeUtc>,
-}
-
-impl RoleQueryReadModelDto {
-    pub fn new(
-        id: String,
-        name: String,
-        description: Option<String>,
-        permissions: Option<Vec<Permission>>,
-    ) -> Self {
-        Self {
-            id,
-            name,
-            description,
-            permissions: serde_json::to_value(permissions).ok(),
-            created_at: None,
-            updated_at: None,
-        }
-    }
 }
 
 impl From<role_detail_read_model::Model> for RoleQueryReadModelDto {

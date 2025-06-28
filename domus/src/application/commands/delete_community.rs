@@ -31,8 +31,8 @@ impl DeleteCommunityCommandHandler {
         }
     }
 
-    pub async fn handle(&self, community_id: String) -> anyhow::Result<()> {
-        let mut aggreagate = self.community_repository.find_by_id(&community_id).await?;
+    pub async fn handle(&self, community: DeleteCommunityCommand) -> anyhow::Result<()> {
+        let mut aggreagate = self.community_repository.find_by_id(&community.id).await?;
 
         let event = aggreagate.delete();
 

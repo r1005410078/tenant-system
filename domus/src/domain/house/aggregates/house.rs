@@ -48,7 +48,8 @@ impl HouseAggregate {
     }
 
     // 更新房源
-    pub fn update(&mut self, new_house: &HouseUpdateData) -> anyhow::Result<HouseEvent> {
+    pub fn update(&mut self, new_house: &HouseUpdateData) -> anyhow::Result<Vec<HouseEvent>> {
+        let mut events = Vec::new();
         if self.is_deleted() {
             return Err(anyhow::anyhow!("house is deleted"));
         }
@@ -57,8 +58,18 @@ impl HouseAggregate {
             return Err(anyhow::anyhow!("house is offline"));
         }
 
+        if new_house.external_sync == Some("published".to_string()) {
+            events.push(self.publish()?)
+        }
+
+        if new_house.external_sync == Some("unpublished".to_string()) {
+            events.push(self.unpublish(new_house.remark.clone().unwrap_or_default().as_str())?)
+        }
+
         self.address = new_house.get_address();
-        Ok(HouseEvent::Updated(new_house.to_event()))
+
+        events.push(HouseEvent::Updated(new_house.to_event()));
+        Ok(events)
     }
 
     // 上架

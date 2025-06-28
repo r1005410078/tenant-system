@@ -7,8 +7,6 @@ pub mod delete_community;
 pub mod delete_house;
 pub mod delete_owner;
 pub mod init_system;
-pub mod publish_house;
-pub mod unpublish_house;
 pub mod update_community;
 pub mod update_community_handler;
 pub mod update_house;

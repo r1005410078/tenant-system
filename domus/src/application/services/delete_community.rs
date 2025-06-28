@@ -1,4 +1,6 @@
-use crate::application::commands::delete_community::DeleteCommunityCommandHandler;
+use crate::application::commands::delete_community::{
+    DeleteCommunityCommand, DeleteCommunityCommandHandler,
+};
 
 pub struct DeleteCommunityService {
     delete_community_handler: DeleteCommunityCommandHandler,
@@ -12,6 +14,8 @@ impl DeleteCommunityService {
     }
 
     pub async fn execute(&self, community_id: String) -> anyhow::Result<()> {
-        self.delete_community_handler.handle(community_id).await
+        self.delete_community_handler
+            .handle(DeleteCommunityCommand::new(community_id))
+            .await
     }
 }

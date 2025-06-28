@@ -3,6 +3,7 @@ use std::{env, sync::Arc};
 use actix_web::{web, App, HttpServer};
 use event_bus::{AsyncEventBus, EventListener};
 use shared_utils::minio_client::Minio;
+use tokio::sync::Mutex;
 use user_system::shared::{auth_middleware::AuthMiddleware, casbin::init_casbin::init_casbin};
 
 use crate::{
@@ -63,7 +64,7 @@ pub async fn execute() -> std::io::Result<()> {
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
-    let enforcer = Arc::new(init_casbin().await);
+    let enforcer = Arc::new(Mutex::new(init_casbin().await));
     let auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
 
     // minio_client

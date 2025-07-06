@@ -44,7 +44,8 @@ impl CommunityQueryService {
             // 小区图片
             image: Set(event.image),
             // 位置
-            location: Set(event.location),
+            location_0: Set(event.location_0),
+            location_1: Set(event.location_1),
             ..Default::default()
         };
 
@@ -70,7 +71,8 @@ impl CommunityQueryService {
             // 小区图片
             image: Set(event.image),
             // 位置
-            location: Set(event.location),
+            location_0: Set(event.location_0),
+            location_1: Set(event.location_1),
             ..Default::default()
         };
 

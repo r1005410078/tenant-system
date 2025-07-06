@@ -18,7 +18,8 @@ pub struct Community {
     // 小区图片
     pub image: Option<String>,
     // 位置
-    pub location: Option<String>,
+    pub location_0: Option<f64>,
+    pub location_1: Option<f64>,
 }
 
 impl Community {
@@ -63,18 +64,21 @@ pub struct Stairs {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DoorNumber {
     // 座栋
-    pub building_number: i32,
+    pub building_number: Option<i32>,
     // 单元
-    pub unit_number: i32,
+    pub unit_number: Option<i32>,
     // 门牌
-    pub door_number: i32,
+    pub door_number: Option<i32>,
 }
 
 impl DoorNumber {
     pub fn to_string(&self) -> String {
         format!(
             "{}-{}-{}",
-            self.building_number, self.unit_number, self.door_number
+            self.building_number
+                .map_or("".to_string(), |v| v.to_string()),
+            self.unit_number.map_or("".to_string(), |v| v.to_string()),
+            self.door_number.map_or("".to_string(), |v| v.to_string())
         )
     }
 }
@@ -82,27 +86,33 @@ impl DoorNumber {
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FloorRange {
     // 最小楼层
-    pub door_number_from: i32,
+    pub door_number_from: Option<i32>,
     // 最大楼层
-    pub door_number_to: i32,
+    pub door_number_to: Option<i32>,
 }
 
 impl FloorRange {
     pub fn to_string(&self) -> String {
-        format!("{}-{}", self.door_number_from, self.door_number_to)
+        format!(
+            "{}-{}",
+            self.door_number_from
+                .map_or("".to_string(), |v| v.to_string()),
+            self.door_number_to
+                .map_or("".to_string(), |v| v.to_string())
+        )
     }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ApartmentType {
     // 室
-    pub room: i32,
+    pub room: Option<i32>,
     // 厅
-    pub hall: i32,
+    pub hall: Option<i32>,
     // 卫
-    pub bathroom: i32,
+    pub bathroom: Option<i32>,
     // 厨
-    pub kitchen: i32,
+    pub kitchen: Option<i32>,
     // 阳台
     pub terrace: Option<i32>,
     // 阁楼

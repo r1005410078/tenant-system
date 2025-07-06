@@ -16,27 +16,25 @@ pub struct HouseCreatedEvent {
     pub transaction_type: String,
     // 状态
     pub house_status: String,
+    // 小区
+    pub community: Community,
+    // 业主
+    pub owner: HouseOwner,
     // 楼层
-    pub floor_range: FloorRange,
+    pub floor_range: Option<FloorRange>,
     // 门牌号
-    pub door_number: DoorNumber,
+    pub door_number: Option<DoorNumber>,
     // 户型
-    pub apartment_type: ApartmentType,
+    pub apartment_type: Option<ApartmentType>,
     // 建筑面积
-    pub building_area: f32,
+    pub building_area: Option<f32>,
     // 装修
-    pub house_decoration: String,
+    pub house_decoration: Option<String>,
     // 满减年限
     pub discount_year_limit: Option<String>,
     // 梯户
-    pub stairs: Stairs,
+    pub stairs: Option<Stairs>,
 
-    // 业主
-    pub owner: HouseOwner,
-    // 小区
-    pub community: Option<Community>,
-    // 位置
-    pub location: Option<String>,
     // 推荐标签
     pub tags: Vec<String>,
     // 车位高度

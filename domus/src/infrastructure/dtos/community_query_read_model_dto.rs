@@ -13,7 +13,8 @@ pub struct CommunityQueryReadModelDto {
     pub community_type: String,
     pub description: Option<String>,
     pub image: Option<String>,
-    pub location: Option<String>,
+    pub location_0: Option<f64>,
+    pub location_1: Option<f64>,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
 }
@@ -29,7 +30,8 @@ impl From<community_query::Model> for CommunityQueryReadModelDto {
             community_type: value.community_type,
             description: value.description,
             image: value.image,
-            location: value.location,
+            location_0: value.location_0,
+            location_1: value.location_1,
             created_at: value.created_at,
             updated_at: value.updated_at,
         }

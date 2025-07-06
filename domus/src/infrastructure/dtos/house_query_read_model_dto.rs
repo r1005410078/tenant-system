@@ -35,13 +35,13 @@ pub struct HouseQueryReadModelDto {
 
     /// 面积与装修
     // 建筑面积
-    pub building_area: f32,
+    pub building_area: Option<f32>,
     // 使用面积
     pub use_area: Option<f32>,
     // 层高
     pub floor_height: Option<f32>,
     // 装修
-    pub house_decoration: String,
+    pub house_decoration: Option<String>,
 
     //// 销售租赁信息
     // 售价
@@ -74,8 +74,6 @@ pub struct HouseQueryReadModelDto {
     //// 标签和特征
     // 推荐标签
     pub tags: Vec<String>,
-    // 位置
-    pub location: Option<String>,
     // 车位高度
     pub car_height: Option<f64>,
     // 实率
@@ -192,7 +190,6 @@ impl HouseQueryReadModelDto {
             handover_date: value.handover_date,
             tags: serde_json::from_value::<Vec<String>>(value.tags.unwrap_or(json!([])))
                 .unwrap_or(vec![]),
-            location: value.location,
             car_height: value.car_height,
             actual_rate: value.actual_rate,
             level: value.level,

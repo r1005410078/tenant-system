@@ -29,7 +29,7 @@ sqlx migrate add community -r --source doumus/migrations
 sqlx migrate run --source domus/migrations --database-url mysql://root:123456@localhost/domus
 sqlx migrate run --source migrations --database-url mysql://root:123456@localhost/meida
 # 生成实体
-sea-orm-cli generate entity -o domus/src/infrastructure/entitiy
+sea-orm-cli generate entity -o domus/src/infrastructure/entitiy --database-url mysql://root:123456@localhost/domus
 ```
 
 初始化用户系统

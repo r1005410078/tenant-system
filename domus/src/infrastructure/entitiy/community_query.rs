@@ -2,7 +2,7 @@
 
 use sea_orm::entity::prelude::*;
 
-#[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
+#[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
 #[sea_orm(table_name = "community_query")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
@@ -15,7 +15,10 @@ pub struct Model {
     #[sea_orm(column_type = "Text", nullable)]
     pub description: Option<String>,
     pub image: Option<String>,
-    pub location: Option<String>,
+    #[sea_orm(column_type = "Double", nullable)]
+    pub location_0: Option<f64>,
+    #[sea_orm(column_type = "Double", nullable)]
+    pub location_1: Option<f64>,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
 }

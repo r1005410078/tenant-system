@@ -16,26 +16,24 @@ pub struct HouseCreateData {
     // 状态
     pub house_status: String,
     // 楼层
-    pub floor_range: FloorRange,
+    pub floor_range: Option<FloorRange>,
     // 门牌号
-    pub door_number: DoorNumber,
+    pub door_number: Option<DoorNumber>,
     // 户型
-    pub apartment_type: ApartmentType,
+    pub apartment_type: Option<ApartmentType>,
     // 建筑面积
-    pub building_area: f32,
+    pub building_area: Option<f32>,
     // 装修
-    pub house_decoration: String,
+    pub house_decoration: Option<String>,
     // 满减年限
     pub discount_year_limit: Option<String>,
     // 梯户
-    pub stairs: Stairs,
+    pub stairs: Option<Stairs>,
 
     // 业主
     pub owner: HouseOwner,
     // 小区
-    pub community: Option<Community>,
-    // 位置
-    pub location: Option<String>,
+    pub community: Community,
     // 推荐标签
     pub tags: Vec<String>,
     // 车位高度
@@ -143,8 +141,7 @@ impl HouseCreateData {
             owner: self.owner.clone(),
             // 小区
             community: self.community.clone(),
-            // 位置
-            location: self.location.clone(),
+
             // 推荐标签
             tags: self.tags.clone(),
             // 车位高度
@@ -226,12 +223,17 @@ impl HouseCreateData {
         // 小区地址 + 栋 + 楼层 + 门牌号
         let mut address = String::new();
 
-        if let Some(c) = &self.community {
-            address = c.address.clone().unwrap();
+        if let Some(addr) = self.community.address.clone() {
+            address = addr;
         }
 
-        address = format!("{},{}", address, &self.floor_range.to_string());
-        address = format!("{},{}", address, &self.door_number.to_string());
+        if let Some(floor_range) = &self.floor_range {
+            address = format!("{},{}", address, floor_range.to_string());
+        }
+
+        if let Some(door_number) = &self.door_number {
+            address = format!("{},{}", address, door_number.to_string());
+        }
 
         address
     }

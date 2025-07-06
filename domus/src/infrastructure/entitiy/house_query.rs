@@ -9,30 +9,30 @@ use crate::infrastructure::entitiy::{community_query, owner_query};
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub id: String,
-    pub title: Option<String>,
     pub community_id: String,
-    pub owner_id: String,
+    pub owner_id: Option<String>,
+    pub title: Option<String>,
     pub purpose: String,
     pub transaction_type: String,
     pub house_status: String,
-    pub door_number_from: i32,
-    pub door_number_to: i32,
-    pub building_number: i32,
-    pub unit_number: i32,
-    pub door_number: i32,
-    pub room: i32,
-    pub hall: i32,
-    pub bathroom: i32,
-    pub kitchen: i32,
+    pub door_number_from: Option<i32>,
+    pub door_number_to: Option<i32>,
+    pub building_number: Option<i32>,
+    pub unit_number: Option<i32>,
+    pub door_number: Option<i32>,
+    pub room: Option<i32>,
+    pub hall: Option<i32>,
+    pub bathroom: Option<i32>,
+    pub kitchen: Option<i32>,
     pub terrace: Option<i32>,
     pub balcony: Option<i32>,
-    #[sea_orm(column_type = "Float")]
-    pub building_area: f32,
+    #[sea_orm(column_type = "Float", nullable)]
+    pub building_area: Option<f32>,
     #[sea_orm(column_type = "Float", nullable)]
     pub use_area: Option<f32>,
     #[sea_orm(column_type = "Float", nullable)]
     pub floor_height: Option<f32>,
-    pub house_decoration: String,
+    pub house_decoration: Option<String>,
     #[sea_orm(column_type = "Double", nullable)]
     pub sale_price: Option<f64>,
     #[sea_orm(column_type = "Double", nullable)]
@@ -52,7 +52,6 @@ pub struct Model {
     pub certificate_date: Option<String>,
     pub handover_date: Option<String>,
     pub tags: Option<Json>,
-    pub location: Option<String>,
     #[sea_orm(column_type = "Double", nullable)]
     pub car_height: Option<f64>,
     #[sea_orm(column_type = "Double", nullable)]

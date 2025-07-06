@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS `community_query` (
   `community_type` VARCHAR(50) NOT NULL COMMENT '小区类型',
   `description` TEXT COMMENT '小区描述',
   `image` VARCHAR(255) DEFAULT NULL COMMENT '小区图片 URL',
-  `location` VARCHAR(255) DEFAULT NULL COMMENT '地理位置（经纬度等）',
+  `location_0` DOUBLE DEFAULT NULL COMMENT '地理位置（经纬度等）',
+  `location_1` DOUBLE DEFAULT NULL COMMENT '地理位置（经纬度等）',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 
@@ -39,27 +40,27 @@ CREATE TABLE `house_query` (
   `house_status` VARCHAR(50) NOT NULL COMMENT '状态',
 
   -- 楼层范围
-  `door_number_from` INT NOT NULL COMMENT '起始楼层',
-  `door_number_to` INT NOT NULL COMMENT '结束楼层',
+  `door_number_from` INT DEFAULT NULL COMMENT '起始楼层',
+  `door_number_to` INT DEFAULT NULL COMMENT '结束楼层',
 
   -- 门牌号结构
-  `building_number` INT NOT NULL COMMENT '栋',
-  `unit_number` INT NOT NULL COMMENT '单元',
-  `door_number` INT NOT NULL COMMENT '门牌号',
+  `building_number` INT DEFAULT NULL COMMENT '栋',
+  `unit_number` INT DEFAULT NULL COMMENT '单元',
+  `door_number` INT DEFAULT NULL COMMENT '门牌号',
 
   -- 户型结构
-  `room` INT NOT NULL COMMENT '室',
-  `hall` INT NOT NULL COMMENT '厅',
-  `bathroom` INT NOT NULL COMMENT '卫',
-  `kitchen` INT NOT NULL COMMENT '厨',
+  `room` INT DEFAULT NULL COMMENT '室',
+  `hall` INT DEFAULT NULL COMMENT '厅',
+  `bathroom` INT DEFAULT NULL COMMENT '卫',
+  `kitchen` INT DEFAULT NULL COMMENT '厨',
   `terrace` INT DEFAULT NULL COMMENT '阳台',
   `balcony` INT DEFAULT NULL COMMENT '阁楼',
 
   -- 面积与装修
-  `building_area` FLOAT NOT NULL COMMENT '建筑面积',
+  `building_area` FLOAT DEFAULT NULL COMMENT '建筑面积',
   `use_area` FLOAT DEFAULT NULL COMMENT '使用面积',
   `floor_height` FLOAT DEFAULT NULL COMMENT '层高',
-  `house_decoration` VARCHAR(100) NOT NULL COMMENT '装修情况',
+  `house_decoration` VARCHAR(100) DEFAULT NULL COMMENT '装修情况',
 
   -- 销售租赁信息
   `sale_price` DOUBLE DEFAULT NULL COMMENT '售价',
@@ -80,7 +81,6 @@ CREATE TABLE `house_query` (
 
   -- 标签和特征
   `tags` JSON DEFAULT NULL COMMENT '推荐标签',
-  `location` VARCHAR(255) DEFAULT NULL COMMENT '位置',
   `car_height` DOUBLE DEFAULT NULL COMMENT '车位高度',
   `actual_rate` DOUBLE DEFAULT NULL COMMENT '实率',
   `level` VARCHAR(50) DEFAULT NULL COMMENT '级别',

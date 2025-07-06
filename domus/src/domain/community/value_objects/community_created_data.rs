@@ -16,7 +16,8 @@ pub struct CommunityCreateData {
     // 小区图片
     pub image: Option<String>,
     // 位置
-    pub location: Option<String>,
+    pub location_0: Option<f64>,
+    pub location_1: Option<f64>,
 }
 
 impl CommunityCreateData {
@@ -30,7 +31,8 @@ impl CommunityCreateData {
             community_type: self.community_type.clone(),
             description: self.description.clone(),
             image: self.image.clone(),
-            location: self.location.clone(),
+            location_0: self.location_0,
+            location_1: self.location_1,
         }
     }
 }

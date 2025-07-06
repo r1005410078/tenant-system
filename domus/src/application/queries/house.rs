@@ -27,24 +27,24 @@ impl HouseQueryService {
     // 创建房源
     pub async fn create(&self, event: HouseCreatedEvent) -> anyhow::Result<()> {
         let model = house_query::ActiveModel {
-            community_id: event.community.map(|c| c.id).flatten().map_or(NotSet, Set),
-            owner_id: event.owner.id.map_or(NotSet, Set),
+            community_id: event.community.id.map_or(NotSet, Set),
+            owner_id: Set(event.owner.id),
             id: Set(event.house_id.clone()),
             title: Set(event.title.clone()),
             purpose: Set(event.purpose.clone()),
             transaction_type: Set(event.transaction_type.clone()),
             house_status: Set(event.house_status.clone()),
-            door_number_from: Set(event.floor_range.door_number_from),
-            door_number_to: Set(event.floor_range.door_number_to),
-            building_number: Set(event.door_number.building_number),
-            unit_number: Set(event.door_number.unit_number),
-            door_number: Set(event.door_number.door_number),
-            room: Set(event.apartment_type.room),
-            hall: Set(event.apartment_type.hall),
-            bathroom: Set(event.apartment_type.bathroom),
-            kitchen: Set(event.apartment_type.kitchen),
-            terrace: Set(event.apartment_type.terrace),
-            balcony: Set(event.apartment_type.balcony),
+            door_number_from: Set(event.floor_range.as_ref().and_then(|f| f.door_number_from)),
+            door_number_to: Set(event.floor_range.as_ref().and_then(|f| f.door_number_to)),
+            building_number: Set(event.door_number.as_ref().and_then(|d| d.building_number)),
+            unit_number: Set(event.door_number.as_ref().and_then(|d| d.unit_number)),
+            door_number: Set(event.door_number.as_ref().and_then(|d| d.door_number)),
+            room: Set(event.apartment_type.as_ref().and_then(|a| a.room)),
+            hall: Set(event.apartment_type.as_ref().and_then(|a| a.hall)),
+            bathroom: Set(event.apartment_type.as_ref().and_then(|a| a.bathroom)),
+            kitchen: Set(event.apartment_type.as_ref().and_then(|a| a.kitchen)),
+            terrace: Set(event.apartment_type.as_ref().and_then(|a| a.terrace)),
+            balcony: Set(event.apartment_type.as_ref().and_then(|a| a.balcony)),
             building_area: Set(event.building_area),
             use_area: Set(event.use_area),
             floor_height: Set(event.floor_height),
@@ -63,15 +63,14 @@ impl HouseQueryService {
             certificate_date: Set(event.certificate_date),
             handover_date: Set(event.handover_date),
             tags: Set(Some(serde_json::to_value(event.tags).unwrap())),
-            location: Set(event.location),
             car_height: Set(event.car_height),
             actual_rate: Set(event.actual_rate),
             level: Set(event.level),
             progress_depth: Set(event.progress_depth),
             door_width: Set(event.door_width),
             discount_year_limit: Set(event.discount_year_limit),
-            stairs: Set(event.stairs.stairs),
-            rooms: Set(event.stairs.rooms),
+            stairs: Set(event.stairs.as_ref().and_then(|s| s.stairs.clone())),
+            rooms: Set(event.stairs.as_ref().and_then(|s| s.rooms.clone())),
             view_method: Set(event.view_method),
             payment_method: Set(event.payment_method),
             property_tax: Set(event.property_tax),
@@ -98,71 +97,27 @@ impl HouseQueryService {
     pub async fn update(&self, event: HouseUpdatedEvent) -> anyhow::Result<()> {
         let model = house_query::ActiveModel {
             community_id: event.community.map(|c| c.id).flatten().map_or(NotSet, Set),
-            owner_id: event.owner.map(|c| c.id).flatten().map_or(NotSet, Set),
+            owner_id: Set(event.owner.map(|o| o.id).flatten()),
             id: Set(event.house_id.clone()),
             title: Set(event.title.clone()),
             purpose: event.purpose.map_or(NotSet, Set),
             transaction_type: event.transaction_type.map_or(NotSet, Set),
             house_status: event.house_status.map_or(NotSet, Set),
-            door_number_from: event
-                .floor_range
-                .clone()
-                .map(|f| f.door_number_from)
-                .map_or(NotSet, Set),
-            door_number_to: event
-                .floor_range
-                .clone()
-                .map(|f| f.door_number_to)
-                .map_or(NotSet, Set),
-            building_number: event
-                .door_number
-                .clone()
-                .map(|d| d.building_number)
-                .map_or(NotSet, Set),
-            unit_number: event
-                .door_number
-                .clone()
-                .map(|d| d.unit_number)
-                .map_or(NotSet, Set),
-            door_number: event
-                .door_number
-                .clone()
-                .map(|d| d.door_number)
-                .map_or(NotSet, Set),
-            room: event
-                .apartment_type
-                .clone()
-                .map(|a| a.room)
-                .map_or(NotSet, Set),
-            hall: event
-                .apartment_type
-                .clone()
-                .map(|a| a.hall)
-                .map_or(NotSet, Set),
-            bathroom: event
-                .apartment_type
-                .clone()
-                .map(|a| a.bathroom)
-                .map_or(NotSet, Set),
-            kitchen: event
-                .apartment_type
-                .clone()
-                .map(|a| a.kitchen)
-                .map_or(NotSet, Set),
-            terrace: event
-                .apartment_type
-                .clone()
-                .map(|a| a.terrace)
-                .map_or(NotSet, Set),
-            balcony: event
-                .apartment_type
-                .clone()
-                .map(|a| a.balcony)
-                .map_or(NotSet, Set),
-            building_area: event.building_area.map_or(NotSet, Set),
+            door_number_from: Set(event.floor_range.as_ref().and_then(|f| f.door_number_from)),
+            door_number_to: Set(event.floor_range.as_ref().and_then(|f| f.door_number_to)),
+            building_number: Set(event.door_number.as_ref().and_then(|d| d.building_number)),
+            unit_number: Set(event.door_number.as_ref().and_then(|d| d.unit_number)),
+            door_number: Set(event.door_number.as_ref().and_then(|d| d.door_number)),
+            room: Set(event.apartment_type.as_ref().and_then(|a| a.room)),
+            hall: Set(event.apartment_type.as_ref().and_then(|a| a.hall)),
+            bathroom: Set(event.apartment_type.as_ref().and_then(|a| a.bathroom)),
+            kitchen: Set(event.apartment_type.as_ref().and_then(|a| a.kitchen)),
+            terrace: Set(event.apartment_type.as_ref().and_then(|a| a.terrace)),
+            balcony: Set(event.apartment_type.as_ref().and_then(|a| a.balcony)),
+            building_area: Set(event.building_area),
             use_area: Set(event.use_area),
             floor_height: Set(event.floor_height),
-            house_decoration: event.house_decoration.map_or(NotSet, Set),
+            house_decoration: Set(event.house_decoration),
             sale_price: Set(event.sale_price),
             rent_price: Set(event.rent_price),
             rent_low_price: Set(event.rent_low_price),
@@ -177,15 +132,14 @@ impl HouseQueryService {
             certificate_date: Set(event.certificate_date),
             handover_date: Set(event.handover_date),
             tags: Set(Some(serde_json::to_value(event.tags).unwrap())),
-            location: Set(event.location),
             car_height: Set(event.car_height),
             actual_rate: Set(event.actual_rate),
             level: Set(event.level),
             progress_depth: Set(event.progress_depth),
             door_width: Set(event.door_width),
             discount_year_limit: Set(event.discount_year_limit),
-            stairs: event.stairs.clone().map(|s| s.stairs).map_or(NotSet, Set),
-            rooms: event.stairs.clone().map(|s| s.rooms).map_or(NotSet, Set),
+            stairs: Set(event.stairs.as_ref().and_then(|s| s.stairs.clone())),
+            rooms: Set(event.stairs.as_ref().and_then(|s| s.rooms.clone())),
             view_method: Set(event.view_method),
             payment_method: Set(event.payment_method),
             property_tax: Set(event.property_tax),

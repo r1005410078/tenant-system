@@ -10,32 +10,38 @@ use crate::domain::{
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct CreateHouseCommand {
-    // 房源标题
-    pub title: Option<String>,
     // 用途
     pub purpose: String,
     // 交易类型
     pub transaction_type: String,
     // 状态
     pub house_status: String,
+    // 业主
+    pub owner: HouseOwner,
+    // 小区
+    pub community: Community,
+
+    // 房源标题
+    pub title: Option<String>,
+
     // 楼层
-    pub floor_range: FloorRange,
+    pub floor_range: Option<FloorRange>,
 
     // 门牌号结构
-    pub door_number: DoorNumber,
+    pub door_number: Option<DoorNumber>,
 
     // 户型结构
-    pub apartment_type: ApartmentType,
+    pub apartment_type: Option<ApartmentType>,
 
     /// 面积与装修
     // 建筑面积
-    pub building_area: f32,
+    pub building_area: Option<f32>,
     // 使用面积
     pub use_area: Option<f32>,
     // 层高
     pub floor_height: Option<f32>,
     // 装修
-    pub house_decoration: String,
+    pub house_decoration: Option<String>,
 
     //// 销售租赁信息
     // 售价
@@ -68,8 +74,6 @@ pub struct CreateHouseCommand {
     //// 标签和特征
     // 推荐标签
     pub tags: Vec<String>,
-    // 位置
-    pub location: Option<String>,
     // 车位高度
     pub car_height: Option<f64>,
     // 实率
@@ -85,11 +89,8 @@ pub struct CreateHouseCommand {
     // 满减年限
     pub discount_year_limit: Option<String>,
     // 梯户
-    pub stairs: Stairs,
-    // 业主
-    pub owner: HouseOwner,
-    // 小区
-    pub community: Community,
+    pub stairs: Option<Stairs>,
+
     // 出售低价
     pub sale_low_price: Option<f64>,
     // 看房方式
@@ -153,9 +154,7 @@ impl CreateHouseCommand {
             // 业主
             owner: self.owner.clone(),
             // 小区
-            community: Some(self.community.clone()),
-            // 位置
-            location: self.location.clone(),
+            community: self.community.clone(),
             // 推荐标签
             tags: self.tags.clone(),
             // 车位高度

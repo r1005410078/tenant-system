@@ -72,12 +72,12 @@ where
 
             let token = match token_opt {
                 Some(t) => t,
-                None => return Err(actix_web::error::ErrorForbidden("Missing token")),
+                None => return Err(actix_web::error::ErrorUnauthorized("Missing token")),
             };
 
             let claims = match Claims::validate(token) {
                 Ok(c) => c,
-                Err(_) => return Err(actix_web::error::ErrorForbidden("Invalid token")),
+                Err(_) => return Err(actix_web::error::ErrorUnauthorized("Invalid token")),
             };
 
             // 2. 保存 Claims 到请求中

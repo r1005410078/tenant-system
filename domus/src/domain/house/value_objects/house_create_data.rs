@@ -1,7 +1,9 @@
 use crate::domain::{
     house::{
         events::house_created::HouseCreatedEvent,
-        value_objects::house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
+        value_objects::house::{
+            ApartmentType, Community, DoorNumber, FileInfo, FloorRange, Stairs,
+        },
     },
     owner::value_objects::owner::HouseOwner,
 };
@@ -108,8 +110,8 @@ pub struct HouseCreateData {
     pub external_sync: Option<String>,
     // 备注
     pub remark: Option<String>,
-    // 小区地址
-    pub images: Option<Vec<String>>,
+    // 房源图片
+    pub images: Option<Vec<FileInfo>>,
 }
 
 impl HouseCreateData {

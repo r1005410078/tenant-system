@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use crate::domain::{
     house::value_objects::{
-        house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
+        house::{ApartmentType, Community, DoorNumber, FileInfo, FloorRange, Stairs},
         house_create_data::HouseCreateData,
     },
     owner::value_objects::owner::HouseOwner,
@@ -124,7 +124,7 @@ pub struct CreateHouseCommand {
     // 备注
     pub remark: Option<String>,
     // 房源描述
-    pub images: Option<Vec<String>>,
+    pub images: Option<Vec<FileInfo>>,
 }
 
 impl CreateHouseCommand {

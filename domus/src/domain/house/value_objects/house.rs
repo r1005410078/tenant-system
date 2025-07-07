@@ -121,3 +121,15 @@ pub struct ApartmentType {
     // 阁楼
     pub balcony: Option<i32>,
 }
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct FileInfo {
+    // 名称
+    pub name: String,
+    // 类型
+    pub r#type: String,
+    // 卫
+    pub size: Option<i32>,
+    // 厨
+    pub url: Option<i32>,
+}

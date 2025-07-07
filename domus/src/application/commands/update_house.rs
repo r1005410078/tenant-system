@@ -2,7 +2,7 @@ use serde::Deserialize;
 
 use crate::domain::{
     house::value_objects::{
-        house::{ApartmentType, Community, DoorNumber, FloorRange, Stairs},
+        house::{ApartmentType, Community, DoorNumber, FileInfo, FloorRange, Stairs},
         house_update_data::HouseUpdateData,
     },
     owner::value_objects::owner::HouseOwner,
@@ -114,8 +114,8 @@ pub struct UpdateHouseCommand {
     pub external_sync: Option<String>,
     // 备注
     pub remark: Option<String>,
-    // 小区地址
-    pub images: Option<Vec<String>>,
+    // 房源图片
+    pub images: Option<Vec<FileInfo>>,
 }
 
 impl UpdateHouseCommand {

@@ -16,8 +16,8 @@ pub struct CommunityAggregate {
 }
 
 impl CommunityAggregate {
-    pub fn new(name: String, address: String) -> CommunityAggregate {
-        let community_id = uuid::Uuid::new_v4().to_string();
+    pub fn new(name: String, address: String, location_id: Option<String>) -> CommunityAggregate {
+        let community_id = location_id.unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
         CommunityAggregate {
             community_id,
             name,
@@ -27,8 +27,11 @@ impl CommunityAggregate {
     }
 
     pub fn create(data: &CommunityCreateData) -> (CommunityAggregate, CommunityEvent) {
-        let aggregate: CommunityAggregate =
-            CommunityAggregate::new(data.name.clone(), data.address.clone());
+        let aggregate: CommunityAggregate = CommunityAggregate::new(
+            data.name.clone(),
+            data.address.clone(),
+            data.location_id.clone(),
+        );
 
         (
             aggregate.clone(),

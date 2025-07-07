@@ -24,19 +24,22 @@ impl UpdateHouseCommandHandler {
     }
 
     pub async fn handle(&self, command: UpdateHouseCommand) -> anyhow::Result<()> {
-        let mut aggreagate = self.house_repository.find_by_id(&command.house_id).await?;
-        let event = aggreagate.update(&command.to_data())?;
+        let mut aggreagate = self.house_repository.find_by_id(&command.id).await?;
+        let events = aggreagate.update(&command.to_data())?;
 
         if self
             .house_repository
-            .exists_address(&aggreagate.address, Some(command.house_id.clone()))
+            .exists_address(&aggreagate.address, Some(command.id.clone()))
             .await?
         {
             return Err(anyhow::anyhow!("地址已存在"));
         }
 
         self.house_repository.save(&aggreagate).await?;
-        self.event_bus.publish(event).await;
+
+        for event in events {
+            self.event_bus.publish(event).await;
+        }
 
         Ok(())
     }

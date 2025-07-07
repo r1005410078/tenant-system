@@ -9,12 +9,14 @@ use crate::domain::{
 pub struct CreateCommunityCommand {
     // 小区名称
     pub name: String,
+    // 位置id
+    pub location_id: Option<String>,
     // 小区地址
     pub address: String,
     // 城市
     pub city: String,
     // 小区年限
-    pub year_built: u16,
+    pub year_built: Option<u16>,
     // 小区类型
     pub community_type: String,
     // 小区描述
@@ -36,6 +38,7 @@ impl CreateCommunityCommand {
             community_type: self.community_type.clone(),
             description: self.description.clone(),
             image: self.image.clone(),
+            location_id: self.location_id.clone(),
             location_0: self.location_0,
             location_1: self.location_1,
         }
@@ -43,6 +46,7 @@ impl CreateCommunityCommand {
 
     pub fn from(community: &Community) -> anyhow::Result<Self> {
         Ok(CreateCommunityCommand {
+            location_id: community.location_id.clone(),
             // 小区名称
             name: community.get_name()?,
             // 小区地址
@@ -50,7 +54,7 @@ impl CreateCommunityCommand {
             // 城市
             city: community.get_city()?,
             // 小区年限
-            year_built: community.get_year_built()?,
+            year_built: community.year_built.clone(),
             // 小区类型
             community_type: community.get_community_type()?,
             // 小区描述

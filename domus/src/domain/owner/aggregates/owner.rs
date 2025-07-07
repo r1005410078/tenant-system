@@ -70,6 +70,10 @@ impl OwnerAggregate {
             self.id_card = Some(id_card.clone());
         }
 
+        if let Some(phone) = &data.phone {
+            self.phone = phone.clone();
+        }
+
         Ok(OwnerEvent::Updated(OwnerUpdatedEvent {
             id: self.owner_id.clone(),
             name: Some(self.name.clone()),

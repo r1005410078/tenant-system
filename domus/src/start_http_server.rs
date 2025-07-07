@@ -40,7 +40,9 @@ use crate::{
     },
     interfaces::controllers::{
         community::{create_community, delete_community, list_community, update_community},
-        house::{create_house, delete_house, get_upload_url, list_houses, update_house},
+        house::{
+            create_house, delete_house, get_house_detail, get_upload_url, list_houses, update_house,
+        },
         owner::{create_owner, delete_owner, owner_list, update_owner},
     },
 };
@@ -202,21 +204,21 @@ pub async fn execute() -> std::io::Result<()> {
                 web::scope("/api/domus/management")
                     .service(
                         web::scope("/community")
-                            .wrap(auth_middleware.clone())
+                            //.wrap(auth_middleware.clone())
                             .service(create_community)
                             .service(update_community)
                             .service(delete_community),
                     )
                     .service(
                         web::scope("/owner")
-                            .wrap(auth_middleware.clone())
+                            // .wrap(auth_middleware.clone())
                             .service(create_owner)
                             .service(update_owner)
                             .service(delete_owner),
                     )
                     .service(
                         web::scope("/house")
-                            .wrap(auth_middleware.clone())
+                            // .wrap(auth_middleware.clone())
                             .service(create_house)
                             .service(update_house)
                             .service(delete_house)
@@ -225,10 +227,14 @@ pub async fn execute() -> std::io::Result<()> {
             )
             .service(
                 web::scope("/api/domus/query")
-                    .wrap(auth_middleware.clone())
+                    // .wrap(auth_middleware.clone())
                     .service(web::scope("/owner").service(owner_list))
                     .service(web::scope("/community").service(list_community))
-                    .service(web::scope("/house").service(list_houses)),
+                    .service(
+                        web::scope("/house")
+                            .service(list_houses)
+                            .service(get_house_detail),
+                    ),
             )
     })
     .bind(server_url)?

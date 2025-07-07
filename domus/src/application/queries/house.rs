@@ -7,12 +7,12 @@ use crate::{
         entitiy::{community_query, house_query, owner_query},
     },
 };
-use sea_orm::RelationTrait;
 use sea_orm::{
     ActiveModelTrait,
     ActiveValue::{NotSet, Set},
     Condition, DbConn, EntityTrait, JoinType, PaginatorTrait, QueryFilter, QuerySelect,
 };
+use sea_orm::{ColumnTrait, RelationTrait};
 use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
 pub struct HouseQueryService {
@@ -95,6 +95,7 @@ impl HouseQueryService {
 
     // 更新房源
     pub async fn update(&self, event: HouseUpdatedEvent) -> anyhow::Result<()> {
+        println!("event: {:#?}", event);
         let model = house_query::ActiveModel {
             community_id: event.community.map(|c| c.id).flatten().map_or(NotSet, Set),
             owner_id: Set(event.owner.map(|o| o.id).flatten()),
@@ -201,6 +202,26 @@ impl HouseQueryService {
             .collect::<Vec<HouseQueryReadModelDto>>();
 
         Ok(TableDataResponse::new(data, total as u64))
+    }
+
+    // 根据id查询
+    pub async fn find_by_id(&self, id: &str) -> Option<HouseQueryReadModelDto> {
+        let data = house_query::Entity::find()
+            .filter(house_query::Column::Id.eq(id))
+            .join(
+                JoinType::LeftJoin,
+                house_query::Relation::CommunityQuery.def(),
+            )
+            .join(JoinType::LeftJoin, house_query::Relation::OwnerQuery.def())
+            .select_also(community_query::Entity)
+            .select_also(owner_query::Entity)
+            .one(self.pool.as_ref())
+            .await;
+
+        match data {
+            Ok(Some((a, b, c))) => Some(HouseQueryReadModelDto::from_value(a, b, c)),
+            _ => None,
+        }
     }
 
     // 发布房源

@@ -36,7 +36,7 @@ pub struct HouseCreatedEvent {
     pub stairs: Option<Stairs>,
 
     // 推荐标签
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
     // 车位高度
     pub car_height: Option<f64>,
     // 实率

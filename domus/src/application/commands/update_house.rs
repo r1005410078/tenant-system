@@ -10,7 +10,7 @@ use crate::domain::{
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct UpdateHouseCommand {
-    pub house_id: String,
+    pub id: String,
     // 房源标题
     pub title: Option<String>,
     // 用途
@@ -119,7 +119,7 @@ pub struct UpdateHouseCommand {
 impl UpdateHouseCommand {
     pub fn to_data(&self) -> HouseUpdateData {
         HouseUpdateData {
-            house_id: self.house_id.clone(),
+            house_id: self.id.clone(),
             // 房源标题
             title: self.title.clone(),
             // 用途

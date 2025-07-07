@@ -35,7 +35,7 @@ pub struct HouseCreateData {
     // 小区
     pub community: Community,
     // 推荐标签
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
     // 车位高度
     pub car_height: Option<f64>,
     // 实率

@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Community {
     pub id: Option<String>,
+
     // 小区名称
     pub name: Option<String>,
     // 小区地址
@@ -17,6 +18,8 @@ pub struct Community {
     pub description: Option<String>,
     // 小区图片
     pub image: Option<String>,
+    //  小区id
+    pub location_id: Option<String>,
     // 位置
     pub location_0: Option<f64>,
     pub location_1: Option<f64>,

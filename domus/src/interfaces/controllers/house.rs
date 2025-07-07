@@ -66,6 +66,19 @@ pub async fn list_houses(
     HttpResponse::Ok().json(res)
 }
 
+#[get("/detail/{house_id}")]
+pub async fn get_house_detail(
+    path: web::Path<String>,
+    house_query_service: web::Data<HouseQueryService>,
+) -> HttpResponse {
+    let res = match house_query_service.find_by_id(&path.into_inner()).await {
+        Some(data) => ResponseBody::success(data),
+        None => ResponseBody::error("not found".to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct UploadUrlRequest {
     file_name: String,

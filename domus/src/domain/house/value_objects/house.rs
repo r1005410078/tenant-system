@@ -129,7 +129,7 @@ pub struct FileInfo {
     // 类型
     pub r#type: String,
     // 卫
-    pub size: Option<i32>,
+    pub size: String,
     // 厨
-    pub url: Option<i32>,
+    pub url: String,
 }

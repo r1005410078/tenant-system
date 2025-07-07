@@ -3,7 +3,9 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 use crate::{
-    domain::house::value_objects::house::{ApartmentType, DoorNumber, FloorRange, Stairs},
+    domain::house::value_objects::house::{
+        ApartmentType, DoorNumber, FileInfo, FloorRange, Stairs,
+    },
     infrastructure::{
         dtos::{
             community_query_read_model_dto::CommunityQueryReadModelDto,
@@ -126,6 +128,8 @@ pub struct HouseQueryReadModelDto {
     pub external_sync: Option<String>,
     // 备注
     pub remark: Option<String>,
+    // 房源图片
+    pub images: Vec<FileInfo>,
 
     // 创建时间
     pub created_at: DateTimeUtc,
@@ -215,6 +219,8 @@ impl HouseQueryReadModelDto {
             present_state: value.present_state,
             external_sync: value.external_sync,
             remark: value.remark,
+            images: serde_json::from_value::<Vec<FileInfo>>(value.images.unwrap_or(json!([])))
+                .unwrap_or(vec![]),
             created_at: value.created_at,
             updated_at: value.updated_at,
         }

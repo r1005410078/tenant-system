@@ -108,6 +108,8 @@ pub struct HouseCreateData {
     pub external_sync: Option<String>,
     // 备注
     pub remark: Option<String>,
+    // 小区地址
+    pub images: Option<Vec<String>>,
 }
 
 impl HouseCreateData {
@@ -216,6 +218,8 @@ impl HouseCreateData {
             external_sync: self.external_sync.clone(),
             // 备注
             remark: self.remark.clone(),
+            // 小区地址
+            images: self.images.clone(),
         }
     }
 

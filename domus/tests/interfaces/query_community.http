@@ -1,4 +1,4 @@
 
-GET http://localhost:9002/api/community/list?page=1&page_size=5
+GET http://localhost:9002/api/domus/query/community/list?page=1&page_size=10000
 Content-Type: application/json
 

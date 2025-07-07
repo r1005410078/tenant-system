@@ -86,6 +86,7 @@ impl HouseQueryService {
             present_state: Set(event.present_state),
             external_sync: Set(event.external_sync),
             remark: Set(event.remark),
+            images: Set(Some(serde_json::to_value(event.images).unwrap())),
             ..Default::default()
         };
 
@@ -156,6 +157,7 @@ impl HouseQueryService {
             present_state: Set(event.present_state),
             external_sync: Set(event.external_sync),
             remark: Set(event.remark),
+            images: Set(Some(serde_json::to_value(event.images).unwrap())),
             ..Default::default()
         };
 

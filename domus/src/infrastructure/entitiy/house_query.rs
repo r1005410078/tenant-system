@@ -81,6 +81,7 @@ pub struct Model {
     pub external_sync: Option<String>,
     #[sea_orm(column_type = "Text", nullable)]
     pub remark: Option<String>,
+    pub images: Option<Json>,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
 }

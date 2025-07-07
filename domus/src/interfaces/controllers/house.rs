@@ -81,16 +81,17 @@ pub async fn get_house_detail(
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 struct UploadUrlRequest {
-    file_name: String,
+    directory: String,
+    filename: String,
 }
 
-#[post("/upload-url")]
-pub async fn get_upload_url(
+#[post("/apply_upload_url")]
+pub async fn apply_upload_url(
     data: web::Json<UploadUrlRequest>,
     file_upload_service: web::Data<FileUploadService>,
 ) -> HttpResponse {
     let res = match file_upload_service
-        .generate_put_url(data.file_name.as_str())
+        .generate_put_url(data.directory.as_str(), data.filename.as_str())
         .await
     {
         Ok(data) => ResponseBody::success(data),

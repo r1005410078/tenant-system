@@ -11,12 +11,15 @@ impl FileUploadService {
         Self { client }
     }
 
-    pub async fn generate_put_url(&self, file_name: &str) -> anyhow::Result<String> {
-        println!("file_name: {}", file_name);
+    pub async fn generate_put_url(
+        &self,
+        directory: &str,
+        filename: &str,
+    ) -> anyhow::Result<String> {
         self.client
             .get_object_put_url(
                 "domus-houses-images",
-                format!("domus-houses-images/{}", file_name).as_str(),
+                format!("{}/{}", directory, filename).as_str(),
                 std::time::Duration::from_secs(600),
             ) // e.g. 10min
             .await

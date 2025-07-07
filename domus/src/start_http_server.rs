@@ -41,7 +41,8 @@ use crate::{
     interfaces::controllers::{
         community::{create_community, delete_community, list_community, update_community},
         house::{
-            create_house, delete_house, get_house_detail, get_upload_url, list_houses, update_house,
+            apply_upload_url, create_house, delete_house, get_house_detail, list_houses,
+            update_house,
         },
         owner::{create_owner, delete_owner, owner_list, update_owner},
     },
@@ -222,7 +223,7 @@ pub async fn execute() -> std::io::Result<()> {
                             .service(create_house)
                             .service(update_house)
                             .service(delete_house)
-                            .service(get_upload_url),
+                            .service(apply_upload_url),
                     ),
             )
             .service(

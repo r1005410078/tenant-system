@@ -123,6 +123,8 @@ pub struct CreateHouseCommand {
     pub external_sync: Option<String>,
     // 备注
     pub remark: Option<String>,
+    // 房源描述
+    pub images: Option<Vec<String>>,
 }
 
 impl CreateHouseCommand {
@@ -229,6 +231,8 @@ impl CreateHouseCommand {
             external_sync: self.external_sync.clone(),
             // 备注
             remark: self.remark.clone(),
+            // 房源描述
+            images: self.images.clone(),
         }
     }
 }

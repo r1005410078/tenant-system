@@ -1,0 +1,35 @@
+
+### 创建
+
+POST http://localhost:9002/api/domus/management/owner/save
+Content-Type: application/json
+
+{
+  "name": "John Doe555",
+  "email": "john.doe@example.com",
+  "phone": "123115557"
+}
+
+
+### 更新
+
+POST http://localhost:9002/api/domus/management/owner/save
+Content-Type: application/json
+
+{
+  "id": "c31c7991-ff1d-4158-90a6-815e9bab8fcd",
+  "name": "啊荣",
+  "email": "100541000@qq.com",
+  "phone": "18727783111",
+  "id_card_images": ["https://example.com/1.jpg", "https://example.com/2.jpg"]
+}
+
+
+### 删除
+
+POST http://localhost:9002/api/domus/management/owner/delete/c31c7991-ff1d-4158-90a6-815e9bab8fcd
+
+
+### 获取
+
+GET http://localhost:9002/api/domus/query/owner/list?page=1&page_size=10

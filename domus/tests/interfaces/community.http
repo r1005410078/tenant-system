@@ -1,0 +1,47 @@
+### 新建
+
+POST http://localhost:9002/api/domus/management/community/save
+Content-Type: application/json
+
+{
+  "id": "123e4567-e89b-12d3-a456-426655440001",
+  "name": "New Community 111",
+  "address": "123 Main St 111",
+  "city": "New York",
+  "year_built": "2025-07-10T09:20:15.123Z",
+  "description": "A place for new ideas",
+  "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
+  "typecode": "residential",
+  "district": "Manhattan",
+  "adcode": "10001",
+  "lat": 40.7128,
+  "lng": -74.006
+}
+
+### 更新
+
+POST http://localhost:9002/api/domus/management/community/save
+Content-Type: application/json
+
+{
+  "id": "123e4567-e89b-12d3-a456-426655440001",
+  "name": "回祥小区",
+  "address": "安庆路",
+  "city": "安庆",
+  "year_built": "2025-07-10T09:20:15.123Z",
+  "description": "A place for new ideas",
+  "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
+  "typecode": "residential",
+  "district": "Manhattan",
+  "adcode": "10001",
+  "lat": 40.7128,
+  "lng": -74.006
+}
+
+
+### 删除
+POST http://localhost:9002/api/domus/management/community/delete/123e4567-e89b-12d3-a456-426655440000
+
+### 查询
+GET http://localhost:9002/api/domus/query/community/list?page=1&page_size=10000
+Content-Type: application/json

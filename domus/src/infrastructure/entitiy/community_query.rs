@@ -20,6 +20,8 @@ pub struct Model {
     #[sea_orm(column_type = "Double", nullable)]
     pub lng: f64,
     pub typecode: String,
+    pub district: Option<String>,
+    pub adcode: Option<String>,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
 }

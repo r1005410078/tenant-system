@@ -35,7 +35,10 @@ use crate::{
     },
     interfaces::controllers::{
         community::{delete_community, list_community, save_community},
-        house::{apply_upload_url, delete_house, get_house_detail, list_houses, save_house},
+        house::{
+            apply_upload_url, delete_house, get_house_detail, group_by_community, list_houses,
+            save_house,
+        },
         owner::{delete_owner, owner_list, save_owner},
     },
 };
@@ -186,7 +189,8 @@ pub async fn execute() -> std::io::Result<()> {
                     .service(
                         web::scope("/house")
                             .service(list_houses)
-                            .service(get_house_detail),
+                            .service(get_house_detail)
+                            .service(group_by_community),
                     ),
             )
     })

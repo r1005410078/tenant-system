@@ -23,7 +23,7 @@ impl OwnerAggregate {
         }
     }
 
-    pub fn create(data: &HouseOwner) -> anyhow::Result<(OwnerAggregate, OwnerEvent)> {
+    pub fn create(mut data: HouseOwner) -> anyhow::Result<(OwnerAggregate, OwnerEvent)> {
         data.validate()?;
 
         let owner_id = uuid::Uuid::new_v4().to_string();
@@ -44,6 +44,7 @@ impl OwnerAggregate {
             data.id_card.clone(),
         );
 
+        data.id = Some(owner_id);
         Ok((owner, OwnerEvent::Created(data.clone())))
     }
 

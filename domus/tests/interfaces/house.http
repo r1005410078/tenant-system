@@ -1,0 +1,113 @@
+
+POST http://localhost:9002/api/domus/management/house/save
+Content-Type: application/json
+
+{
+    "owner": {
+        "id": "ea0e8ee3-2c91-4f72-8c67-7ec7e20d7eaa",
+        "name": "taosheng rong:本人",
+        "description": "",
+        "phone": "18626891229:本人"
+    },
+    "community": {
+        "id": "K3FFGA9AAU",
+        "name": "回祥小区-西区",
+        "city": "Beijing",
+        "address": "华中路与港华路交叉口东北112米",
+        "year_built": "2025-07-10T09:20:15.123Z",
+        "description": "A place for new ideas",
+        "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
+        "typecode": "residential",
+        "district": "Manhattan",
+        "adcode": "10001",
+        "lat": 40.7128,
+        "lng": -74.006
+    },
+    "purpose": "住宅",
+    "transaction_type": "出售",
+    "house_status": "有效",
+    "sale_price": 12,
+    "sale_low_price": 11,
+    "down_payment": 2,
+    "door_number": {
+        "building_number": 3,
+        "unit_number": 1,
+        "door_number": 1
+    },
+    "apartment_type": {
+        "room": 1,
+        "bathroom": 1,
+        "kitchen": 1,
+        "balcony": 1
+    }
+}
+
+
+### 更新
+
+POST http://localhost:9002/api/domus/management/house/save
+Content-Type: application/json
+
+{
+    "id": "2fd0a841-80a9-4eec-9925-a821c785a5d7",
+    "purpose": "门面",
+    "transaction_type": "出售",
+    "house_status": "有效",
+    "owner": {
+        "id": "ea0e8ee3-2c91-4f72-8c67-7ec7e20d7eaa",
+        "name": "taosheng rong:本人",
+        "description": "",
+        "phone": "18626891229:本人"
+    },
+    "community": {
+        "id": "K3FFGA9AAU",
+        "name": "回祥小区-东区",
+        "city": "Beijing",
+        "address": "华中路与港华路交叉口东北112米",
+        "year_built": "2025-07-10T09:20:15.123Z",
+        "description": "A place for new ideas",
+        "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
+        "typecode": "residential",
+        "district": "Manhattan",
+        "adcode": "10001",
+        "lat": 40.7128,
+        "lng": -74.006
+    },
+    "sale_price": 12,
+    "sale_low_price": 11,
+    "down_payment": 2,
+    "door_number": {
+        "building_number": 1,
+        "unit_number": 1,
+        "door_number": 1
+    },
+    "apartment_type": {
+        "room": 1,
+        "bathroom": 1,
+        "kitchen": 1,
+        "balcony": 1
+    }
+}
+
+### 查询
+
+GET http://localhost:9002/api/domus/query/house/list?page=1&page_size=5
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYzUyYjQwNDItZTU0Ny00YTZjLTg2YmMtY2E4YzNiZjM1MzVkIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbImU1MWQzNmE3LTQ4NDItNDU3Ny1hNDFlLWU2OTRiYzNmN2M1OSJdLCJleHAiOjE3NTExNzUxNDIsImlhdCI6MTc1MTA4ODc0Mn0._B-rNbbp5Axq3Fdulmd1NVJozUF1GeFWsDicjZK8KUE
+
+
+### 根据小区分组
+
+GET http://localhost:9002/api/domus/query/house/group_by_community
+Content-Type: application/json
+
+### 根据id查询
+
+GET http://localhost:9002/api/domus/query/house/detail/2fd0a841-80a9-4eec-9925-a821c785a5d7
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYzUyYjQwNDItZTU0Ny00YTZjLTg2YmMtY2E4YzNiZjM1MzVkIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbImU1MWQzNmE3LTQ4NDItNDU3Ny1hNDFlLWU2OTRiYzNmN2M1OSJdLCJleHAiOjE3NTExNzUxNDIsImlhdCI6MTc1MTA4ODc0Mn0._B-rNbbp5Axq3Fdulmd1NVJozUF1GeFWsDicjZK8KUE
+
+
+### 删除
+POST http://localhost:9002/api/domus/management/house/delete/ae94b28b-515b-407d-855d-57aed190c6a0
+Content-Type: application/json

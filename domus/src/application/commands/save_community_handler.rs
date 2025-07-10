@@ -38,16 +38,6 @@ impl SaveCommunityCommandHandler {
 
         match aggreagate {
             Some(mut aggreagate) => {
-                if let Some(address) = community.address.clone() {
-                    if self
-                        .community_repository
-                        .exists_address(&address, Some(community_id.clone()))
-                        .await?
-                    {
-                        return Err(anyhow::anyhow!("小区地址已存在"));
-                    }
-                }
-
                 let event = aggreagate.update(&community)?;
 
                 self.community_repository.save(&aggreagate).await?;
@@ -59,16 +49,6 @@ impl SaveCommunityCommandHandler {
             None => {
                 // 创建小区
                 let (aggregate, event) = CommunityAggregate::create(&command.into_inner())?;
-
-                // 检查小区是否已存在
-                if self
-                    .community_repository
-                    .exists_address(&aggregate.address, None)
-                    .await?
-                {
-                    return Err(anyhow::anyhow!("Community already exists at this address"));
-                }
-
                 self.community_repository.create(aggregate.clone()).await?;
                 self.event_bus.publish(event).await;
 

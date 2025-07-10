@@ -71,8 +71,6 @@ impl SaveOwnerCommandHandler {
                     }
                 }
 
-                let (aggregate, event) = OwnerAggregate::create(&owner)?;
-
                 // 手机号是否存在
                 if self
                     .owner_repository
@@ -82,7 +80,10 @@ impl SaveOwnerCommandHandler {
                     return Err(anyhow::anyhow!("手机号已存在"));
                 }
 
+                let (aggregate, event) = OwnerAggregate::create(owner)?;
+
                 self.owner_repository.create(aggregate.clone()).await?;
+
                 self.event_bus.publish(event).await;
 
                 Ok(aggregate.owner_id)

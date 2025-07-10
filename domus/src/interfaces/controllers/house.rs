@@ -19,6 +19,7 @@ pub async fn save_house(
     body: web::Json<HouseData>,
     save_house_service: web::Data<SaveHouseService>,
 ) -> HttpResponse {
+    println!("body: {:#?}", body);
     let res = match save_house_service.execute(body.into_inner()).await {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
@@ -46,6 +47,16 @@ pub async fn list_houses(
     house_query_service: web::Data<HouseQueryService>,
 ) -> HttpResponse {
     let res = match house_query_service.find_all(query.into_inner()).await {
+        Ok(data) => ResponseBody::success(data),
+        Err(e) => ResponseBody::error(e.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("/group_by_community")]
+pub async fn group_by_community(house_query_service: web::Data<HouseQueryService>) -> HttpResponse {
+    let res = match house_query_service.group_by_community().await {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };

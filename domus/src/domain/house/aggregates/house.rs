@@ -35,10 +35,11 @@ impl HouseAggregate {
     }
 
     // 创建房源
-    pub fn create(house: &House) -> anyhow::Result<(HouseAggregate, HouseEvent)> {
+    pub fn create(mut house: House) -> anyhow::Result<(HouseAggregate, HouseEvent)> {
         let house_id = uuid::Uuid::new_v4().to_string();
 
         house.validate()?;
+        house.id = Some(house_id.clone());
 
         Ok((
             HouseAggregate::new(

@@ -1,9 +1,0 @@
-
-POST http://localhost:9002/api/owner/create
-Content-Type: application/json
-
-{
-  "name": "John Doe555",
-  "email": "john.doe@example.com",
-  "phone": "123115557"
-}

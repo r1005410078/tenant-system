@@ -7,6 +7,7 @@ use crate::domain::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HouseData {
     // 房源
+    #[serde(flatten)]
     pub house: Option<House>,
     // 小区
     pub community: Option<Community>,
@@ -44,7 +45,7 @@ pub struct House {
     // 位置
     pub location: Option<String>,
     // 推荐标签
-    pub tags: Vec<String>,
+    pub tags: Option<Vec<String>>,
     // 车位高度
     pub car_height: Option<f64>,
     // 实率
@@ -229,4 +230,55 @@ pub struct FileInfo {
     pub size: String,
     // 厨
     pub url: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use crate::domain::house::value_objects::house::HouseData;
+
+    #[test]
+    fn test_validate() {
+        let json = json!({
+            "owner": {
+                "name": "taosheng rong:本人",
+                "description": "",
+                "phone": "18626891229:本人"
+            },
+            "community": {
+                "id": "B0FFGA9AAU",
+                "name": "东安花园",
+                "address": "华中路与港华路交叉口东北100米",
+                "year_built": "2025-07-10T09:20:15.123Z",
+                "description": "A place for new ideas",
+                "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
+                "typecode": "residential",
+                "district": "Manhattan",
+                "adcode": "10001",
+                "lat": 40.7128,
+                "lng": -74.006
+            },
+            "purpose": "住宅",
+            "transaction_type": "出售",
+            "house_status": "有效",
+            "sale_price": 12,
+            "sale_low_price": 11,
+            "down_payment": 2,
+            "door_number": {
+                "building_number": 1,
+                "unit_number": 1,
+                "door_number": 1
+            },
+            "apartment_type": {
+                "room": 1,
+                "bathroom": 1,
+                "kitchen": 1,
+                "balcony": 1
+            }
+        });
+        let data: HouseData = serde_json::from_value(json).unwrap();
+
+        println!("data: {:#?}", data);
+    }
 }

@@ -1,3 +1,4 @@
+use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
 
 use crate::infrastructure::entitiy::{self};
@@ -27,17 +28,21 @@ impl HouseDataDto {
     }
 }
 
+#[derive(Debug, Clone, FromQueryResult, Serialize, Deserialize)]
 pub struct CommunityWithHouseCount {
     // 小区
     pub id: String,
+    // 小区名称
     pub name: String,
+    // 小区地址
     pub address: String,
+    // 所属区域
+    pub district: Option<String>,
+    // 所属行政区划代码（如“110105”，代表朝阳区）
+    pub adcode: Option<String>,
+    // 小区坐标
+    pub lat: f64,
+    pub lng: f64,
     // 个数
-    pub count: Option<i64>,
-}
-
-impl CommunityWithHouseCount {
-    pub fn new(community: Option<entitiy::community_query::Model>, count: Option<i64>) -> Self {
-        Self { community, count }
-    }
+    pub house_count: Option<i64>,
 }

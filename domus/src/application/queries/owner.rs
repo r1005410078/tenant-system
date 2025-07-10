@@ -29,12 +29,16 @@ impl OwnerQueryService {
             name: Set(event.name.unwrap().clone()),
             phone: Set(event.phone.unwrap().clone()),
             id_card: Set(event.id_card.clone()),
+            id_card_images: Set(event
+                .id_card_images
+                .map(|v| serde_json::to_value(&v).unwrap())),
             ..Default::default()
         };
 
         model.insert(self.pool.as_ref()).await?;
         Ok(())
     }
+
     // 更新业主
     pub async fn update(&self, event: HouseOwner) -> anyhow::Result<()> {
         let model = owner_query::ActiveModel {
@@ -42,6 +46,9 @@ impl OwnerQueryService {
             name: event.name.map_or(NotSet, Set),
             phone: event.phone.map_or(NotSet, Set),
             id_card: Set(event.id_card.clone()),
+            id_card_images: Set(event
+                .id_card_images
+                .map(|v| serde_json::to_value(&v).unwrap())),
             ..Default::default()
         };
 

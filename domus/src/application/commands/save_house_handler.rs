@@ -55,7 +55,7 @@ impl SaveHouseCommandHandler {
             }
 
             None => {
-                let (aggregate, event) = HouseAggregate::create(&house)?;
+                let (aggregate, event) = HouseAggregate::create(house)?;
                 self.house_repository.create(aggregate).await?;
                 self.event_bus.publish(event).await;
 

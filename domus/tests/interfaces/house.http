@@ -1,4 +1,5 @@
 
+### 新增
 POST http://localhost:9002/api/domus/management/house/save
 Content-Type: application/json
 
@@ -44,7 +45,6 @@ Content-Type: application/json
 
 
 ### 更新
-
 POST http://localhost:9002/api/domus/management/house/save
 Content-Type: application/json
 
@@ -90,19 +90,16 @@ Content-Type: application/json
 }
 
 ### 查询
-
 GET http://localhost:9002/api/domus/query/house/list?page=1&page_size=5
 Content-Type: application/json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYzUyYjQwNDItZTU0Ny00YTZjLTg2YmMtY2E4YzNiZjM1MzVkIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbImU1MWQzNmE3LTQ4NDItNDU3Ny1hNDFlLWU2OTRiYzNmN2M1OSJdLCJleHAiOjE3NTExNzUxNDIsImlhdCI6MTc1MTA4ODc0Mn0._B-rNbbp5Axq3Fdulmd1NVJozUF1GeFWsDicjZK8KUE
 
 
 ### 根据小区分组
-
 GET http://localhost:9002/api/domus/query/house/group_by_community
 Content-Type: application/json
 
 ### 根据id查询
-
 GET http://localhost:9002/api/domus/query/house/detail/2fd0a841-80a9-4eec-9925-a821c785a5d7
 Content-Type: application/json
 Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiYzUyYjQwNDItZTU0Ny00YTZjLTg2YmMtY2E4YzNiZjM1MzVkIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbImU1MWQzNmE3LTQ4NDItNDU3Ny1hNDFlLWU2OTRiYzNmN2M1OSJdLCJleHAiOjE3NTExNzUxNDIsImlhdCI6MTc1MTA4ODc0Mn0._B-rNbbp5Axq3Fdulmd1NVJozUF1GeFWsDicjZK8KUE

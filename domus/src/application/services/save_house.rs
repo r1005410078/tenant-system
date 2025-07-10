@@ -3,7 +3,6 @@ use std::sync::Arc;
 use crate::{
     application::{
         commands::{save_house::SaveHouseCommand, save_house_handler::SaveHouseCommandHandler},
-        listeners::house,
         services::{save_community::SaveCommunityService, save_owner::SaveOwnerService},
     },
     domain::house::value_objects::house::HouseData,
@@ -42,7 +41,7 @@ impl SaveHouseService {
         }
 
         // 1.保存业主
-        if let Some(ref owner) = house_data.owner {
+        if let Some(owner) = house_data.owner {
             let owner_id = self.save_owner_service.execute(owner).await?;
             house.owner_id = Some(owner_id);
         }

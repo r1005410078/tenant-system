@@ -1,20 +1,20 @@
 -- Add up migration script here
 
-CREATE TABLE IF NOT EXISTS `community_query` (
-  `id` CHAR(36) PRIMARY KEY NOT NULL COMMENT '小区ID',
-  `name` VARCHAR(100) NOT NULL COMMENT '小区名称',
-  `address` VARCHAR(255) NOT NULL COMMENT '小区地址',
-  `city` VARCHAR(100) NOT NULL COMMENT '城市',
-  `year_built` SMALLINT UNSIGNED NOT NULL COMMENT '建成年份',
-  `community_type` VARCHAR(50) NOT NULL COMMENT '小区类型',
-  `description` TEXT COMMENT '小区描述',
-  `image` VARCHAR(255) DEFAULT NULL COMMENT '小区图片 URL',
-  `location_0` DOUBLE DEFAULT NULL COMMENT '地理位置（经纬度等）',
-  `location_1` DOUBLE DEFAULT NULL COMMENT '地理位置（经纬度等）',
+CREATE TABLE `community_query` (
+  `id` VARCHAR(255) NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `address` VARCHAR(255) NOT NULL,
+  `city` VARCHAR(100) NOT NULL,
+  `year_built` TIMESTAMP NULL DEFAULT NULL COMMENT '小区建成年份',
+  `description` TEXT DEFAULT NULL COMMENT '小区描述',
+  `images` JSON DEFAULT NULL COMMENT '小区图片',
+  `lat` DOUBLE DEFAULT NULL COMMENT '纬度',
+  `lng` DOUBLE DEFAULT NULL COMMENT '经度',
+  `typecode` VARCHAR(100) NOT NULL COMMENT '小区类型编码',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
-
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='小区信息表';
+  `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='小区读模型表';
 
 
 CREATE TABLE `owner_query` (

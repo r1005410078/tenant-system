@@ -4,10 +4,10 @@ use event_bus::AsyncEventBus;
 
 use crate::{
     application::{
-        commands::{save_community::SaveCommunityCommand, save_owner::SaveOwnerCommand},
+        commands::save_owner::SaveOwnerCommand,
         repositories::owner_repository_aggregate::OwnerRepositoryAggregate,
     },
-    domain::owner::{aggregates::owner::OwnerAggregate, value_objects::owner::HouseOwner},
+    domain::owner::aggregates::owner::OwnerAggregate,
 };
 
 pub struct SaveOwnerCommandHandler {

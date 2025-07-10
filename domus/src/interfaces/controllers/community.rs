@@ -3,7 +3,6 @@ use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
-        commands::save_community::SaveCommunityCommand,
         queries::community::CommunityQueryService,
         services::{
             delete_community::DeleteCommunityService, save_community::SaveCommunityService,

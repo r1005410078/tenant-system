@@ -9,14 +9,11 @@ use user_system::shared::{auth_middleware::AuthMiddleware, casbin::init_casbin::
 use crate::{
     application::{
         commands::{
-            create_community_handler::CreateCommunityCommandHandler,
-            create_house_handler::CreateHouseCommandHandler,
-            create_owner::CreateOwnerCommandHandler,
             delete_community::DeleteCommunityCommandHandler,
             delete_house::DeleteHouseCommandHandler, delete_owner::DeleteOwnerCommandHandler,
-            update_community_handler::UpdateCommunityCommandHandler,
-            update_house_handler::UpdateHouseCommandHandler,
-            update_owner::UpdateOwnerCommandHandler,
+            save_community_handler::SaveCommunityCommandHandler,
+            save_house_handler::SaveHouseCommandHandler,
+            save_owner_handler::SaveOwnerCommandHandler,
         },
         listeners::{
             community::CommunityEventListener, house::HouseEventListener, owner::OwnerEventListener,
@@ -25,12 +22,10 @@ use crate::{
             community::CommunityQueryService, house::HouseQueryService, owner::OwnerQueryService,
         },
         services::{
-            create_community::CreateCommunityService, create_house::CreateHouseService,
-            create_owner::CreateOwnerService, delete_community::DeleteCommunityService,
-            delete_house::DeleteHouseService, delete_owner::DeleteOwnerService,
-            file_upload_service::FileUploadService, save_community::SaveCommunityService,
-            save_owner::SaveOwnerService, update_community::UpdateCommunityService,
-            update_house::UpdateHouseService, update_owner::UpdateOwnerService,
+            delete_community::DeleteCommunityService, delete_house::DeleteHouseService,
+            delete_owner::DeleteOwnerService, file_upload_service::FileUploadService,
+            save_community::SaveCommunityService, save_house::SaveHouseService,
+            save_owner::SaveOwnerService,
         },
     },
     infrastructure::{
@@ -39,12 +34,9 @@ use crate::{
         mysql_pool::create_mysql_pool, owner::mysql_owner_aggregate::MySqlOwnerAggregateRepository,
     },
     interfaces::controllers::{
-        community::{create_community, delete_community, list_community, update_community},
-        house::{
-            apply_upload_url, create_house, delete_house, get_house_detail, list_houses,
-            update_house,
-        },
-        owner::{create_owner, delete_owner, owner_list, update_owner},
+        community::{delete_community, list_community, save_community},
+        house::{apply_upload_url, delete_house, get_house_detail, list_houses, save_house},
+        owner::{delete_owner, owner_list, save_owner},
     },
 };
 
@@ -58,7 +50,7 @@ pub async fn execute() -> std::io::Result<()> {
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
     let enforcer = Arc::new(Mutex::new(init_casbin().await));
-    let auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
+    let _auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
 
     // minio_client
     let minio_client = Arc::new(
@@ -78,24 +70,14 @@ pub async fn execute() -> std::io::Result<()> {
     // 创建小区仓储
     let community_repo = Arc::new(MySqlCommunityAggregateRepository::new(pool.clone()));
 
-    // 创建小区服务
-    let create_community_command_handler = Arc::new(CreateCommunityCommandHandler::new(
+    // 保存小区服务
+    let save_community_command_handler = Arc::new(SaveCommunityCommandHandler::new(
         community_repo.clone(),
         event_bus.clone(),
     ));
 
-    let create_community_service = web::Data::new(CreateCommunityService::new(
-        create_community_command_handler.clone(),
-    ));
-
-    // 更新小区服务
-    let update_community_command_handler = Arc::new(UpdateCommunityCommandHandler::new(
-        community_repo.clone(),
-        event_bus.clone(),
-    ));
-
-    let update_community_service = web::Data::new(UpdateCommunityService::new(
-        update_community_command_handler.clone(),
+    let save_community_service = web::Data::new(SaveCommunityService::new(
+        save_community_command_handler.clone(),
     ));
 
     // 删除小区服务
@@ -106,55 +88,31 @@ pub async fn execute() -> std::io::Result<()> {
     // 创建 业主
     let owner_repo = Arc::new(MySqlOwnerAggregateRepository::new(pool.clone()));
 
-    let create_owner_command_handler = Arc::new(CreateOwnerCommandHandler::new(
+    let save_owner_command_handler = Arc::new(SaveOwnerCommandHandler::new(
         owner_repo.clone(),
         event_bus.clone(),
     ));
 
-    // 创建业主服务
-    let create_owner_service = web::Data::new(CreateOwnerService::new(
-        create_owner_command_handler.clone(),
-    ));
-
-    let update_owner_command_handler = Arc::new(UpdateOwnerCommandHandler::new(
-        owner_repo.clone(),
-        event_bus.clone(),
-    ));
-
-    // 更新业主服务
-    let update_owner_service = web::Data::new(UpdateOwnerService::new(
-        update_owner_command_handler.clone(),
-    ));
+    // 保存业主服务
+    let save_owner_service =
+        web::Data::new(SaveOwnerService::new(save_owner_command_handler.clone()));
 
     // 删除业主服务
     let delete_owner_service = web::Data::new(DeleteOwnerService::new(
         DeleteOwnerCommandHandler::new(owner_repo.clone(), event_bus.clone()),
     ));
 
-    let save_community_service = Arc::new(SaveCommunityService::new(
-        create_community_command_handler.clone(),
-        update_community_command_handler.clone(),
-    ));
-
-    let save_owner_service = Arc::new(SaveOwnerService::new(
-        create_owner_command_handler.clone(),
-        update_owner_command_handler.clone(),
-    ));
-
     // 创建房源
     let mysql_house_repository_aggregate =
         Arc::new(MysqlHouseRepositoryAggregate::new(pool.clone()));
 
-    let create_house_service = web::Data::new(CreateHouseService::new(
-        CreateHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone()),
-        save_community_service.clone(),
-        save_owner_service.clone(),
-    ));
+    let save_house_command_handler =
+        SaveHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone());
 
-    let update_house_service = web::Data::new(UpdateHouseService::new(
-        UpdateHouseCommandHandler::new(mysql_house_repository_aggregate.clone(), event_bus.clone()),
-        save_community_service.clone(),
-        save_owner_service.clone(),
+    let save_house_service = web::Data::new(SaveHouseService::new(
+        save_house_command_handler,
+        save_community_service.clone().into_inner(),
+        save_owner_service.clone().into_inner(),
     ));
 
     // 删除房源
@@ -188,14 +146,11 @@ pub async fn execute() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .app_data(create_community_service.clone())
-            .app_data(update_community_service.clone())
+            .app_data(save_community_service.clone())
             .app_data(delete_community_service.clone())
-            .app_data(create_owner_service.clone())
-            .app_data(update_owner_service.clone())
+            .app_data(save_owner_service.clone())
             .app_data(delete_owner_service.clone())
-            .app_data(create_house_service.clone())
-            .app_data(update_house_service.clone())
+            .app_data(save_house_service.clone())
             .app_data(delete_house_service.clone())
             .app_data(community_query_service.clone())
             .app_data(owner_query_service.clone())
@@ -206,22 +161,19 @@ pub async fn execute() -> std::io::Result<()> {
                     .service(
                         web::scope("/community")
                             //.wrap(auth_middleware.clone())
-                            .service(create_community)
-                            .service(update_community)
+                            .service(save_community)
                             .service(delete_community),
                     )
                     .service(
                         web::scope("/owner")
                             // .wrap(auth_middleware.clone())
-                            .service(create_owner)
-                            .service(update_owner)
+                            .service(save_owner)
                             .service(delete_owner),
                     )
                     .service(
                         web::scope("/house")
                             // .wrap(auth_middleware.clone())
-                            .service(create_house)
-                            .service(update_house)
+                            .service(save_house)
                             .service(delete_house)
                             .service(apply_upload_url),
                     ),

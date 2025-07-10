@@ -63,14 +63,4 @@ impl Community {
 
         Ok(())
     }
-
-    pub fn get_address(&self) -> String {
-        format!(
-            "{}{}",
-            self.district.clone().unwrap_or_default(),
-            self.address.clone().unwrap_or_default(),
-        )
-        .as_str()
-        .to_string()
-    }
 }

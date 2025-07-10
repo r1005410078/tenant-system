@@ -14,54 +14,6 @@ pub struct HouseData {
     pub owner: Option<HouseOwner>,
 }
 
-impl HouseData {
-    pub fn new(
-        house: Option<House>,
-        community: Option<Community>,
-        owner: Option<HouseOwner>,
-    ) -> Self {
-        Self {
-            house,
-            community,
-            owner,
-        }
-    }
-
-    pub fn get_address(&self) -> Option<String> {
-        self.community.as_ref().and_then(|c| Some(c.get_address()))
-    }
-
-    pub fn get_door_number(&self) -> Option<String> {
-        self.house
-            .as_ref()
-            .and_then(|h| h.door_number.clone().map(|d| d.to_string()))
-    }
-
-    pub fn validate(&self) -> anyhow::Result<()> {
-        let house = self
-            .house
-            .as_ref()
-            .ok_or_else(|| anyhow::anyhow!("房源信息不能为空"))?;
-
-        house.validate()?;
-
-        let community = self
-            .community
-            .as_ref()
-            .ok_or_else(|| anyhow::anyhow!("小区信息不能为空"))?;
-
-        community.validate()?;
-
-        let owner = self
-            .owner
-            .as_ref()
-            .ok_or_else(|| anyhow::anyhow!("业主信息不能为空"))?;
-
-        owner.validate()?;
-        Ok(())
-    }
-}
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct House {
     pub id: Option<String>,
@@ -249,18 +201,6 @@ pub struct FloorRange {
     pub door_number_from: Option<i32>,
     // 最大楼层
     pub door_number_to: Option<i32>,
-}
-
-impl FloorRange {
-    pub fn to_string(&self) -> String {
-        format!(
-            "{}-{}",
-            self.door_number_from
-                .map_or("".to_string(), |v| v.to_string()),
-            self.door_number_to
-                .map_or("".to_string(), |v| v.to_string())
-        )
-    }
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

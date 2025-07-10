@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use crate::{
-    domain::house::value_objects::house::{House, HouseData},
+    domain::house::value_objects::house::House,
     infrastructure::{
         dto::house_data_dto::HouseDataDto,
         entitiy::{community_query, house_query, owner_query},

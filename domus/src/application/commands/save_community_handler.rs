@@ -7,9 +7,7 @@ use crate::{
         commands::save_community::SaveCommunityCommand,
         repositories::community_repository_aggregate::CommunityRepositoryAggregate,
     },
-    domain::community::{
-        aggregates::community::CommunityAggregate, value_objects::commuity::Community,
-    },
+    domain::community::aggregates::community::CommunityAggregate,
 };
 
 pub struct SaveCommunityCommandHandler {

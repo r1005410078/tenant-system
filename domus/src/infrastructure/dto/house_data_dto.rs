@@ -26,3 +26,18 @@ impl HouseDataDto {
         }
     }
 }
+
+pub struct CommunityWithHouseCount {
+    // 小区
+    pub id: String,
+    pub name: String,
+    pub address: String,
+    // 个数
+    pub count: Option<i64>,
+}
+
+impl CommunityWithHouseCount {
+    pub fn new(community: Option<entitiy::community_query::Model>, count: Option<i64>) -> Self {
+        Self { community, count }
+    }
+}

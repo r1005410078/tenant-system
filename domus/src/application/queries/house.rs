@@ -3,11 +3,12 @@ use std::sync::Arc;
 use crate::{
     domain::house::value_objects::house::House,
     infrastructure::{
-        dto::house_data_dto::HouseDataDto,
+        dto::house_data_dto::{CommunityWithHouseCount, HouseDataDto, HouseDataGroupDto},
         entitiy::{community_query, house_query, owner_query},
     },
 };
 use sea_orm::{
+    prelude::Expr,
     ActiveModelTrait,
     ActiveValue::{NotSet, Set},
     Condition, DbConn, EntityTrait, JoinType, PaginatorTrait, QueryFilter, QuerySelect,
@@ -247,5 +248,26 @@ impl HouseQueryService {
 
         model.update(self.pool.as_ref()).await?;
         Ok(())
+    }
+
+    // 获取所有的小区对应的房源个数
+    pub async fn find_house_count_group_by_community(
+        &self,
+    ) -> anyhow::Result<Vec<CommunityWithHouseCount>> {
+        // 需要join 小区， 小区id,房源个数
+        let data = house_query::Entity::find()
+            .select_only()
+            .column(community_query::Column::Id)
+            .column(community_query::Column::Name)
+            .column(community_query::Column::Address)
+            .expr_as(house_query::Column::Id.count(), "house_count")
+            .join(
+                JoinType::LeftJoin,
+                house_query::Relation::CommunityQuery.def(),
+            )
+            .select_also(community_query::Entity)
+            .group_by(community_query::Column::Id)
+            .all(self.pool.as_ref())
+            .await?;
     }
 }

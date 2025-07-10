@@ -1,12 +1,7 @@
-pub mod create_community;
-pub mod create_house;
-pub mod create_owner;
 pub mod delete_community;
 pub mod delete_house;
 pub mod delete_owner;
 pub mod file_upload_service;
 pub mod save_community;
+pub mod save_house;
 pub mod save_owner;
-pub mod update_community;
-pub mod update_house;
-pub mod update_owner;

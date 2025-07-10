@@ -4,35 +4,22 @@ use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
-        commands::{create_house::CreateHouseCommand, update_house::UpdateHouseCommand},
         queries::house::HouseQueryService,
         services::{
-            create_house::CreateHouseService, delete_house::DeleteHouseService,
-            file_upload_service::FileUploadService, update_house::UpdateHouseService,
+            delete_house::DeleteHouseService, file_upload_service::FileUploadService,
+            save_house::SaveHouseService,
         },
     },
+    domain::house::value_objects::house::HouseData,
     interfaces::dtos::response::ResponseBody,
 };
 
-#[post("/create")]
-pub async fn create_house(
-    body: web::Json<CreateHouseCommand>,
-    create_house_service: web::Data<CreateHouseService>,
+#[post("/save")]
+pub async fn save_house(
+    body: web::Json<HouseData>,
+    save_house_service: web::Data<SaveHouseService>,
 ) -> HttpResponse {
-    let res = match create_house_service.execute(body.into_inner()).await {
-        Ok(data) => ResponseBody::success(data),
-        Err(e) => ResponseBody::error(e.to_string()),
-    };
-
-    HttpResponse::Ok().json(res)
-}
-
-#[post("/update")]
-pub async fn update_house(
-    body: web::Json<UpdateHouseCommand>,
-    update_house_service: web::Data<UpdateHouseService>,
-) -> HttpResponse {
-    let res = match update_house_service.execute(body.into_inner()).await {
+    let res = match save_house_service.execute(body.into_inner()).await {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };

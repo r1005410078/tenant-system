@@ -9,5 +9,10 @@ pub trait HouseRepositoryAggregate: Send + Sync {
     // 获取小区
     async fn find_by_id(&self, id: &str) -> anyhow::Result<HouseAggregate>;
     // 地址是否存在
-    async fn exists_address(&self, address: &str, self_id: Option<String>) -> anyhow::Result<bool>;
+    async fn exists_address(
+        &self,
+        community_id: &str,
+        door_number: Option<String>,
+        self_id: Option<String>,
+    ) -> anyhow::Result<bool>;
 }

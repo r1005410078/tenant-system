@@ -32,7 +32,11 @@ impl DeleteCommunityCommandHandler {
     }
 
     pub async fn handle(&self, community: DeleteCommunityCommand) -> anyhow::Result<()> {
-        let mut aggreagate = self.community_repository.find_by_id(&community.id).await?;
+        let mut aggreagate = self
+            .community_repository
+            .find_by_id(&community.id)
+            .await?
+            .ok_or_else(|| anyhow::anyhow!("小区不存在"))?;
 
         let event = aggreagate.delete();
 

@@ -1,58 +1,188 @@
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct Community {
-    pub id: Option<String>,
+use crate::domain::{
+    community::value_objects::commuity::Community, owner::value_objects::owner::HouseOwner,
+};
 
-    // 小区名称
-    pub name: Option<String>,
-    // 小区地址
-    pub address: Option<String>,
-    // 城市
-    pub city: Option<String>,
-    // 小区年限
-    pub year_built: Option<u16>,
-    // 小区类型
-    pub community_type: Option<String>,
-    // 小区描述
-    pub description: Option<String>,
-    // 小区图片
-    pub image: Option<String>,
-    //  小区id
-    pub location_id: Option<String>,
-    // 位置
-    pub location_0: Option<f64>,
-    pub location_1: Option<f64>,
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct HouseData {
+    // 房源
+    pub house: Option<House>,
+    // 小区
+    pub community: Option<Community>,
+    // 所有者
+    pub owner: Option<HouseOwner>,
 }
 
-impl Community {
-    pub fn get_name(&self) -> anyhow::Result<String> {
-        self.name
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("小区名称不能为空"))
+impl HouseData {
+    pub fn new(
+        house: Option<House>,
+        community: Option<Community>,
+        owner: Option<HouseOwner>,
+    ) -> Self {
+        Self {
+            house,
+            community,
+            owner,
+        }
     }
 
-    pub fn get_address(&self) -> anyhow::Result<String> {
-        self.address
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("小区地址不能为空"))
+    pub fn get_address(&self) -> Option<String> {
+        self.community.as_ref().and_then(|c| Some(c.get_address()))
     }
 
-    pub fn get_city(&self) -> anyhow::Result<String> {
-        self.city
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("城市不能为空"))
+    pub fn get_door_number(&self) -> Option<String> {
+        self.house
+            .as_ref()
+            .and_then(|h| h.door_number.clone().map(|d| d.to_string()))
     }
 
-    pub fn get_year_built(&self) -> anyhow::Result<u16> {
-        self.year_built
-            .ok_or_else(|| anyhow::anyhow!("小区年限不能为空"))
-    }
+    pub fn validate(&self) -> anyhow::Result<()> {
+        let house = self
+            .house
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("房源信息不能为空"))?;
 
-    pub fn get_community_type(&self) -> anyhow::Result<String> {
-        self.community_type
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("小区类型不能为空"))
+        house.validate()?;
+
+        let community = self
+            .community
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("小区信息不能为空"))?;
+
+        community.validate()?;
+
+        let owner = self
+            .owner
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("业主信息不能为空"))?;
+
+        owner.validate()?;
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct House {
+    pub id: Option<String>,
+    pub community_id: Option<String>,
+    pub owner_id: Option<String>,
+    // 房源标题
+    pub title: Option<String>,
+    // 用途
+    pub purpose: Option<String>,
+    // 交易类型
+    pub transaction_type: Option<String>,
+    // 状态
+    pub house_status: Option<String>,
+    // 楼层
+    pub floor_range: Option<FloorRange>,
+    // 门牌号
+    pub door_number: Option<DoorNumber>,
+    // 户型
+    pub apartment_type: Option<ApartmentType>,
+    // 建筑面积
+    pub building_area: Option<f32>,
+    // 装修
+    pub house_decoration: Option<String>,
+    // 满减年限
+    pub discount_year_limit: Option<String>,
+    // 梯户
+    pub stairs: Option<Stairs>,
+    // 位置
+    pub location: Option<String>,
+    // 推荐标签
+    pub tags: Vec<String>,
+    // 车位高度
+    pub car_height: Option<f64>,
+    // 实率
+    pub actual_rate: Option<f64>,
+    // 级别
+    pub level: Option<String>,
+    // 层高
+    pub floor_height: Option<f32>,
+    // 进深
+    pub progress_depth: Option<f64>,
+    // 门宽
+    pub door_width: Option<f64>,
+
+    // 使用面积
+    pub use_area: Option<f32>,
+    // 售价
+    pub sale_price: Option<f64>,
+    // 租价
+    pub rent_price: Option<f64>,
+    // 出租低价
+    pub rent_low_price: Option<f64>,
+    // 首付
+    pub down_payment: Option<f64>,
+    // 出售低价
+    pub sale_low_price: Option<f64>,
+    // 房屋类型
+    pub house_type: Option<String>,
+    // 朝向
+    pub house_orientation: Option<String>,
+
+    // 看房方式
+    pub view_method: Option<String>,
+    // 付款方式
+    pub payment_method: Option<String>,
+    // 房源税费
+    pub property_tax: Option<String>,
+    // 建筑结构
+    pub building_structure: Option<String>,
+    // 建筑年代
+    pub building_year: Option<i32>,
+    // 产权性质
+    pub property_rights: Option<String>,
+    // 产权年限
+    pub property_year_limit: Option<String>,
+    // 产证日期
+    pub certificate_date: Option<String>,
+    // 交房日期
+    pub handover_date: Option<String>,
+    // 学位
+    pub degree: Option<String>,
+    // 户口
+    pub household: Option<String>,
+    // 来源
+    pub source: Option<String>,
+    // 委托编号
+    pub delegate_number: Option<String>,
+    // 唯一住房
+    pub unique_housing: Option<String>,
+    // 全款
+    pub full_payment: Option<String>,
+    // 抵押
+    pub mortgage: Option<String>,
+    // 急切
+    pub urgent: Option<String>,
+    // 配套
+    pub support: Option<String>,
+    // 现状
+    pub present_state: Option<String>,
+    // 外网同步
+    pub external_sync: Option<String>,
+    // 备注
+    pub remark: Option<String>,
+    // 房源图片
+    pub images: Option<Vec<FileInfo>>,
+}
+
+impl House {
+    pub fn validate(&self) -> anyhow::Result<()> {
+        if self.purpose.is_none() {
+            return Err(anyhow::anyhow!("用途不能为空"));
+        }
+
+        if self.transaction_type.is_none() {
+            return Err(anyhow::anyhow!("交易类型不能为空"));
+        }
+
+        if self.house_status.is_none() {
+            return Err(anyhow::anyhow!("房源状态不能为空"));
+        }
+        Ok(())
     }
 }
 
@@ -72,17 +202,44 @@ pub struct DoorNumber {
     pub unit_number: Option<i32>,
     // 门牌
     pub door_number: Option<i32>,
+    // 楼层
+    pub floor: Option<i32>,
 }
 
 impl DoorNumber {
     pub fn to_string(&self) -> String {
-        format!(
-            "{}-{}-{}",
-            self.building_number
-                .map_or("".to_string(), |v| v.to_string()),
-            self.unit_number.map_or("".to_string(), |v| v.to_string()),
-            self.door_number.map_or("".to_string(), |v| v.to_string())
-        )
+        let mut addr = String::new();
+
+        if let Some(building_number) = self.building_number {
+            addr.push_str(&building_number.to_string());
+            addr.push_str("幢");
+        }
+
+        if let Some(unit_number) = self.unit_number {
+            if !addr.is_empty() {
+                addr.push_str("-");
+            }
+            addr.push_str(&unit_number.to_string());
+            addr.push_str("单元");
+        }
+
+        if let Some(door_number) = self.door_number {
+            if !addr.is_empty() {
+                addr.push_str("-");
+            }
+            addr.push_str(&door_number.to_string());
+            addr.push_str("室");
+        }
+
+        if let Some(floor) = self.floor {
+            if !addr.is_empty() {
+                addr.push_str("-");
+            }
+            addr.push_str(&floor.to_string());
+            addr.push_str("层");
+        }
+
+        addr
     }
 }
 

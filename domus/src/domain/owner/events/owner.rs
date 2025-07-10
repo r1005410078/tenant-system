@@ -1,13 +1,12 @@
 use serde::Serialize;
 
-use crate::domain::owner::events::{
-    owner_created::OwnerCreatedEvent, owner_deleted::OwnerDeletedEvent,
-    owner_updated::OwnerUpdatedEvent,
+use crate::domain::owner::{
+    events::owner_deleted::OwnerDeletedEvent, value_objects::owner::HouseOwner,
 };
 
 #[derive(Debug, Clone, Serialize)]
 pub enum OwnerEvent {
-    Created(OwnerCreatedEvent),
-    Updated(OwnerUpdatedEvent),
+    Created(HouseOwner),
+    Updated(HouseOwner),
     Deleted(OwnerDeletedEvent),
 }

@@ -49,8 +49,8 @@ impl CommunityRepositoryAggregate for MySqlCommunityAggregateRepository {
     }
 
     // 获取小区
-    async fn find_by_id(&self, id: &str) -> anyhow::Result<CommunityAggregate> {
-        let model = entitiy::community_aggregate::Entity::find()
+    async fn find_by_id(&self, id: &str) -> anyhow::Result<Option<CommunityAggregate>> {
+        let data = entitiy::community_aggregate::Entity::find()
             .filter(
                 Condition::all()
                     .add(entitiy::community_aggregate::Column::Id.eq(id))
@@ -58,14 +58,14 @@ impl CommunityRepositoryAggregate for MySqlCommunityAggregateRepository {
             )
             .one(self.pool.as_ref())
             .await?
-            .ok_or_else(|| anyhow::anyhow!("Community not found"))?;
+            .map(|m| CommunityAggregate {
+                community_id: m.id,
+                name: m.name,
+                address: m.address,
+                deleted_at: m.deleted_at,
+            });
 
-        Ok(CommunityAggregate {
-            community_id: model.id,
-            name: model.name,
-            address: model.address,
-            deleted_at: model.deleted_at,
-        })
+        Ok(data)
     }
 
     // 判断小区是否重复

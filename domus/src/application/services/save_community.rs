@@ -1,40 +1,25 @@
-use std::sync::Arc;
-
 use crate::{
     application::commands::{
-        create_community::CreateCommunityCommand,
-        create_community_handler::CreateCommunityCommandHandler,
-        update_community::UpdateCommunityCommand,
-        update_community_handler::UpdateCommunityCommandHandler,
+        save_community::SaveCommunityCommand, save_community_handler::SaveCommunityCommandHandler,
     },
-    domain::house::value_objects::house::Community,
+    domain::community::value_objects::commuity::Community,
 };
+use std::sync::Arc;
 
 pub struct SaveCommunityService {
-    pub create_community_command_handler: Arc<CreateCommunityCommandHandler>,
-    pub update_community_command_handler: Arc<UpdateCommunityCommandHandler>,
+    pub save_community_command_handler: Arc<SaveCommunityCommandHandler>,
 }
 
 impl SaveCommunityService {
-    pub fn new(
-        create_community_command_handler: Arc<CreateCommunityCommandHandler>,
-        update_community_command_handler: Arc<UpdateCommunityCommandHandler>,
-    ) -> Self {
+    pub fn new(save_community_command_handler: Arc<SaveCommunityCommandHandler>) -> Self {
         Self {
-            create_community_command_handler,
-            update_community_command_handler,
+            save_community_command_handler,
         }
     }
 
-    pub async fn save(&self, community: &Community) -> anyhow::Result<String> {
-        if community.id.is_some() {
-            // 如果小区ID存在，则更新小区信息
-            let command = UpdateCommunityCommand::from(community);
-            self.update_community_command_handler.handle(command).await
-        } else {
-            // 创建小区
-            let command = CreateCommunityCommand::from(community)?;
-            self.create_community_command_handler.handle(command).await
-        }
+    pub async fn execute(&self, community: Community) -> anyhow::Result<String> {
+        self.save_community_command_handler
+            .handle(SaveCommunityCommand::new(community))
+            .await
     }
 }

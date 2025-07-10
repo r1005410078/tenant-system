@@ -5,13 +5,15 @@ use crate::domain::house::{
         house::HouseEvent, house_deleted::HouseDeletedEvent, house_published::HousePublishedEvent,
         house_unpublished::HouseUnpublishedEvent,
     },
-    value_objects::{house_create_data::HouseCreateData, house_update_data::HouseUpdateData},
+    value_objects::house::House,
 };
 
 pub struct HouseAggregate {
     pub house_id: String,
-    // 房子地址
-    pub address: String,
+    // 小区id
+    pub community_id: String,
+    // 门牌号
+    pub door_number: Option<String>,
     // 上架时间
     pub publish_at: Option<DateTimeUtc>,
     // 下架时间
@@ -21,24 +23,31 @@ pub struct HouseAggregate {
 }
 
 impl HouseAggregate {
-    pub fn new(house_id: String, address: String) -> Self {
+    pub fn new(house_id: String, community_id: String, door_number: Option<String>) -> Self {
         Self {
             house_id,
-            address,
-            publish_at: Some(chrono::Utc::now()),
+            community_id,
+            door_number,
             deleted_at: None,
             unpublish_at: None,
+            publish_at: Some(chrono::Utc::now()),
         }
     }
 
     // 创建房源
-    pub fn create(new_house: &HouseCreateData) -> (HouseAggregate, HouseEvent) {
+    pub fn create(house: &House) -> anyhow::Result<(HouseAggregate, HouseEvent)> {
         let house_id = uuid::Uuid::new_v4().to_string();
 
-        (
-            HouseAggregate::new(house_id.clone(), new_house.get_address()),
-            HouseEvent::Created(new_house.to_event(house_id)),
-        )
+        house.validate()?;
+
+        Ok((
+            HouseAggregate::new(
+                house_id.clone(),
+                house.community_id.clone().unwrap(),
+                house.door_number.as_ref().map(|d| d.to_string()),
+            ),
+            HouseEvent::Created(house.clone()),
+        ))
     }
 
     // 删除房源
@@ -48,8 +57,9 @@ impl HouseAggregate {
     }
 
     // 更新房源
-    pub fn update(&mut self, new_house: &HouseUpdateData) -> anyhow::Result<Vec<HouseEvent>> {
+    pub fn update(&mut self, house: &House) -> anyhow::Result<Vec<HouseEvent>> {
         let mut events = Vec::new();
+
         if self.is_deleted() {
             return Err(anyhow::anyhow!("house is deleted"));
         }
@@ -58,17 +68,17 @@ impl HouseAggregate {
             return Err(anyhow::anyhow!("house is offline"));
         }
 
-        if new_house.external_sync == Some("published".to_string()) {
+        // 处理事件
+        if house.external_sync == Some("published".to_string()) {
             events.push(self.publish()?)
         }
 
-        if new_house.external_sync == Some("unpublished".to_string()) {
-            events.push(self.unpublish(new_house.remark.clone().unwrap_or_default().as_str())?)
+        if house.external_sync == Some("unpublished".to_string()) {
+            events.push(self.unpublish(house.remark.clone().unwrap_or_default().as_str())?)
         }
 
-        self.address = new_house.get_address();
+        events.push(HouseEvent::Updated(house.clone()));
 
-        events.push(HouseEvent::Updated(new_house.to_event()));
         Ok(events)
     }
 

@@ -1,8 +1,5 @@
 use crate::domain::owner::{
-    events::{
-        owner::OwnerEvent, owner_created::OwnerCreatedEvent, owner_deleted::OwnerDeletedEvent,
-        owner_updated::OwnerUpdatedEvent,
-    },
+    events::{owner::OwnerEvent, owner_deleted::OwnerDeletedEvent},
     value_objects::owner::HouseOwner,
 };
 
@@ -27,6 +24,8 @@ impl OwnerAggregate {
     }
 
     pub fn create(data: &HouseOwner) -> anyhow::Result<(OwnerAggregate, OwnerEvent)> {
+        data.validate()?;
+
         let owner_id = uuid::Uuid::new_v4().to_string();
         let name = data
             .name
@@ -45,16 +44,7 @@ impl OwnerAggregate {
             data.id_card.clone(),
         );
 
-        let event = OwnerCreatedEvent {
-            id: owner_id.clone(),
-            name: name.clone(),
-            phone: phone.clone(),
-            id_card: data.id_card.clone(),
-            id_card_images: data.id_card_images.clone(),
-            description: data.description.clone(),
-        };
-
-        Ok((owner, OwnerEvent::Created(event)))
+        Ok((owner, OwnerEvent::Created(data.clone())))
     }
 
     // 更新
@@ -66,6 +56,7 @@ impl OwnerAggregate {
         if let Some(name) = &data.name {
             self.name = name.clone();
         }
+
         if let Some(id_card) = &data.id_card {
             self.id_card = Some(id_card.clone());
         }
@@ -74,14 +65,7 @@ impl OwnerAggregate {
             self.phone = phone.clone();
         }
 
-        Ok(OwnerEvent::Updated(OwnerUpdatedEvent {
-            id: self.owner_id.clone(),
-            name: Some(self.name.clone()),
-            phone: data.phone.clone(),
-            id_card: self.id_card.clone(),
-            id_card_images: data.id_card_images.clone(),
-            description: data.description.clone(),
-        }))
+        Ok(OwnerEvent::Updated(data.clone()))
     }
 
     pub fn delete(&mut self) -> OwnerEvent {

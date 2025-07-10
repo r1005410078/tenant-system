@@ -2,9 +2,7 @@ use sea_orm::prelude::DateTimeUtc;
 
 use crate::domain::community::{
     events::{community::CommunityEvent, community_deleted::CommunityDeletedEvent},
-    value_objects::{
-        community_created_data::CommunityCreateData, community_updated_data::CommunityUpdateData,
-    },
+    value_objects::commuity::Community,
 };
 
 #[derive(Debug, Clone)]
@@ -16,8 +14,8 @@ pub struct CommunityAggregate {
 }
 
 impl CommunityAggregate {
-    pub fn new(name: String, address: String, location_id: Option<String>) -> CommunityAggregate {
-        let community_id = location_id.unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
+    pub fn new(name: String, address: String, id: Option<String>) -> CommunityAggregate {
+        let community_id = id.unwrap_or_else(|| uuid::Uuid::new_v4().to_string());
         CommunityAggregate {
             community_id,
             name,
@@ -26,20 +24,19 @@ impl CommunityAggregate {
         }
     }
 
-    pub fn create(data: &CommunityCreateData) -> (CommunityAggregate, CommunityEvent) {
+    pub fn create(data: &Community) -> anyhow::Result<(CommunityAggregate, CommunityEvent)> {
+        data.validate()?;
+
         let aggregate: CommunityAggregate = CommunityAggregate::new(
-            data.name.clone(),
-            data.address.clone(),
-            data.location_id.clone(),
+            data.name.clone().unwrap().clone(),
+            data.address.clone().unwrap().clone(),
+            data.id.clone(),
         );
 
-        (
-            aggregate.clone(),
-            CommunityEvent::Created(data.to_event(&aggregate.community_id)),
-        )
+        Ok((aggregate.clone(), CommunityEvent::Created(data.clone())))
     }
 
-    pub fn update(&mut self, data: &CommunityUpdateData) -> anyhow::Result<CommunityEvent> {
+    pub fn update(&mut self, data: &Community) -> anyhow::Result<CommunityEvent> {
         if self.is_deleted() {
             return Err(anyhow::anyhow!("community is deleted"));
         }
@@ -47,7 +44,7 @@ impl CommunityAggregate {
         self.name = data.name.clone().unwrap_or(self.name.clone());
         self.address = data.address.clone().unwrap_or(self.address.clone());
 
-        Ok(CommunityEvent::Updated(data.to_event()))
+        Ok(CommunityEvent::Updated(data.clone()))
     }
 
     pub fn delete(&mut self) -> CommunityEvent {

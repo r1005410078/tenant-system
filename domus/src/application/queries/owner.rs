@@ -1,10 +1,8 @@
 use std::sync::Arc;
 
 use crate::{
-    domain::owner::events::{owner_created::OwnerCreatedEvent, owner_updated::OwnerUpdatedEvent},
-    infrastructure::{
-        dtos::owner_query_read_model_dto::OwnerQueryReadModelDto, entitiy::owner_query,
-    },
+    domain::owner::value_objects::owner::HouseOwner,
+    infrastructure::entitiy::owner_query::{self},
 };
 use sea_orm::EntityTrait;
 use sea_orm::PaginatorTrait;
@@ -25,11 +23,11 @@ impl OwnerQueryService {
     }
 
     // 创建业主
-    pub async fn create(&self, event: OwnerCreatedEvent) -> anyhow::Result<()> {
+    pub async fn create(&self, event: HouseOwner) -> anyhow::Result<()> {
         let model = owner_query::ActiveModel {
-            id: Set(event.id.clone()),
-            name: Set(event.name.clone()),
-            phone: Set(event.phone.clone()),
+            id: Set(event.id.unwrap().clone()),
+            name: Set(event.name.unwrap().clone()),
+            phone: Set(event.phone.unwrap().clone()),
             id_card: Set(event.id_card.clone()),
             ..Default::default()
         };
@@ -38,9 +36,9 @@ impl OwnerQueryService {
         Ok(())
     }
     // 更新业主
-    pub async fn update(&self, event: OwnerUpdatedEvent) -> anyhow::Result<()> {
+    pub async fn update(&self, event: HouseOwner) -> anyhow::Result<()> {
         let model = owner_query::ActiveModel {
-            id: Set(event.id.clone()),
+            id: Set(event.id.unwrap().clone()),
             name: event.name.map_or(NotSet, Set),
             phone: event.phone.map_or(NotSet, Set),
             id_card: Set(event.id_card.clone()),
@@ -60,21 +58,20 @@ impl OwnerQueryService {
         model.delete(self.pool.as_ref()).await?;
         Ok(())
     }
+
     // 查询业主列表
     pub async fn find_all(
         &self,
         table_data_request: TableDataRequest,
-    ) -> anyhow::Result<TableDataResponse<OwnerQueryReadModelDto>> {
+    ) -> anyhow::Result<TableDataResponse<owner_query::Model>> {
         let paginator =
             owner_query::Entity::find().paginate(self.pool.as_ref(), table_data_request.page_size);
 
         let total = paginator.num_items().await?;
+
         let data = paginator
-            .fetch_page(table_data_request.page - 1)
-            .await?
-            .into_iter()
-            .map(OwnerQueryReadModelDto::from)
-            .collect::<Vec<OwnerQueryReadModelDto>>();
+            .fetch_page(table_data_request.page.saturating_sub(1))
+            .await?;
 
         Ok(TableDataResponse::new(data, total as u64))
     }

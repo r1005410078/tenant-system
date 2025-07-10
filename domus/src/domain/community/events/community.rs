@@ -1,13 +1,12 @@
-use serde::Serialize;
-
-use crate::domain::community::events::{
-    community_created::CommunityCreatedEvent, community_deleted::CommunityDeletedEvent,
-    community_updated::CommunityUpdatedEvent,
+use crate::domain::community::{
+    events::community_deleted::CommunityDeletedEvent, value_objects::commuity::Community,
 };
+
+use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize)]
 pub enum CommunityEvent {
-    Created(CommunityCreatedEvent),
-    Updated(CommunityUpdatedEvent),
+    Created(Community),
+    Updated(Community),
     Deleted(CommunityDeletedEvent),
 }

@@ -3,39 +3,23 @@ use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
-        commands::{
-            create_community::CreateCommunityCommand, update_community::UpdateCommunityCommand,
-        },
+        commands::save_community::SaveCommunityCommand,
         queries::community::CommunityQueryService,
         services::{
-            create_community::CreateCommunityService, delete_community::DeleteCommunityService,
-            update_community::UpdateCommunityService,
+            delete_community::DeleteCommunityService, save_community::SaveCommunityService,
         },
     },
+    domain::community::value_objects::commuity::Community,
     interfaces::dtos::response::ResponseBody,
 };
 
-#[post("/create")]
-async fn create_community(
-    body: web::Json<CreateCommunityCommand>,
-    service: web::Data<CreateCommunityService>,
+#[post("/save")]
+async fn save_community(
+    body: web::Json<Community>,
+    service: web::Data<SaveCommunityService>,
 ) -> HttpResponse {
-    let command = body.into_inner();
-    let res = match service.execute(command).await {
-        Ok(community) => ResponseBody::success(community),
-        Err(e) => ResponseBody::error(e.to_string()),
-    };
-
-    HttpResponse::Ok().json(res)
-}
-
-#[post("/update")]
-async fn update_community(
-    body: web::Json<UpdateCommunityCommand>,
-    service: web::Data<UpdateCommunityService>,
-) -> HttpResponse {
-    let command = body.into_inner();
-    let res = match service.execute(command).await {
+    let community = body.into_inner();
+    let res = match service.execute(community).await {
         Ok(community) => ResponseBody::success(community),
         Err(e) => ResponseBody::error(e.to_string()),
     };

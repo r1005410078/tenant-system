@@ -1,9 +1,9 @@
 use std::sync::Arc;
 
 use crate::{
-    domain::house::events::{house_created::HouseCreatedEvent, house_updated::HouseUpdatedEvent},
+    domain::house::value_objects::house::{House, HouseData},
     infrastructure::{
-        dtos::house_query_read_model_dto::HouseQueryReadModelDto,
+        dto::house_data_dto::HouseDataDto,
         entitiy::{community_query, house_query, owner_query},
     },
 };
@@ -25,15 +25,15 @@ impl HouseQueryService {
     }
 
     // 创建房源
-    pub async fn create(&self, event: HouseCreatedEvent) -> anyhow::Result<()> {
+    pub async fn create(&self, event: House) -> anyhow::Result<()> {
         let model = house_query::ActiveModel {
-            community_id: event.community.id.map_or(NotSet, Set),
-            owner_id: Set(event.owner.id),
-            id: Set(event.house_id.clone()),
+            id: Set(event.id.unwrap().clone()),
+            community_id: event.community_id.map_or(NotSet, Set),
+            owner_id: Set(event.owner_id),
             title: Set(event.title.clone()),
-            purpose: Set(event.purpose.clone()),
-            transaction_type: Set(event.transaction_type.clone()),
-            house_status: Set(event.house_status.clone()),
+            purpose: Set(event.purpose.unwrap().clone()),
+            transaction_type: Set(event.transaction_type.unwrap().clone()),
+            house_status: Set(event.house_status.unwrap().clone()),
             door_number_from: Set(event.floor_range.as_ref().and_then(|f| f.door_number_from)),
             door_number_to: Set(event.floor_range.as_ref().and_then(|f| f.door_number_to)),
             building_number: Set(event.door_number.as_ref().and_then(|d| d.building_number)),
@@ -95,12 +95,11 @@ impl HouseQueryService {
     }
 
     // 更新房源
-    pub async fn update(&self, event: HouseUpdatedEvent) -> anyhow::Result<()> {
-        println!("event: {:#?}", event);
+    pub async fn update(&self, event: House) -> anyhow::Result<()> {
         let model = house_query::ActiveModel {
-            community_id: event.community.map(|c| c.id).flatten().map_or(NotSet, Set),
-            owner_id: Set(event.owner.map(|o| o.id).flatten()),
-            id: Set(event.house_id.clone()),
+            id: Set(event.id.unwrap().clone()),
+            community_id: event.community_id.map_or(NotSet, Set),
+            owner_id: Set(event.owner_id),
             title: Set(event.title.clone()),
             purpose: event.purpose.map_or(NotSet, Set),
             transaction_type: event.transaction_type.map_or(NotSet, Set),
@@ -179,7 +178,7 @@ impl HouseQueryService {
     pub async fn find_all(
         &self,
         params: TableDataRequest,
-    ) -> anyhow::Result<TableDataResponse<HouseQueryReadModelDto>> {
+    ) -> anyhow::Result<TableDataResponse<HouseDataDto>> {
         let condition = Condition::all();
         // 分页逻辑
         let page = params.page.max(1);
@@ -200,14 +199,14 @@ impl HouseQueryService {
 
         let data = data
             .into_iter()
-            .map(|(a, b, c)| HouseQueryReadModelDto::from_value(a, b, c))
-            .collect::<Vec<HouseQueryReadModelDto>>();
+            .map(|(house, community, owner)| HouseDataDto::new(house, community, owner))
+            .collect::<Vec<HouseDataDto>>();
 
         Ok(TableDataResponse::new(data, total as u64))
     }
 
     // 根据id查询
-    pub async fn find_by_id(&self, id: &str) -> Option<HouseQueryReadModelDto> {
+    pub async fn find_by_id(&self, id: &str) -> Option<HouseDataDto> {
         let data = house_query::Entity::find()
             .filter(house_query::Column::Id.eq(id))
             .join(
@@ -221,7 +220,7 @@ impl HouseQueryService {
             .await;
 
         match data {
-            Ok(Some((a, b, c))) => Some(HouseQueryReadModelDto::from_value(a, b, c)),
+            Ok(Some((house, community, owner))) => Some(HouseDataDto::new(house, community, owner)),
             _ => None,
         }
     }

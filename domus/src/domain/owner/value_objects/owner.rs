@@ -17,15 +17,14 @@ pub struct HouseOwner {
 }
 
 impl HouseOwner {
-    pub fn get_name(&self) -> anyhow::Result<String> {
-        self.name
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("业主姓名不能为空"))
-    }
+    pub fn validate(&self) -> anyhow::Result<()> {
+        if self.name.is_none() {
+            return Err(anyhow::anyhow!("业主姓名不能为空"));
+        }
 
-    pub fn get_phone(&self) -> anyhow::Result<String> {
-        self.phone
-            .clone()
-            .ok_or_else(|| anyhow::anyhow!("业主电话不能为空"))
+        if self.phone.is_none() {
+            return Err(anyhow::anyhow!("业主电话不能为空"));
+        }
+        Ok(())
     }
 }

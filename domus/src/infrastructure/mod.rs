@@ -1,5 +1,5 @@
 pub mod community;
-pub mod dtos;
+pub mod dto;
 pub mod entitiy;
 pub mod house;
 pub mod mysql_pool;

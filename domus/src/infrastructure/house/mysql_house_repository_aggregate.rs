@@ -26,7 +26,8 @@ impl HouseRepositoryAggregate for MysqlHouseRepositoryAggregate {
     async fn create(&self, aggregate: HouseAggregate) -> anyhow::Result<()> {
         let model = entitiy::house_aggregate::ActiveModel {
             house_id: Set(aggregate.house_id),
-            address: Set(aggregate.address),
+            community_id: Set(aggregate.community_id),
+            door_number: Set(aggregate.door_number),
             publish_at: Set(aggregate.publish_at),
             ..Default::default()
         };
@@ -39,7 +40,8 @@ impl HouseRepositoryAggregate for MysqlHouseRepositoryAggregate {
     async fn save(&self, aggregate: &HouseAggregate) -> anyhow::Result<()> {
         let model = entitiy::house_aggregate::ActiveModel {
             house_id: Set(aggregate.house_id.clone()),
-            address: Set(aggregate.address.clone()),
+            community_id: Set(aggregate.community_id.clone()),
+            door_number: Set(aggregate.door_number.clone()),
             publish_at: Set(aggregate.publish_at.clone()),
             unpublish_at: Set(aggregate.unpublish_at.clone()),
             deleted_at: Set(aggregate.deleted_at.clone()),
@@ -61,7 +63,8 @@ impl HouseRepositoryAggregate for MysqlHouseRepositoryAggregate {
             .await?
             .map(|model| HouseAggregate {
                 house_id: model.house_id,
-                address: model.address,
+                community_id: model.community_id,
+                door_number: model.door_number,
                 publish_at: model.publish_at,
                 unpublish_at: model.unpublish_at,
                 deleted_at: model.deleted_at,
@@ -70,9 +73,15 @@ impl HouseRepositoryAggregate for MysqlHouseRepositoryAggregate {
     }
 
     // 地址是否存在
-    async fn exists_address(&self, address: &str, self_id: Option<String>) -> anyhow::Result<bool> {
+    async fn exists_address(
+        &self,
+        community_id: &str,
+        door_number: Option<String>,
+        self_id: Option<String>,
+    ) -> anyhow::Result<bool> {
         let mut condition = Condition::all()
-            .add(entitiy::house_aggregate::Column::Address.eq(address))
+            .add(entitiy::house_aggregate::Column::CommunityId.eq(community_id))
+            .add(entitiy::house_aggregate::Column::DoorNumber.eq(door_number))
             .add(entitiy::house_aggregate::Column::DeletedAt.is_null());
 
         if let Some(id) = self_id {

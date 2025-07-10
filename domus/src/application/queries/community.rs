@@ -8,12 +8,7 @@ use sea_orm::{
 use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
 use crate::{
-    domain::community::events::{
-        community_created::CommunityCreatedEvent, community_updated::CommunityUpdatedEvent,
-    },
-    infrastructure::{
-        dtos::community_query_read_model_dto::CommunityQueryReadModelDto, entitiy::community_query,
-    },
+    domain::community::value_objects::commuity::Community, infrastructure::entitiy::community_query,
 };
 
 pub struct CommunityQueryService {
@@ -26,26 +21,26 @@ impl CommunityQueryService {
     }
 
     // 创建小区
-    pub async fn create(&self, event: CommunityCreatedEvent) -> anyhow::Result<()> {
+    pub async fn create(&self, event: Community) -> anyhow::Result<()> {
         let model = community_query::ActiveModel {
-            id: Set(event.community_id),
+            id: Set(event.id.unwrap()),
             // 小区名称
-            name: Set(event.name),
+            name: Set(event.name.unwrap()),
             // 小区地址
-            address: Set(event.address),
+            address: Set(event.address.unwrap()),
             // 城市
-            city: Set(event.city),
+            city: Set(event.city.unwrap()),
             // 小区年限
             year_built: Set(event.year_built),
             // 小区类型
-            community_type: Set(event.community_type),
+            typecode: Set(event.typecode.unwrap()),
             // 小区描述
             description: Set(event.description),
             // 小区图片
-            image: Set(event.image),
+            images: Set(event.images.map(|v| serde_json::to_value(&v).unwrap())),
             // 位置
-            location_0: Set(event.location_0),
-            location_1: Set(event.location_1),
+            lat: Set(event.lat.unwrap()),
+            lng: Set(event.lng.unwrap()),
             ..Default::default()
         };
 
@@ -53,9 +48,9 @@ impl CommunityQueryService {
         Ok(())
     }
     // 更新小区
-    pub async fn update(&self, event: CommunityUpdatedEvent) -> anyhow::Result<()> {
+    pub async fn update(&self, event: Community) -> anyhow::Result<()> {
         let model = community_query::ActiveModel {
-            id: Set(event.community_id),
+            id: Set(event.id.unwrap()),
             // 小区名称
             name: event.name.map_or(NotSet, Set),
             // 小区地址
@@ -63,16 +58,16 @@ impl CommunityQueryService {
             // 城市
             city: event.city.map_or(NotSet, Set),
             // 小区年限
-            year_built: event.year_built.map_or(NotSet, Set),
+            year_built: Set(event.year_built),
             // 小区类型
-            community_type: event.community_type.map_or(NotSet, Set),
+            typecode: event.typecode.map_or(NotSet, Set),
             // 小区描述
             description: Set(event.description),
             // 小区图片
-            image: Set(event.image),
+            images: Set(event.images.map(|v| serde_json::to_value(&v).unwrap())),
             // 位置
-            location_0: Set(event.location_0),
-            location_1: Set(event.location_1),
+            lat: event.lat.map_or(NotSet, Set),
+            lng: event.lng.map_or(NotSet, Set),
             ..Default::default()
         };
 
@@ -95,7 +90,7 @@ impl CommunityQueryService {
     pub async fn find_all(
         &self,
         table_data_request: TableDataRequest,
-    ) -> anyhow::Result<TableDataResponse<CommunityQueryReadModelDto>> {
+    ) -> anyhow::Result<TableDataResponse<community_query::Model>> {
         let paginator = community_query::Entity::find()
             .paginate(self.pool.as_ref(), table_data_request.page_size);
 
@@ -104,11 +99,6 @@ impl CommunityQueryService {
             .fetch_page(table_data_request.page.saturating_sub(1))
             .await?;
 
-        let records = data
-            .into_iter()
-            .map(CommunityQueryReadModelDto::from)
-            .collect();
-
-        Ok(TableDataResponse::new(records, total as u64))
+        Ok(TableDataResponse::new(data, total as u64))
     }
 }

@@ -24,8 +24,8 @@ use crate::{
         services::{
             delete_community::DeleteCommunityService, delete_house::DeleteHouseService,
             delete_owner::DeleteOwnerService, file_upload_service::FileUploadService,
-            save_community::SaveCommunityService, save_house::SaveHouseService,
-            save_owner::SaveOwnerService,
+            house_comment::HouseCommentService, save_community::SaveCommunityService,
+            save_house::SaveHouseService, save_owner::SaveOwnerService,
         },
     },
     infrastructure::{
@@ -39,6 +39,7 @@ use crate::{
             apply_upload_url, delete_house, get_house_detail, group_by_community, list_houses,
             save_house,
         },
+        house_comment::{add_comment, delete_comment, get_comments, update_comment},
         owner::{delete_owner, owner_list, save_owner},
     },
 };
@@ -66,6 +67,9 @@ pub async fn execute() -> std::io::Result<()> {
         .await
         .unwrap(),
     );
+
+    // 房源评论
+    let hosue_comment_service = web::Data::new(HouseCommentService::new(pool.clone()));
 
     // 上传文件服务
     let file_upload_service = web::Data::new(FileUploadService::new(minio_client.clone()));
@@ -159,6 +163,7 @@ pub async fn execute() -> std::io::Result<()> {
             .app_data(owner_query_service.clone())
             .app_data(house_query_service.clone())
             .app_data(file_upload_service.clone())
+            .app_data(hosue_comment_service.clone())
             .service(
                 web::scope("/api/domus/management")
                     .service(
@@ -192,6 +197,14 @@ pub async fn execute() -> std::io::Result<()> {
                             .service(get_house_detail)
                             .service(group_by_community),
                     ),
+            )
+            .service(
+                web::scope("/api/domus/house_comment")
+                    // .wrap(auth_middleware.clone())
+                    .service(add_comment)
+                    .service(update_comment)
+                    .service(delete_comment)
+                    .service(get_comments),
             )
     })
     .bind(server_url)?

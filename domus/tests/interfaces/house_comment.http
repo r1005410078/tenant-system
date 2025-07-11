@@ -1,0 +1,22 @@
+### 添加房屋评论
+POST http://localhost:9002/api/domus/house_comment/add_comment
+Content-Type: application/json
+
+{
+  "house_id": "111",
+  "comment": "这是一条评论"
+}
+
+### 更新房屋评论
+POST http://localhost:9002/api/domus/house_comment/update_comment
+Content-Type: application/json
+
+{
+  "comment_id": "4692965d-83f9-4086-87c0-ff6025dcbb87",
+  "comment": "这是一条更新后的评论1111"
+}
+
+
+
+### 获取房屋评论
+GET http://localhost:9002/api/domus/house_comment/get_comments/111

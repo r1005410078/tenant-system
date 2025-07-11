@@ -5,14 +5,13 @@ Content-Type: application/json
 
 {
     "owner": {
-        "id": "ea0e8ee3-2c91-4f72-8c67-7ec7e20d7eaa",
-        "name": "taosheng rong:本人",
+        "name": "张三:本人",
         "description": "",
-        "phone": "18626891229:本人"
+        "phone": "18626891222:本人"
     },
     "community": {
-        "id": "K3FFGA9AAU",
-        "name": "回祥小区-西区",
+        "id": "A3FFGA9AAU",
+        "name": "华东小区-东区",
         "city": "Beijing",
         "address": "华中路与港华路交叉口东北112米",
         "year_built": "2025-07-10T09:20:15.123Z",

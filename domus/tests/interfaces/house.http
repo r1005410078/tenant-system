@@ -4,38 +4,34 @@ POST http://localhost:9002/api/domus/management/house/save
 Content-Type: application/json
 
 {
-    "owner": {
-        "name": "张三:本人",
-        "description": "",
-        "phone": "18626891222:本人"
-    },
-    "community": {
-        "id": "A3FFGA9AAU",
-        "name": "华东小区-东区",
-        "city": "Beijing",
-        "address": "华中路与港华路交叉口东北112米",
-        "year_built": "2025-07-10T09:20:15.123Z",
-        "description": "A place for new ideas",
-        "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
-        "typecode": "residential",
-        "district": "Manhattan",
-        "adcode": "10001",
-        "lat": 40.7128,
-        "lng": -74.006
-    },
     "purpose": "住宅",
     "transaction_type": "出售",
     "house_status": "有效",
-    "sale_price": 12,
-    "sale_low_price": 11,
-    "down_payment": 2,
+    "owner": {
+        "name": "taosheng rong:本人",
+        "phone": "18626891229:本人"
+    },
+    "sale_price": 180,
+    "sale_low_price": 140,
+    "down_payment": 30,
+    "community": {
+        "name": "回祥小区",
+        "address": "回祥路98号",
+        "city": "安庆",
+        "lat": 30.537141,
+        "lng": 117.065439,
+        "district": "安徽省安庆市宜秀区",
+        "adcode": "340811",
+        "typecode": "120302"
+    },
     "door_number": {
-        "building_number": 3,
+        "building_number": 1,
         "unit_number": 1,
-        "door_number": 1
+        "door_number": 2
     },
     "apartment_type": {
-        "room": 1,
+        "room": 3,
+        "hall": 1,
         "bathroom": 1,
         "kitchen": 1,
         "balcony": 1

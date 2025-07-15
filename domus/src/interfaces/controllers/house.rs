@@ -4,7 +4,7 @@ use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
-        queries::house::HouseQueryService,
+        queries::house::{HouseQueryService, HouseRequest},
         services::{
             delete_house::DeleteHouseService, file_upload_service::FileUploadService,
             save_house::SaveHouseService,
@@ -41,9 +41,9 @@ pub async fn delete_house(
     HttpResponse::Ok().json(res)
 }
 
-#[get("/list")]
+#[post("/list")]
 pub async fn list_houses(
-    query: web::Query<TableDataRequest>,
+    query: web::Json<HouseRequest>,
     house_query_service: web::Data<HouseQueryService>,
 ) -> HttpResponse {
     let res = match house_query_service.find_all(query.into_inner()).await {

@@ -21,6 +21,7 @@ pub struct Model {
     pub building_number: Option<i32>,
     pub unit_number: Option<i32>,
     pub door_number: Option<i32>,
+    pub current_floor: Option<i32>,
     pub room: Option<i32>,
     pub hall: Option<i32>,
     pub bathroom: Option<i32>,

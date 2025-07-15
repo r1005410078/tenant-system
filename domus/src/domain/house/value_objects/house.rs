@@ -42,8 +42,6 @@ pub struct House {
     pub discount_year_limit: Option<String>,
     // 梯户
     pub stairs: Option<Stairs>,
-    // 位置
-    pub location: Option<String>,
     // 推荐标签
     pub tags: Option<Vec<String>>,
     // 车位高度

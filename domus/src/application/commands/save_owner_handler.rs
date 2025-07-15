@@ -45,16 +45,16 @@ impl SaveOwnerCommandHandler {
                     }
                 }
 
-                // 手机号是否存在
-                if let Some(phone) = &owner.phone {
-                    if self
-                        .owner_repository
-                        .exists_phone(phone, Some(aggregate.owner_id.clone()))
-                        .await?
-                    {
-                        return Err(anyhow::anyhow!("手机号已存在"));
-                    }
-                }
+                // 手机号是否存在 TODO 后续优化 房源所有者应该有自己的房子
+                // if let Some(phone) = &owner.phone {
+                //     if self
+                //         .owner_repository
+                //         .exists_phone(phone, Some(aggregate.owner_id.clone()))
+                //         .await?
+                //     {
+                //         return Err(anyhow::anyhow!("手机号已存在"));
+                //     }
+                // }
 
                 let event = aggregate.update(&owner)?;
 

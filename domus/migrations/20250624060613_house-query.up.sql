@@ -49,6 +49,7 @@ CREATE TABLE `house_query` (
   `building_number` INT DEFAULT NULL COMMENT '栋',
   `unit_number` INT DEFAULT NULL COMMENT '单元',
   `door_number` INT DEFAULT NULL COMMENT '门牌号',
+  `current_floor` INT DEFAULT NULL COMMENT '当前楼层',
 
   -- 户型结构
   `room` INT DEFAULT NULL COMMENT '室',

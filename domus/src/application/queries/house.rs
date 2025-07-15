@@ -13,6 +13,8 @@ use sea_orm::{
     Condition, DbConn, EntityTrait, JoinType, PaginatorTrait, QueryFilter, QuerySelect,
 };
 use sea_orm::{ColumnTrait, RelationTrait};
+use serde::Deserialize;
+use serde::Serialize;
 use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
 pub struct HouseQueryService {
@@ -174,22 +176,35 @@ impl HouseQueryService {
         model.delete(self.pool.as_ref()).await?;
         Ok(())
     }
+
     // 查询房源列表
     pub async fn find_all(
         &self,
-        params: TableDataRequest,
+        params: HouseRequest,
     ) -> anyhow::Result<TableDataResponse<HouseDataDto>> {
-        let condition = Condition::all();
+        let mut condition = Condition::all();
+        if let Some(AmapBounds {
+            north_east,
+            south_west,
+        }) = params.amap_bounds
+        {
+            condition = condition
+                .add(community_query::Column::Lat.gte(south_west.lat))
+                .add(community_query::Column::Lat.lte(north_east.lat))
+                .add(community_query::Column::Lng.gte(south_west.lng))
+                .add(community_query::Column::Lng.lte(north_east.lng));
+        }
+
         // 分页逻辑
         let page = params.page.max(1);
         let page_size = params.page_size.min(100).max(1);
         let paginator = house_query::Entity::find()
-            .filter(condition.clone())
             .join(
                 JoinType::LeftJoin,
                 house_query::Relation::CommunityQuery.def(),
             )
             .join(JoinType::LeftJoin, house_query::Relation::OwnerQuery.def())
+            .filter(condition.clone())
             .select_also(community_query::Entity)
             .select_also(owner_query::Entity)
             .paginate(self.pool.as_ref(), page_size as u64);
@@ -273,4 +288,24 @@ impl HouseQueryService {
 
         Ok(data)
     }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+
+pub struct HouseRequest {
+    pub page: u64,
+    pub page_size: u64,
+    pub amap_bounds: Option<AmapBounds>,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct AmapBounds {
+    pub north_east: Coord,
+    pub south_west: Coord,
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct Coord {
+    pub lng: f64,
+    pub lat: f64,
 }

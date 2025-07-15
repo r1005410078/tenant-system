@@ -3,7 +3,7 @@ use shared_dto::table_data::TableDataRequest;
 
 use crate::{
     application::{
-        queries::community::CommunityQueryService,
+        queries::community::{CommunityQueryService, CommunityRequest},
         services::{
             delete_community::DeleteCommunityService, save_community::SaveCommunityService,
         },
@@ -40,9 +40,9 @@ async fn delete_community(
     HttpResponse::Ok().json(res)
 }
 
-#[get("/list")]
+#[post("/list")]
 async fn list_community(
-    query: web::Query<TableDataRequest>,
+    query: web::Json<CommunityRequest>,
     service: web::Data<CommunityQueryService>,
 ) -> HttpResponse {
     let res = match service.find_all(query.into_inner()).await {

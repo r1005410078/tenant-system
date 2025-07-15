@@ -1,10 +1,12 @@
 use std::sync::Arc;
 
 use sea_orm::{
+    prelude::DateTimeUtc,
     ActiveModelTrait,
     ActiveValue::{NotSet, Set},
-    DbConn, EntityTrait, PaginatorTrait,
+    ColumnTrait, Condition, DbConn, EntityTrait, PaginatorTrait, QueryFilter,
 };
+use serde::{Deserialize, Serialize};
 use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
 use crate::{
@@ -26,8 +28,12 @@ impl CommunityQueryService {
             id: Set(event.id.unwrap()),
             // 小区名称
             name: Set(event.name.unwrap()),
+            // 小区编码
+            adcode: Set(event.adcode),
             // 小区地址
             address: Set(event.address.unwrap()),
+            // 区
+            district: Set(event.district),
             // 城市
             city: Set(event.city.unwrap()),
             // 小区年限
@@ -89,9 +95,18 @@ impl CommunityQueryService {
     // 查询小区列表
     pub async fn find_all(
         &self,
-        table_data_request: TableDataRequest,
+        table_data_request: CommunityRequest,
     ) -> anyhow::Result<TableDataResponse<community_query::Model>> {
+        let mut condition = Condition::all();
+
+        println!("{:?}", table_data_request);
+
+        if let Some(updated_at) = table_data_request.updated_at {
+            condition = condition.add(community_query::Column::UpdatedAt.gt(updated_at));
+        }
+
         let paginator = community_query::Entity::find()
+            .filter(condition)
             .paginate(self.pool.as_ref(), table_data_request.page_size);
 
         let total = paginator.num_items().await?;
@@ -101,4 +116,11 @@ impl CommunityQueryService {
 
         Ok(TableDataResponse::new(data, total as u64))
     }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct CommunityRequest {
+    pub page: u64,
+    pub page_size: u64,
+    pub updated_at: Option<DateTimeUtc>,
 }

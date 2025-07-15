@@ -8,6 +8,7 @@ use crate::{
     },
 };
 use sea_orm::{
+    prelude::DateTimeUtc,
     ActiveModelTrait,
     ActiveValue::{NotSet, Set},
     Condition, DbConn, EntityTrait, JoinType, PaginatorTrait, QueryFilter, QuerySelect,
@@ -195,6 +196,10 @@ impl HouseQueryService {
                 .add(community_query::Column::Lng.lte(north_east.lng));
         }
 
+        if let Some(update_at) = params.update_at {
+            condition = condition.add(community_query::Column::UpdatedAt.gt(update_at));
+        }
+
         // 分页逻辑
         let page = params.page.max(1);
         let page_size = params.page_size.min(100).max(1);
@@ -296,6 +301,7 @@ pub struct HouseRequest {
     pub page: u64,
     pub page_size: u64,
     pub amap_bounds: Option<AmapBounds>,
+    pub update_at: Option<DateTimeUtc>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

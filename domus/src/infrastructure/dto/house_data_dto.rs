@@ -155,6 +155,8 @@ impl HouseDataDto {
             images: house
                 .images
                 .map(|images| serde_json::from_value(images).unwrap_or_default()),
+            // 更新时间
+            updated_at: Some(house.updated_at),
         };
 
         Self {

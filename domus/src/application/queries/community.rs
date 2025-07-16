@@ -99,8 +99,6 @@ impl CommunityQueryService {
     ) -> anyhow::Result<TableDataResponse<community_query::Model>> {
         let mut condition = Condition::all();
 
-        println!("{:?}", table_data_request);
-
         if let Some(updated_at) = table_data_request.updated_at {
             condition = condition.add(community_query::Column::UpdatedAt.gt(updated_at));
         }

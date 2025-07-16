@@ -1,3 +1,4 @@
+use sea_orm::prelude::DateTimeUtc;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{
@@ -118,6 +119,8 @@ pub struct House {
     pub remark: Option<String>,
     // 房源图片
     pub images: Option<Vec<FileInfo>>,
+    // 更新时间
+    pub updated_at: Option<DateTimeUtc>,
 }
 
 impl House {

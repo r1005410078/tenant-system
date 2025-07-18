@@ -3,14 +3,21 @@ use shared_dto::table_data::{TableDataRequest, TableDataResponse};
 
 use crate::{
     domain::roles::events::{
-        permission_granted_to_role::PermissionGrantedToRoleEvent, role_created::RoleCreatedEvent,
-        role_deleted::RoleDeletedEvent, role_updated::RoleUpdatedEvent,
+        permission_granted_to_role::{Permission, PermissionGrantedToRoleEvent},
+        role_created::RoleCreatedEvent,
+        role_deleted::RoleDeletedEvent,
+        role_updated::RoleUpdatedEvent,
     },
     infrastructure::{
-        dtos::role_query_dto::RoleQueryReadModelDto, entitiy::role_detail_read_model,
+        dtos::role_query_dto::RoleQueryReadModelDto,
+        entitiy::{permissions_detail, role_detail_read_model},
     },
 };
-use std::sync::Arc;
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+    sync::Arc,
+};
 
 pub struct RoleQueryService {
     pool: Arc<DbConn>,
@@ -58,13 +65,58 @@ impl RoleQueryService {
         model.delete(self.pool.as_ref()).await?;
         Ok(())
     }
+
+    // 获取
+    pub async fn get_permissions_details_map(
+        &self,
+    ) -> anyhow::Result<HashMap<Permission, permissions_detail::Model>> {
+        let mut permissions_details_map = HashMap::new();
+        let permissions_details = permissions_detail::Entity::find()
+            .all(self.pool.as_ref())
+            .await?;
+
+        for detail in permissions_details {
+            permissions_details_map.insert(
+                Permission {
+                    action: detail.action.to_string(),
+                    source: detail.source.to_string(),
+                },
+                detail,
+            );
+        }
+
+        Ok(permissions_details_map)
+    }
+
     // 查询角色
     pub async fn find(&self, role_id: &str) -> anyhow::Result<RoleQueryReadModelDto> {
-        role_detail_read_model::Entity::find_by_id(role_id)
+        let role = role_detail_read_model::Entity::find_by_id(role_id)
             .one(self.pool.as_ref())
             .await?
-            .map(RoleQueryReadModelDto::from)
-            .ok_or(anyhow::anyhow!("角色不存在"))
+            .ok_or(anyhow::anyhow!("角色不存在"))?;
+
+        let permissions_details_map = self.get_permissions_details_map().await?;
+
+        let permissions = role.permissions.map(|permissions| {
+            let permissions: Vec<Permission> =
+                serde_json::from_value(permissions).unwrap_or_default();
+            permissions
+                .iter()
+                .map(|p| permissions_details_map.get(p).cloned())
+                .flatten()
+                .collect::<Vec<permissions_detail::Model>>()
+        });
+
+        let role_query = RoleQueryReadModelDto {
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            permissions,
+            created_at: role.created_at,
+            updated_at: role.updated_at,
+        };
+
+        Ok(role_query)
     }
 
     // 查询角色列表
@@ -76,12 +128,34 @@ impl RoleQueryService {
             .paginate(self.pool.as_ref(), table_data_request.page_size);
 
         let total = paginator.num_items().await?;
-        let data = paginator
+        let role_list = paginator
             .fetch_page(table_data_request.page.saturating_sub(1))
-            .await?
-            .into_iter()
-            .map(RoleQueryReadModelDto::from)
-            .collect::<Vec<_>>();
+            .await?;
+
+        let permissions_details_map = self.get_permissions_details_map().await?;
+
+        let mut data = vec![];
+
+        for role in role_list {
+            let permissions = role.permissions.map(|permissions| {
+                let permissions: Vec<Permission> =
+                    serde_json::from_value(permissions).unwrap_or_default();
+                permissions
+                    .iter()
+                    .map(|p| permissions_details_map.get(p).cloned())
+                    .flatten()
+                    .collect::<Vec<permissions_detail::Model>>()
+            });
+
+            data.push(RoleQueryReadModelDto {
+                id: role.id,
+                name: role.name,
+                description: role.description,
+                permissions,
+                created_at: role.created_at,
+                updated_at: role.updated_at,
+            });
+        }
 
         Ok(TableDataResponse::new(data, total))
     }

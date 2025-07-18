@@ -17,10 +17,10 @@ impl PermissionGrantedToRoleEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub struct Permission {
     // 资源
-    pub resouce: String,
+    pub source: String,
     // 权限
-    pub permission: String,
+    pub action: String,
 }

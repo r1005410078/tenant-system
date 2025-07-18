@@ -58,8 +58,8 @@ impl InitSystemCommandHandler {
             .await?
             .iter()
             .map(|model| Permission {
-                resouce: model.source.clone(),
-                permission: model.action.clone(),
+                source: model.source.clone(),
+                action: model.action.clone(),
             })
             .collect();
 

@@ -127,8 +127,8 @@ pub async fn run() -> std::io::Result<()> {
             .app_data(role_query_service.clone())
             .app_data(permissions_detail_service.clone())
             .service(
-                web::scope("/api/user")
-                    .wrap(auth_middleware.clone())
+                web::scope("/api/user_system/user")
+                    // .wrap(auth_middleware.clone())
                     .service(delete_user)
                     .service(update_user)
                     .service(get_login_history)
@@ -137,8 +137,8 @@ pub async fn run() -> std::io::Result<()> {
                     .service(register),
             )
             .service(
-                web::scope("/api/role")
-                    .wrap(auth_middleware.clone())
+                web::scope("/api/user_system/role")
+                    // .wrap(auth_middleware.clone())
                     .service(create_role)
                     .service(delete_role)
                     .service(update_role)

@@ -1,8 +1,19 @@
-POST http://localhost:9001/api/role/create
+POST http://localhost:9001/api/user_system/role/create
 Content-Type: application/json
-Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiOTQzMzgyMDMtZDk0Ni00YjM2LThmNTQtZTc5ZjBjM2QxZWNhIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbIjkyYzYxZDE4LTg4NzktNDljOC05MDY3LWU2OGU3M2UwNjQ2OSJdLCJleHAiOjE3NTExNjU5MDksImlhdCI6MTc1MTA3OTUwOX0.jmsO3E48xUN95HF78dK5wdeyr2UWOG_2xPB9XUMRWQ8
+
 
 {
-  "name": "aaaa",
-  "description": "aaaa"
+    "name": "Administrator",
+    "description": "普通管理员",
+    "permissions": [
+        {
+            "source": "^/api/user/*",
+            "action": "POST"
+        },
+        {
+            "source": "^/api/role/*",
+            "action": "POST"
+        }
+    ]
 }
+

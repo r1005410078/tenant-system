@@ -17,6 +17,5 @@ Content-Type: application/json
 }
 
 
-
 ### 获取房屋评论
 GET http://localhost:9002/api/domus/house_comment/get_comments/111

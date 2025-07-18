@@ -1,6 +1,9 @@
 use std::sync::Arc;
 
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, ColumnTrait, DbConn, EntityTrait, QueryFilter};
+use sea_orm::{
+    ActiveModelTrait, ActiveValue::Set, ColumnTrait, DbConn, EntityTrait, Order, QueryFilter,
+    QueryOrder,
+};
 
 use crate::infrastructure::entitiy::house_comments;
 
@@ -77,6 +80,7 @@ impl HouseCommentService {
     pub async fn get_comments(&self, house_id: &str) -> anyhow::Result<Vec<house_comments::Model>> {
         let model = house_comments::Entity::find()
             .filter(house_comments::Column::HouseId.eq(house_id))
+            .order_by(house_comments::Column::UpdatedAt, Order::Desc)
             .all(self.pool.as_ref())
             .await?;
 

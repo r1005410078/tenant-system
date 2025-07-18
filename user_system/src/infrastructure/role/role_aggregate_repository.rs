@@ -52,8 +52,8 @@ impl RoleRepository for MySqlRoleAggregateRepository {
             let model = casbin_rules::ActiveModel {
                 ptype: Set("p".to_string()),
                 v0: Set(Some(command.id.clone())),
-                v1: Set(Some(p.resouce.clone())),
-                v2: Set(Some(p.permission.clone())),
+                v1: Set(Some(p.source.clone())),
+                v2: Set(Some(p.action.clone())),
                 ..Default::default()
             };
             model.insert(self.pool.as_ref()).await?;
@@ -86,8 +86,8 @@ impl RoleRepository for MySqlRoleAggregateRepository {
             let model = casbin_rules::ActiveModel {
                 ptype: Set("p".to_string()),
                 v0: Set(Some(command.id.to_string())),
-                v1: Set(Some(p.resouce.clone())),
-                v2: Set(Some(p.permission.clone())),
+                v1: Set(Some(p.source.clone())),
+                v2: Set(Some(p.action.clone())),
                 ..Default::default()
             };
             model.insert(self.pool.as_ref()).await?;
@@ -129,8 +129,8 @@ impl From<role_aggregate::Model> for RoleAggregate {
 impl From<casbin_rules::Model> for Permission {
     fn from(model: casbin_rules::Model) -> Self {
         Permission {
-            resouce: model.v1.unwrap(),
-            permission: model.v2.unwrap(),
+            source: model.v1.unwrap(),
+            action: model.v2.unwrap(),
         }
     }
 }

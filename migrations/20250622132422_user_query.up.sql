@@ -4,7 +4,7 @@ create table if not exists user_query (
   username varchar(50) not null comment '用户名',
   email varchar(100) comment '邮箱',
   phone varchar(20) comment '手机号',
-  rules json comment '用户权限',
+  roles json comment '用户角色',
   created_at TIMESTAMP default current_timestamp comment '创建时间',
   updated_at TIMESTAMP default current_timestamp on update current_timestamp comment '更新时间'
 );

@@ -87,13 +87,6 @@ where
             // 角色名称
             let subs = claims.rules;
 
-            println!(
-                "sub: {:?}, obj: {:?}, act: {:?}",
-                subs,
-                req.path(),
-                req.method()
-            );
-
             for sub in subs {
                 let obj = req.path().to_string();
                 let act = req.method().as_str().to_string().to_uppercase();
@@ -101,7 +94,7 @@ where
                     .lock()
                     .await
                     .enforce((sub.clone(), obj.clone(), act.clone()))
-                    .unwrap_or(false);
+                    .unwrap();
 
                 if allowed {
                     return srv.call(req).await;

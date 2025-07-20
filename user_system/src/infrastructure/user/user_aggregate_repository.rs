@@ -2,7 +2,7 @@ use crate::{
     application::repositories::user_aggreate_repository::UserAggregateRepository,
     domain::user::aggregates::user::UserAggregate, infrastructure::entitiy,
 };
-use casbin::MgmtApi;
+use casbin::{CoreApi, MgmtApi};
 use sea_orm::*;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -101,7 +101,7 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
             )
             .one(self.pool.as_ref())
             .await?
-            .ok_or(anyhow::anyhow!("user not found"))?
+            .ok_or(anyhow::anyhow!("用户名或密码错误"))?
             .into();
 
         user.roles = self.get_roles_by_user_id(&user.id.to_string()).await;
@@ -117,7 +117,7 @@ impl UserAggregateRepository for MySqlUserAggregateRepository {
             )
             .one(self.pool.as_ref())
             .await?
-            .ok_or(anyhow::anyhow!("user not found"))?
+            .ok_or(anyhow::anyhow!("用户名或密码错误"))?
             .into();
 
         user.roles = self.get_roles_by_user_id(user_id).await;

@@ -43,5 +43,11 @@ Content-Type: application/json
 POST http://localhost:9002/api/domus/management/community/delete/123e4567-e89b-12d3-a456-426655440000
 
 ### 查询
-GET http://localhost:9002/api/domus/query/community/list?page=1&page_size=10000
+POST http://localhost:9002/api/domus/query/community/list
 Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNDkzNjVkZDQtOWRkYS00NDI1LTk4ZGQtMjAxNWRlMDY3OTZiIiwidXNlcm5hbWUiOiJhZG1pbiIsInJ1bGVzIjpbXSwiZXhwIjoxNzUzMDI1MjcxLCJpYXQiOjE3NTI5Mzg4NzF9.68Rl77io1snZdxq8_raHteGN2211R7RZuOp_W86m6mA
+
+{
+  "page": 1,
+  "page_size": 10
+}

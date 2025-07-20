@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
 use crate::{
-    domain::house::value_objects::house::House,
+    domain::house::value_objects::house::{ApartmentType, House},
     infrastructure::{
         dto::house_data_dto::{CommunityWithHouseCount, HouseDataDto},
         entitiy::{community_query, house_query, owner_query},
     },
 };
+use argon2::password_hash::rand_core::le;
 use sea_orm::{
     prelude::DateTimeUtc,
     ActiveModelTrait,
@@ -196,6 +197,148 @@ impl HouseQueryService {
                 .add(community_query::Column::Lng.lte(north_east.lng));
         }
 
+        if let Some(transaction_type) = params.transaction_type {
+            condition = condition.add(house_query::Column::TransactionType.eq(transaction_type));
+        }
+
+        if let Some(purpose) = params.purpose {
+            condition = condition.add(house_query::Column::Purpose.eq(purpose));
+        }
+
+        // 朝向
+        if let Some(house_orientation) = params.house_orientation {
+            condition = condition.add(house_query::Column::HouseOrientation.eq(house_orientation));
+        }
+
+        // 装修
+        if let Some(house_decoration) = params.house_decoration {
+            condition = condition.add(house_query::Column::HouseDecoration.eq(house_decoration));
+        }
+
+        // apartment_type
+        if let Some(apartment_type) = params.apartment_type {
+            if let Some(r) = apartment_type.room {
+                condition = condition.add(house_query::Column::Room.eq(r));
+            }
+            if let Some(h) = apartment_type.hall {
+                condition = condition.add(house_query::Column::Hall.eq(h));
+            }
+            if let Some(b) = apartment_type.bathroom {
+                condition = condition.add(house_query::Column::Bathroom.eq(b));
+            }
+            if let Some(k) = apartment_type.kitchen {
+                condition = condition.add(house_query::Column::Kitchen.eq(k));
+            }
+            if let Some(t) = apartment_type.terrace {
+                condition = condition.add(house_query::Column::Terrace.eq(t));
+            }
+            if let Some(b) = apartment_type.balcony {
+                condition = condition.add(house_query::Column::Balcony.eq(b));
+            }
+        }
+
+        // 售价
+        if let Some(price) = params.price {
+            // 如果是 1000+
+            if price.ends_with('+') {
+                let price = price
+                    .trim_end_matches('+')
+                    .parse::<f32>()
+                    .unwrap_or_default();
+                condition = condition.add(house_query::Column::SalePrice.lte(price));
+            }
+
+            let price = price
+                .split('-')
+                .map(|p| p.parse::<f32>().unwrap_or_default())
+                .collect::<Vec<f32>>();
+
+            // 范围查询 1000-2000
+            if price.len() == 2 {
+                condition =
+                    condition.add(house_query::Column::SalePrice.between(price[0], price[1]));
+            }
+
+            // 大于等于 1000
+            if price.len() == 1 {
+                condition = condition.add(house_query::Column::SalePrice.gte(price[0]));
+            }
+        }
+
+        // 租金
+        if let Some(rent) = params.rent {
+            // 如果是 1000+
+            if rent.ends_with('+') {
+                let rent = rent
+                    .trim_end_matches('+')
+                    .parse::<f32>()
+                    .unwrap_or_default();
+                condition = condition.add(house_query::Column::RentPrice.lte(rent));
+            }
+
+            let rent = rent
+                .split('-')
+                .map(|p| p.parse::<f32>().unwrap_or_default())
+                .collect::<Vec<f32>>();
+
+            // 范围查询 1000-2000
+            if rent.len() == 2 {
+                condition = condition.add(house_query::Column::RentPrice.between(rent[0], rent[1]));
+            }
+
+            // 大于等于 1000
+            if rent.len() == 1 {
+                condition = condition.add(house_query::Column::SalePrice.gte(rent[0]));
+            }
+        }
+
+        // 面积
+        if let Some(area) = params.area {
+            // 如果是 1000+
+            if area.ends_with('+') {
+                let area = area
+                    .trim_end_matches('+')
+                    .parse::<f32>()
+                    .unwrap_or_default();
+                condition = condition.add(house_query::Column::BuildingArea.lte(area));
+            }
+
+            let area = area
+                .split('-')
+                .map(|p| p.parse::<f32>().unwrap_or_default())
+                .collect::<Vec<f32>>();
+
+            // 范围查询 1000-2000
+            if area.len() == 2 {
+                condition =
+                    condition.add(house_query::Column::BuildingArea.between(area[0], area[1]));
+            }
+
+            // 大于等于 1000
+            if area.len() == 1 {
+                condition = condition.add(house_query::Column::BuildingArea.gte(area[0]));
+            }
+        }
+
+        // 楼层
+        if let Some(floor) = params.floor {
+            match floor.as_str() {
+                "low" => {
+                    condition = condition.add(house_query::Column::Level.lt(3));
+                }
+                "middle" => {
+                    condition = condition.add(house_query::Column::Level.between(3, 6));
+                }
+                "high" => {
+                    condition = condition.add(house_query::Column::Level.gt(6));
+                }
+                _ => {
+                    // 如果不是 low, middle, high 则不做处理
+                    condition = condition.add(house_query::Column::Level.eq(floor));
+                }
+            }
+        }
+
         if let Some(update_at) = params.update_at {
             condition = condition.add(community_query::Column::UpdatedAt.gt(update_at));
         }
@@ -302,6 +445,16 @@ pub struct HouseRequest {
     pub page_size: u64,
     pub amap_bounds: Option<AmapBounds>,
     pub update_at: Option<DateTimeUtc>,
+    pub transaction_type: Option<String>,
+    pub purpose: Option<String>,
+    pub house_orientation: Option<String>,
+    pub house_decoration: Option<String>,
+    pub apartment_type: Option<ApartmentType>,
+    pub price: Option<String>,
+    pub rent: Option<String>,
+    pub area: Option<String>,
+    // "low", "middle", "high"
+    pub floor: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

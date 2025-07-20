@@ -26,7 +26,7 @@ impl InitSystemCommandHandler {
 
     pub async fn handle(&self) -> anyhow::Result<()> {
         let port = env::var("USER_SYSTEM_PORT").unwrap_or("9001".to_string());
-        let url = format!("http://127.0.0.1:{}/api", port);
+        let url = format!("http://127.0.0.1:{}/api/user_system", port);
 
         // 登陆
         let login_body = json!({"username": "admin", "password": "admin"});
@@ -59,6 +59,12 @@ impl InitSystemCommandHandler {
                 "source": "^/api/domus/query/*",
                 "action": "GET",
                 "description": "房源查询"
+            },
+            {
+                "name": "高级房源查询",
+                "source": "^/api/domus/query/*",
+                "action": "POST",
+                "description": "使用高级房源查询"
             }
         ]);
 
@@ -70,7 +76,7 @@ impl InitSystemCommandHandler {
             .await?;
 
         if !res.status().is_success() {
-            println!("权限数据初始化失败 {}", res.status());
+            println!("创建权限权限数据初始化失败 {}", res.status());
         }
 
         // 获取所有的权限
@@ -81,7 +87,7 @@ impl InitSystemCommandHandler {
             .await?;
 
         if !res.status().is_success() {
-            println!("权限数据初始化失败 {}", res.status());
+            println!("获取所有的权限失败 {}", res.status());
             return Ok(());
         }
 
@@ -90,8 +96,8 @@ impl InitSystemCommandHandler {
         let mut permissions: Vec<Permission> = vec![];
         for permission in permissions_details.data {
             permissions.push(Permission {
-                resouce: permission.source,
-                permission: permission.action,
+                source: permission.source,
+                action: permission.action,
             });
         }
 
@@ -104,7 +110,7 @@ impl InitSystemCommandHandler {
             .await?;
 
         if !res.status().is_success() {
-            println!("权限数据初始化失败 {}", res.status());
+            println!("绑定所有权限失败 {}", res.status());
             return Ok(());
         }
 
@@ -153,9 +159,9 @@ pub struct PermissionsDetails {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Permission {
     // 资源
-    pub resouce: String,
+    pub source: String,
     // 权限
-    pub permission: String,
+    pub action: String,
 }
 
 #[cfg(test)]

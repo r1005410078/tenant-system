@@ -1,4 +1,5 @@
 use crate::domain::user::events::login::LoginEvent;
+use crate::infrastructure::dtos::user_query_dto::UserQueryDto;
 use crate::{
     application::repositories::user_aggreate_repository::UserAggregateRepository,
     domain::user::aggregates::user::UserAggregate,
@@ -9,13 +10,39 @@ use std::sync::Arc;
 use user_system::shared::claims::Claims;
 
 #[derive(Debug, Serialize, Deserialize)]
+pub struct UserInfomation {
+    pub id: String,
+    // 用户名
+    pub username: String,
+    // 邮箱
+    pub email: Option<String>,
+    // 手机号
+    pub phone: Option<String>,
+    // 角色
+    pub roles: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
 pub struct LoginInfomation {
     token: String,
-    user: UserAggregate,
+    user: UserInfomation,
+}
+
+impl From<UserAggregate> for UserInfomation {
+    fn from(user: UserAggregate) -> Self {
+        Self {
+            id: user.id.to_string(),
+            username: user.username,
+            email: user.email,
+            phone: user.phone,
+            roles: user.roles,
+        }
+    }
 }
 
 impl LoginInfomation {
     pub fn new(token: String, user: UserAggregate) -> Self {
+        let user = UserInfomation::from(user);
         Self { token, user }
     }
 }
@@ -45,6 +72,8 @@ impl LoginCommandHandler {
             .user_repo
             .find_by_username(command.username.as_str())
             .await?;
+
+        println!("user: {:#?}", user);
 
         let login_event = user.login(command.username.as_str(), command.password.as_str());
 

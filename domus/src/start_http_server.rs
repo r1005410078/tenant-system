@@ -54,12 +54,12 @@ pub async fn execute() -> std::io::Result<()> {
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
     let enforcer = Arc::new(Mutex::new(init_casbin().await));
-    let _auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
+    let auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
 
     // minio_client
     let minio_client = Arc::new(
         Minio::new(
-            Some("http://127.0.0.1:9000".to_string()),
+            Some("http://192.168.1.243:9000".to_string()),
             "minioadmin",
             "minioadmin",
         )
@@ -168,44 +168,41 @@ pub async fn execute() -> std::io::Result<()> {
                 web::scope("/api/domus/management")
                     .service(
                         web::scope("/community")
-                            //.wrap(auth_middleware.clone())
+                            .wrap(auth_middleware.clone())
                             .service(save_community)
                             .service(delete_community),
                     )
                     .service(
                         web::scope("/owner")
-                            // .wrap(auth_middleware.clone())
+                            .wrap(auth_middleware.clone())
                             .service(save_owner)
                             .service(delete_owner),
                     )
                     .service(
                         web::scope("/house")
-                            // .wrap(auth_middleware.clone())
+                            .wrap(auth_middleware.clone())
                             .service(save_house)
                             .service(delete_house)
-                            .service(apply_upload_url),
+                            .service(apply_upload_url)
+                            .service(add_comment)
+                            .service(update_comment)
+                            .service(delete_comment),
                     ),
             )
             .service(
                 web::scope("/api/domus/query")
-                    // .wrap(auth_middleware.clone())
+                    .wrap(auth_middleware.clone())
                     .service(web::scope("/owner").service(owner_list))
                     .service(web::scope("/community").service(list_community))
                     .service(
                         web::scope("/house")
                             .service(list_houses)
                             .service(get_house_detail)
-                            .service(group_by_community),
+                            .service(group_by_community)
+                            .service(get_comments),
                     ),
             )
-            .service(
-                web::scope("/api/domus/house_comment")
-                    // .wrap(auth_middleware.clone())
-                    .service(add_comment)
-                    .service(update_comment)
-                    .service(delete_comment)
-                    .service(get_comments),
-            )
+            .service(web::scope("/api/domus/house_comment").wrap(auth_middleware.clone()))
     })
     .bind(server_url)?
     .run()

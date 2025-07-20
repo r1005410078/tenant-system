@@ -101,7 +101,7 @@ impl InitSystemCommandHandler {
                 permissions_detail::ActiveModel {
                     id: Set(uuid::Uuid::new_v4().to_string()),
                     name: Set("角色管理".to_string()),
-                    source: Set("^/api/role/*".to_string()),
+                    source: Set("^/api/user_system/role/*".to_string()),
                     action: Set("POST".to_string()),
                     description: Set(Some("管理角色的增加，删除，修改".to_string())),
                     ..Default::default()
@@ -109,7 +109,7 @@ impl InitSystemCommandHandler {
                 permissions_detail::ActiveModel {
                     id: Set(uuid::Uuid::new_v4().to_string()),
                     name: Set("获取角色信息".to_string()),
-                    source: Set("^/api/role/*".to_string()),
+                    source: Set("^/api/user_system/role/*".to_string()),
                     action: Set("GET".to_string()),
                     description: Set(Some("获取角色信息".to_string())),
                     ..Default::default()
@@ -117,7 +117,7 @@ impl InitSystemCommandHandler {
                 permissions_detail::ActiveModel {
                     id: Set(uuid::Uuid::new_v4().to_string()),
                     name: Set("用户管理".to_string()),
-                    source: Set("^/api/user/*".to_string()),
+                    source: Set("^/api/user_system/user/*".to_string()),
                     action: Set("POST".to_string()),
                     description: Set(Some("管理用户的增加，删除，修改".to_string())),
                     ..Default::default()
@@ -125,7 +125,7 @@ impl InitSystemCommandHandler {
                 permissions_detail::ActiveModel {
                     id: Set(uuid::Uuid::new_v4().to_string()),
                     name: Set("获取用户管信息".to_string()),
-                    source: Set("^/api/user/*".to_string()),
+                    source: Set("^/api/user_system/user/*".to_string()),
                     action: Set("GET".to_string()),
                     description: Set(Some("获取用户信息".to_string())),
                     ..Default::default()

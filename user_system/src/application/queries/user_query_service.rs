@@ -81,7 +81,7 @@ impl UserQueryService {
             username: Set(user.username.clone()),
             email: Set(user.email.clone()),
             phone: Set(user.phone.clone()),
-            rules: Set(Some(serde_json::to_value(user.roles.clone())?)),
+            roles: Set(Some(serde_json::to_value(user.roles.clone())?)),
             ..Default::default()
         };
 
@@ -106,7 +106,7 @@ impl UserQueryService {
             username: Set(user.username.clone()),
             email: Set(user.email.clone()),
             phone: Set(user.phone.clone()),
-            rules: Set(Some(serde_json::to_value(user.roles.clone())?)),
+            roles: Set(Some(serde_json::to_value(user.roles.clone())?)),
             ..Default::default()
         };
 
@@ -150,7 +150,7 @@ impl UserQueryService {
     pub async fn bind_roles(&self, event: &UserBindedToRolesEvent) -> anyhow::Result<()> {
         let model = entitiy::user_query::ActiveModel {
             user_id: Set(event.user_id.clone()),
-            rules: Set(Some(serde_json::to_value(event.roles.clone()).unwrap())),
+            roles: Set(Some(serde_json::to_value(event.roles.clone()).unwrap())),
             ..Default::default()
         };
 

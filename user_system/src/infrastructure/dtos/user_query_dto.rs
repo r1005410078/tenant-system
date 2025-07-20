@@ -2,7 +2,7 @@ use sea_orm::prelude::DateTimeUtc;
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
 
-use crate::infrastructure::entitiy::user_query;
+use crate::{domain::user::aggregates::user::UserAggregate, infrastructure::entitiy::user_query};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct UserQueryDto {
@@ -10,7 +10,7 @@ pub struct UserQueryDto {
     pub username: String,
     pub email: Option<String>,
     pub phone: Option<String>,
-    pub rules: Option<Json>,
+    pub roles: Option<Json>,
     pub created_at: Option<DateTimeUtc>,
     pub updated_at: Option<DateTimeUtc>,
 }
@@ -22,7 +22,7 @@ impl From<user_query::Model> for UserQueryDto {
             username: user.username,
             email: user.email,
             phone: user.phone,
-            rules: user.rules,
+            roles: user.roles,
             created_at: user.created_at,
             updated_at: user.updated_at,
         }

@@ -106,7 +106,7 @@ impl RoleRepository for MySqlRoleAggregateRepository {
             )
             .one(self.pool.as_ref())
             .await?
-            .ok_or(anyhow::anyhow!("role not found"))?
+            .ok_or(anyhow::anyhow!(format!("找不到角色: {}", id)))?
             .into();
 
         model.permissions = self.get_permissions_by_role_id(&model.id).await?;

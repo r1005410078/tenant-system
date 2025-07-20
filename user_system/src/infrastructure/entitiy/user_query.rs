@@ -10,7 +10,7 @@ pub struct Model {
     pub username: String,
     pub email: Option<String>,
     pub phone: Option<String>,
-    pub rules: Option<Json>,
+    pub roles: Option<Json>,
     pub created_at: Option<DateTimeUtc>,
     pub updated_at: Option<DateTimeUtc>,
 }

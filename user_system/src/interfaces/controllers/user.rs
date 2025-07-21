@@ -1,4 +1,6 @@
-use actix_web::{post, web, HttpResponse};
+use actix_web::{post, web, HttpMessage, HttpRequest, HttpResponse};
+use serde::{Deserialize, Serialize};
+use user_system::shared::claims::Claims;
 
 use crate::{
     application::{
@@ -48,6 +50,44 @@ async fn update_user(
     update_user_service: web::Data<UpdateUserService>,
 ) -> HttpResponse {
     let res = match update_user_service.execute(user.into_inner()).await {
+        Ok(data) => ResponseBody::success(data.id),
+        Err(err) => ResponseBody::error(err.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct UpdateProfile {
+    pub username: Option<String>,
+    pub email: Option<String>,
+    pub phone: Option<String>,
+    pub password: Option<String>,
+}
+
+// 更新个人信息
+#[post("/update")]
+async fn update_profile(
+    user: web::Json<UpdateProfile>,
+    update_user_service: web::Data<UpdateUserService>,
+    req: HttpRequest,
+) -> HttpResponse {
+    let extensions = req.extensions();
+    let id = extensions.get::<Claims>().map(|c| c.user_id.clone());
+    if id.is_none() {
+        return HttpResponse::Unauthorized().json("Unauthorized".to_string());
+    }
+
+    let user_command = UpdateUserCommand {
+        id: id.unwrap(),
+        username: user.username.clone(),
+        email: user.email.clone(),
+        phone: user.phone.clone(),
+        password: user.password.clone(),
+        roles: None,
+    };
+
+    let res = match update_user_service.execute(user_command).await {
         Ok(data) => ResponseBody::success(data.id),
         Err(err) => ResponseBody::error(err.to_string()),
     };

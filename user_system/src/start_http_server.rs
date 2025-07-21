@@ -31,7 +31,7 @@ use crate::{
             create_role, delete_role, detail_role, list_role, permissions_details_list,
             save_permission_detail, update_role,
         },
-        user::{delete_user, login, register, update_user},
+        user::{delete_user, login, register, update_profile, update_user},
         user_query::{get_login_history, get_user, get_user_list},
     },
 };
@@ -146,6 +146,11 @@ pub async fn run() -> std::io::Result<()> {
                     .service(list_role)
                     .service(permissions_details_list)
                     .service(save_permission_detail),
+            )
+            .service(
+                web::scope("/api/user_system/user_profile")
+                    .wrap(auth_middleware.clone())
+                    .service(update_profile),
             )
             .service(web::scope("/api/user_system").service(login))
     })

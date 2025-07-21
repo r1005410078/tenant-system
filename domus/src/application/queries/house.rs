@@ -7,18 +7,17 @@ use crate::{
         entitiy::{community_query, house_query, owner_query},
     },
 };
-use argon2::password_hash::rand_core::le;
 use chrono::Utc;
 use sea_orm::{
     prelude::DateTimeUtc,
     ActiveModelTrait,
     ActiveValue::{NotSet, Set},
-    Condition, DbConn, EntityTrait, JoinType, PaginatorTrait, QueryFilter, QuerySelect,
+    Condition, DbConn, EntityTrait, JoinType, PaginatorTrait, QueryFilter, QueryOrder, QuerySelect,
 };
 use sea_orm::{ColumnTrait, RelationTrait};
 use serde::Deserialize;
 use serde::Serialize;
-use shared_dto::table_data::{TableDataRequest, TableDataResponse};
+use shared_dto::table_data::TableDataResponse;
 
 pub struct HouseQueryService {
     pool: Arc<DbConn>,
@@ -342,11 +341,14 @@ impl HouseQueryService {
             }
         }
 
-        if let Some(update_at) = params.update_at {
-            condition = condition.add(community_query::Column::UpdatedAt.gt(update_at));
+        if let Some(updated_at) = params.updated_at {
+            condition = condition.add(house_query::Column::UpdatedAt.gt(updated_at));
         }
 
-        condition = condition.add(house_query::Column::DeletedAt.is_null());
+        // 不排除已删除
+        if !params.not_exclude_deleted.unwrap_or(false) {
+            condition = condition.add(house_query::Column::DeletedAt.is_null());
+        }
 
         // 分页逻辑
         let page = params.page.max(1);
@@ -358,6 +360,7 @@ impl HouseQueryService {
             )
             .join(JoinType::LeftJoin, house_query::Relation::OwnerQuery.def())
             .filter(condition.clone())
+            .order_by_desc(house_query::Column::UpdatedAt)
             .select_also(community_query::Entity)
             .select_also(owner_query::Entity)
             .paginate(self.pool.as_ref(), page_size as u64);
@@ -449,7 +452,7 @@ pub struct HouseRequest {
     pub page: u64,
     pub page_size: u64,
     pub amap_bounds: Option<AmapBounds>,
-    pub update_at: Option<DateTimeUtc>,
+    pub updated_at: Option<DateTimeUtc>,
     pub transaction_type: Option<String>,
     pub purpose: Option<String>,
     pub house_orientation: Option<String>,
@@ -460,6 +463,8 @@ pub struct HouseRequest {
     pub area: Option<String>,
     // "low", "middle", "high"
     pub floor: Option<String>,
+    // 不排除已删除的
+    pub not_exclude_deleted: Option<bool>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]

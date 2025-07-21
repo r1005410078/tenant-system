@@ -8,6 +8,7 @@ use crate::{
     },
 };
 use argon2::password_hash::rand_core::le;
+use chrono::Utc;
 use sea_orm::{
     prelude::DateTimeUtc,
     ActiveModelTrait,
@@ -172,10 +173,12 @@ impl HouseQueryService {
     pub async fn delete(&self, house_id: &str) -> anyhow::Result<()> {
         let model = house_query::ActiveModel {
             id: Set(house_id.to_string()),
+            deleted_at: Set(Some(Utc::now())),
             ..Default::default()
         };
 
-        model.delete(self.pool.as_ref()).await?;
+        // 假删除
+        model.update(self.pool.as_ref()).await?;
         Ok(())
     }
 
@@ -342,6 +345,8 @@ impl HouseQueryService {
         if let Some(update_at) = params.update_at {
             condition = condition.add(community_query::Column::UpdatedAt.gt(update_at));
         }
+
+        condition = condition.add(house_query::Column::DeletedAt.is_null());
 
         // 分页逻辑
         let page = params.page.max(1);

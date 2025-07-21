@@ -83,6 +83,12 @@ where
             // 2. 保存 Claims 到请求中
             req.extensions_mut().insert(claims.clone());
 
+            // 开始验证权限
+            // 如果是个人信息,直接放行
+            if req.path().contains("/api/user_system/user_profile") {
+                return srv.call(req).await;
+            }
+
             // 3. 构造 Casbin 的三元组 (sub, obj, act)
             // 角色名称
             let subs = claims.rules;

@@ -1,5 +1,4 @@
-use actix_web::{get, post, web, HttpRequest, HttpResponse};
-use shared_dto::table_data::TableDataRequest;
+use actix_web::{post, web, HttpRequest, HttpResponse};
 
 use crate::{
     application::{

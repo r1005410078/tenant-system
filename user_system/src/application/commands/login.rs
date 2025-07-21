@@ -96,7 +96,7 @@ impl LoginCommandHandler {
             // 保存会话 TODO
             Ok(LoginInfomation::new(claims.get_token(), user))
         } else {
-            Err(anyhow::anyhow!("密码错误!"))
+            Err(anyhow::anyhow!("用户名或密码错误!"))
         }
     }
 }

@@ -49,10 +49,13 @@ pub async fn update_comment(
     house_comment_service: web::Data<HouseCommentService>,
 ) -> HttpResponse {
     let extensions = req.extensions();
-    let admin = extensions
-        .get::<Claims>()
-        .map(|c| c.username.clone())
-        .unwrap_or("test".to_string());
+    let admin = extensions.get::<Claims>().map(|c| c.username.clone());
+
+    if admin.is_none() {
+        return HttpResponse::Unauthorized().finish();
+    }
+
+    let admin = admin.unwrap();
 
     let res = match house_comment_service
         .update_comment(&admin, &body.comment_id, &body.comment)
@@ -72,11 +75,13 @@ pub async fn delete_comment(
     house_comment_service: web::Data<HouseCommentService>,
 ) -> HttpResponse {
     let extensions = req.extensions();
-    let admin = extensions
-        .get::<Claims>()
-        .map(|c| c.username.clone())
-        .unwrap_or("test".to_string());
+    let admin = extensions.get::<Claims>().map(|c| c.username.clone());
 
+    if admin.is_none() {
+        return HttpResponse::Unauthorized().finish();
+    }
+
+    let admin = admin.unwrap();
     let comment_id = comment_id.into_inner();
     let res = match house_comment_service
         .delete_comment(&admin, &comment_id)

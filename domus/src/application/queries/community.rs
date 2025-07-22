@@ -7,7 +7,7 @@ use sea_orm::{
     ColumnTrait, Condition, DbConn, EntityTrait, PaginatorTrait, QueryFilter,
 };
 use serde::{Deserialize, Serialize};
-use shared_dto::table_data::{TableDataRequest, TableDataResponse};
+use shared_dto::table_data::TableDataResponse;
 
 use crate::{
     domain::community::value_objects::commuity::Community, infrastructure::entitiy::community_query,

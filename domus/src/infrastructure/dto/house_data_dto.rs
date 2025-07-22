@@ -25,6 +25,7 @@ impl HouseDataDto {
     ) -> Self {
         let house = House {
             id: Some(house.id),
+            created_by: house.created_by,
             community_id: Some(house.community_id),
             owner_id: house.owner_id,
             // 房源标题

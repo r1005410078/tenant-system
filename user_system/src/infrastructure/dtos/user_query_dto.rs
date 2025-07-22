@@ -2,7 +2,7 @@ use sea_orm::prelude::DateTimeUtc;
 use serde::{Deserialize, Serialize};
 use serde_json::Value as Json;
 
-use crate::{domain::user::aggregates::user::UserAggregate, infrastructure::entitiy::user_query};
+use crate::infrastructure::entitiy::user_query;
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct UserQueryDto {

@@ -133,7 +133,6 @@ pub async fn run() -> std::io::Result<()> {
                     .service(update_user)
                     .service(get_login_history)
                     .service(get_user_list)
-                    .service(get_user)
                     .service(register),
             )
             .service(
@@ -150,7 +149,8 @@ pub async fn run() -> std::io::Result<()> {
             .service(
                 web::scope("/api/user_system/user_profile")
                     .wrap(auth_middleware.clone())
-                    .service(update_profile),
+                    .service(update_profile)
+                    .service(get_user),
             )
             .service(web::scope("/api/user_system").service(login))
     })

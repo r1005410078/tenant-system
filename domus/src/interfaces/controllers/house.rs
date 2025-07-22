@@ -1,6 +1,7 @@
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use shared_dto::table_data::TableDataRequest;
+use user_system::shared::claims::Claims;
 
 use crate::{
     application::{
@@ -18,9 +19,20 @@ use crate::{
 pub async fn save_house(
     body: web::Json<HouseData>,
     save_house_service: web::Data<SaveHouseService>,
+    req: HttpRequest,
 ) -> HttpResponse {
-    println!("body: {:#?}", body);
-    let res = match save_house_service.execute(body.into_inner()).await {
+    let extensions = req.extensions();
+    let user = extensions.get::<Claims>();
+
+    if user.is_none() {
+        return HttpResponse::Forbidden().finish();
+    }
+
+    let user = user.unwrap();
+    let mut house_command = body.into_inner();
+    house_command.update_created_by(user.user_id.clone());
+
+    let res = match save_house_service.execute(house_command).await {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };

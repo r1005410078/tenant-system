@@ -16,9 +16,18 @@ pub struct HouseData {
     pub owner: Option<HouseOwner>,
 }
 
+impl HouseData {
+    pub fn update_created_by(&mut self, created_by: String) {
+        if let Some(house) = &mut self.house {
+            house.created_by = Some(created_by);
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct House {
     pub id: Option<String>,
+    pub created_by: Option<String>,
     pub community_id: Option<String>,
     pub owner_id: Option<String>,
     // 房源标题

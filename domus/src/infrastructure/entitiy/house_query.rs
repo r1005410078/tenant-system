@@ -84,6 +84,7 @@ pub struct Model {
     #[sea_orm(column_type = "Text", nullable)]
     pub remark: Option<String>,
     pub images: Option<Json>,
+    pub created_by: Option<String>,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
 }

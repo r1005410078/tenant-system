@@ -111,6 +111,7 @@ CREATE TABLE `house_query` (
   `remark` TEXT DEFAULT NULL COMMENT '备注',
   `images` JSON DEFAULT NULL COMMENT '图片列表',
   -- 创建时间
+  `created_by` varchar(36) comment '录入者',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='房源表';

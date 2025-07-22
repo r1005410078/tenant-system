@@ -27,7 +27,18 @@ impl SaveOwnerCommandHandler {
     }
 
     pub async fn handle(&self, command: SaveOwnerCommand) -> anyhow::Result<String> {
-        let owner = command.into_inner();
+        let mut owner = command.into_inner();
+
+        if owner.id.is_none() {
+            if let Some(ref phone) = owner.phone {
+                owner.id = self
+                    .owner_repository
+                    .find_by_phone(phone)
+                    .await?
+                    .map(|o| o.owner_id);
+            }
+        }
+
         let owner_id = owner.id.clone();
 
         match owner_id {
@@ -46,15 +57,15 @@ impl SaveOwnerCommandHandler {
                 }
 
                 // 手机号是否存在 TODO 后续优化 房源所有者应该有自己的房子
-                // if let Some(phone) = &owner.phone {
-                //     if self
-                //         .owner_repository
-                //         .exists_phone(phone, Some(aggregate.owner_id.clone()))
-                //         .await?
-                //     {
-                //         return Err(anyhow::anyhow!("手机号已存在"));
-                //     }
-                // }
+                if let Some(phone) = &owner.phone {
+                    if self
+                        .owner_repository
+                        .exists_phone(phone, Some(aggregate.owner_id.clone()))
+                        .await?
+                    {
+                        return Err(anyhow::anyhow!("手机号已经绑定其他用户"));
+                    }
+                }
 
                 let event = aggregate.update(&owner)?;
 
@@ -69,15 +80,6 @@ impl SaveOwnerCommandHandler {
                     if self.owner_repository.exists_id_card(id_card, None).await? {
                         return Err(anyhow::anyhow!("身份证号已存在"));
                     }
-                }
-
-                // 手机号是否存在
-                if self
-                    .owner_repository
-                    .exists_phone(owner.phone.as_ref().unwrap(), None)
-                    .await?
-                {
-                    return Err(anyhow::anyhow!("手机号已存在"));
                 }
 
                 let (aggregate, event) = OwnerAggregate::create(owner)?;

@@ -1,6 +1,5 @@
 use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
-use shared_dto::table_data::TableDataRequest;
 use user_system::shared::claims::Claims;
 
 use crate::{

@@ -73,8 +73,6 @@ impl LoginCommandHandler {
             .find_by_username(command.username.as_str())
             .await?;
 
-        println!("user: {:#?}", user);
-
         let login_event = user.login(command.username.as_str(), command.password.as_str());
 
         // 保存用户聚合

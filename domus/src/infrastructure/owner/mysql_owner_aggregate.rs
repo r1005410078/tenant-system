@@ -71,6 +71,27 @@ impl OwnerRepositoryAggregate for MySqlOwnerAggregateRepository {
         })
     }
 
+    // 根据手机号查找业主
+    async fn find_by_phone(&self, phone: &str) -> anyhow::Result<Option<OwnerAggregate>> {
+        let model = entitiy::owner::Entity::find()
+            .filter(
+                Condition::all()
+                    .add(entitiy::owner::Column::Phone.eq(phone))
+                    .add(entitiy::owner::Column::DeletedAt.is_null()),
+            )
+            .one(self.pool.as_ref())
+            .await?
+            .map(|m| OwnerAggregate {
+                owner_id: m.owner_id,
+                name: m.name,
+                phone: m.phone,
+                id_card: m.id_card,
+                deleted_at: m.deleted_at,
+            });
+
+        Ok(model)
+    }
+
     // 是否存在
     async fn exists_phone(&self, phone: &str, self_id: Option<String>) -> anyhow::Result<bool> {
         let mut condition = Condition::all()
@@ -86,8 +107,6 @@ impl OwnerRepositoryAggregate for MySqlOwnerAggregateRepository {
             .filter(condition.clone())
             .all(self.pool.as_ref())
             .await?;
-
-        println!("m: {:?}", m);
 
         let count = entitiy::owner::Entity::find()
             .filter(condition)

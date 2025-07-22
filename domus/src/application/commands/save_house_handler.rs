@@ -37,7 +37,7 @@ impl SaveHouseCommandHandler {
                 .exists_address(community_id, door_number, id.clone())
                 .await?
             {
-                return Err(anyhow::anyhow!("地址已存在"));
+                return Err(anyhow::anyhow!("地址已存在, 您可以更新它"));
             }
         }
 

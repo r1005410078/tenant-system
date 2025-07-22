@@ -91,6 +91,7 @@ impl HouseQueryService {
             external_sync: Set(event.external_sync),
             remark: Set(event.remark),
             images: Set(Some(serde_json::to_value(event.images).unwrap())),
+            created_by: Set(event.created_by),
             ..Default::default()
         };
 

@@ -130,6 +130,8 @@ pub struct House {
     pub images: Option<Vec<FileInfo>>,
     // 更新时间
     pub updated_at: Option<DateTimeUtc>,
+    // 删除时间
+    pub deleted_at: Option<DateTimeUtc>,
 }
 
 impl House {

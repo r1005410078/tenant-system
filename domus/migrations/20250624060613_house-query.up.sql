@@ -110,6 +110,7 @@ CREATE TABLE `house_query` (
   `external_sync` VARCHAR(100) DEFAULT NULL COMMENT '是否同步外网',
   `remark` TEXT DEFAULT NULL COMMENT '备注',
   `images` JSON DEFAULT NULL COMMENT '图片列表',
+  `delete_at` TIMESTAMP DEFAULT NULL COMMENT '删除时间',
   -- 创建时间
   `created_by` varchar(36) comment '录入者',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

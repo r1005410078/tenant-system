@@ -1,17 +1,18 @@
 use sea_orm::FromQueryResult;
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
 use crate::{
     domain::house::value_objects::house::{ApartmentType, DoorNumber, FloorRange, House, Stairs},
     infrastructure::entitiy::{self},
 };
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HouseDataDto {
     // 房源
     #[serde(flatten)]
     pub house: House,
-    // 小区
     pub community: Option<entitiy::community_query::Model>,
     // 所有者
     pub owner: Option<entitiy::owner_query::Model>,

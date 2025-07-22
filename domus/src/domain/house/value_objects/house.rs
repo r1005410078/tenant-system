@@ -1,10 +1,12 @@
 use sea_orm::prelude::DateTimeUtc;
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
 use crate::domain::{
     community::value_objects::commuity::Community, owner::value_objects::owner::HouseOwner,
 };
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct HouseData {
     // 房源
@@ -24,6 +26,7 @@ impl HouseData {
     }
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct House {
     pub id: Option<String>,
@@ -151,6 +154,7 @@ impl House {
     }
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Stairs {
     // 梯
@@ -159,6 +163,7 @@ pub struct Stairs {
     pub rooms: Option<String>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct DoorNumber {
     // 座栋
@@ -208,6 +213,7 @@ impl DoorNumber {
     }
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FloorRange {
     // 最小楼层
@@ -216,6 +222,7 @@ pub struct FloorRange {
     pub door_number_to: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ApartmentType {
     // 室
@@ -232,6 +239,7 @@ pub struct ApartmentType {
     pub balcony: Option<i32>,
 }
 
+#[skip_serializing_none]
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FileInfo {
     // 名称

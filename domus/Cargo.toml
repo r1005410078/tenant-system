@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+serde_with = { workspace = true }
 casbin = { workspace = true }
 chrono= { workspace = true }
 uuid = { workspace = true }

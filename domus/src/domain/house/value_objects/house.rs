@@ -96,7 +96,7 @@ pub struct House {
     // 建筑结构
     pub building_structure: Option<String>,
     // 建筑年代
-    pub building_year: Option<i32>,
+    pub building_year: Option<String>,
     // 产权性质
     pub property_rights: Option<String>,
     // 产权年限

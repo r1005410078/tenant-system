@@ -76,7 +76,7 @@ CREATE TABLE `house_query` (
   `house_type` VARCHAR(50) DEFAULT NULL COMMENT '房屋类型',
   `house_orientation` VARCHAR(50) DEFAULT NULL COMMENT '朝向',
   `building_structure` VARCHAR(100) DEFAULT NULL COMMENT '建筑结构',
-  `building_year` INT DEFAULT NULL COMMENT '建筑年代',
+  `building_year` VARCHAR(100) DEFAULT NULL COMMENT '建筑年代',
   `property_rights` VARCHAR(100) DEFAULT NULL COMMENT '产权性质',
   `property_year_limit` VARCHAR(50) DEFAULT NULL COMMENT '产权年限',
   `certificate_date` VARCHAR(50) DEFAULT NULL COMMENT '产证日期',

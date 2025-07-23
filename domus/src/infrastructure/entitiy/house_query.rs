@@ -48,7 +48,7 @@ pub struct Model {
     pub house_type: Option<String>,
     pub house_orientation: Option<String>,
     pub building_structure: Option<String>,
-    pub building_year: Option<i32>,
+    pub building_year: Option<String>,
     pub property_rights: Option<String>,
     pub property_year_limit: Option<String>,
     pub certificate_date: Option<String>,

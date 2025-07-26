@@ -43,8 +43,8 @@ pub struct House {
     pub house_status: Option<String>,
     // 楼层
     pub floor_range: Option<FloorRange>,
-    // 门牌号
-    pub door_number: Option<DoorNumber>,
+    // 地址(楼号/单元号/门牌号)
+    pub house_address: Option<String>,
     // 户型
     pub apartment_type: Option<ApartmentType>,
     // 建筑面积
@@ -150,6 +150,10 @@ impl House {
         if self.house_status.is_none() {
             return Err(anyhow::anyhow!("房源状态不能为空"));
         }
+
+        if self.house_address.is_none() {
+            return Err(anyhow::anyhow!("房源地址不能为空"));
+        }
         Ok(())
     }
 }
@@ -161,56 +165,6 @@ pub struct Stairs {
     pub stairs: Option<String>,
     // 户
     pub rooms: Option<String>,
-}
-
-#[skip_serializing_none]
-#[derive(Debug, Clone, Deserialize, Serialize)]
-pub struct DoorNumber {
-    // 座栋
-    pub building_number: Option<i32>,
-    // 单元
-    pub unit_number: Option<i32>,
-    // 门牌
-    pub door_number: Option<i32>,
-    // 楼层
-    pub floor: Option<i32>,
-}
-
-impl DoorNumber {
-    pub fn to_string(&self) -> String {
-        let mut addr = String::new();
-
-        if let Some(building_number) = self.building_number {
-            addr.push_str(&building_number.to_string());
-            addr.push_str("幢");
-        }
-
-        if let Some(unit_number) = self.unit_number {
-            if !addr.is_empty() {
-                addr.push_str("-");
-            }
-            addr.push_str(&unit_number.to_string());
-            addr.push_str("单元");
-        }
-
-        if let Some(door_number) = self.door_number {
-            if !addr.is_empty() {
-                addr.push_str("-");
-            }
-            addr.push_str(&door_number.to_string());
-            addr.push_str("室");
-        }
-
-        if let Some(floor) = self.floor {
-            if !addr.is_empty() {
-                addr.push_str("-");
-            }
-            addr.push_str(&floor.to_string());
-            addr.push_str("层");
-        }
-
-        addr
-    }
 }
 
 #[skip_serializing_none]
@@ -285,11 +239,7 @@ mod tests {
             "sale_price": 12,
             "sale_low_price": 11,
             "down_payment": 2,
-            "door_number": {
-                "building_number": 1,
-                "unit_number": 1,
-                "door_number": 1
-            },
+            "house_address": "10栋101室",
             "apartment_type": {
                 "room": 1,
                 "bathroom": 1,

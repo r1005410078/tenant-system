@@ -2,7 +2,9 @@
 
 use sea_orm::entity::prelude::*;
 use serde::{Deserialize, Serialize};
+use serde_with::skip_serializing_none;
 
+#[skip_serializing_none]
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Deserialize, Serialize)]
 #[sea_orm(table_name = "community_query")]
 pub struct Model {
@@ -22,6 +24,8 @@ pub struct Model {
     pub typecode: String,
     pub district: Option<String>,
     pub adcode: Option<String>,
+    pub property_management_company: Option<String>,
+    pub remark: Option<String>,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
 }

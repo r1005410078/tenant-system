@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_with::skip_serializing_none;
 
 use crate::{
-    domain::house::value_objects::house::{ApartmentType, DoorNumber, FloorRange, House, Stairs},
+    domain::house::value_objects::house::{ApartmentType, FloorRange, House, Stairs},
     infrastructure::entitiy::{self},
 };
 
@@ -43,12 +43,7 @@ impl HouseDataDto {
                 door_number_to: house.door_number_to,
             }),
             // 门牌号
-            door_number: Some(DoorNumber {
-                building_number: house.building_number,
-                unit_number: house.unit_number,
-                door_number: house.door_number,
-                floor: house.current_floor,
-            }),
+            house_address: Some(house.house_address),
             // 户型
             apartment_type: Some(ApartmentType {
                 // 室

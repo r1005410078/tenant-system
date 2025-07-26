@@ -12,7 +12,7 @@ pub trait HouseRepositoryAggregate: Send + Sync {
     async fn exists_address(
         &self,
         community_id: &str,
-        door_number: Option<String>,
+        house_address: &str,
         self_id: Option<String>,
     ) -> anyhow::Result<bool>;
 }

@@ -29,12 +29,12 @@ impl SaveHouseCommandHandler {
         let house = command.into_inner();
         let id = house.id.clone();
 
-        let door_number = house.door_number.as_ref().map(|d| d.to_string());
-
-        if let Some(ref community_id) = house.community_id {
+        if let (Some(ref community_id), Some(ref house_address)) =
+            (house.community_id.clone(), house.house_address.clone())
+        {
             if self
                 .house_repository
-                .exists_address(community_id, door_number, id.clone())
+                .exists_address(community_id, house_address, id.clone())
                 .await?
             {
                 return Err(anyhow::anyhow!("地址已存在, 您可以更新它"));

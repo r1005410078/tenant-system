@@ -12,7 +12,9 @@ CREATE TABLE `community_query` (
   `lng` DOUBLE DEFAULT NULL COMMENT '经度',
   `typecode` VARCHAR(100) NOT NULL COMMENT '小区类型编码',
   `district` VARCHAR(100) DEFAULT NULL COMMENT '区',
-  `adcode` VARCHAR(100) DEFAULT NULL COMMENT '区域编码',  
+  `adcode` VARCHAR(100) DEFAULT NULL COMMENT '区域编码',
+  `property_management_company` VARCHAR(100) DEFAULT NULL COMMENT '物业管理公司',  
+  `remark` VARCHAR(100) DEFAULT NULL COMMENT 'remark',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`)
@@ -45,10 +47,8 @@ CREATE TABLE `house_query` (
   `door_number_from` INT DEFAULT NULL COMMENT '起始楼层',
   `door_number_to` INT DEFAULT NULL COMMENT '结束楼层',
 
-  -- 门牌号结构
-  `building_number` INT DEFAULT NULL COMMENT '栋',
-  `unit_number` INT DEFAULT NULL COMMENT '单元',
-  `door_number` INT DEFAULT NULL COMMENT '门牌号',
+  -- 地址(门牌号结构)
+  `house_address` VARCHAR(200) NOT NULL COMMENT '用途',
   `current_floor` INT DEFAULT NULL COMMENT '当前楼层',
 
   -- 户型结构
@@ -110,7 +110,7 @@ CREATE TABLE `house_query` (
   `external_sync` VARCHAR(100) DEFAULT NULL COMMENT '是否同步外网',
   `remark` TEXT DEFAULT NULL COMMENT '备注',
   `images` JSON DEFAULT NULL COMMENT '图片列表',
-  `delete_at` TIMESTAMP DEFAULT NULL COMMENT '删除时间',
+  `deleted_at` TIMESTAMP DEFAULT NULL COMMENT '删除时间',
   -- 创建时间
   `created_by` varchar(36) comment '录入者',
   `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',

@@ -24,11 +24,7 @@ Content-Type: application/json
         "adcode": "340811",
         "typecode": "120302"
     },
-    "door_number": {
-        "building_number": 1,
-        "unit_number": 1,
-        "door_number": 2
-    },
+    "house_address": "10栋101室",
     "apartment_type": {
         "room": 3,
         "hall": 1,
@@ -71,11 +67,7 @@ Content-Type: application/json
     "sale_price": 12,
     "sale_low_price": 11,
     "down_payment": 2,
-    "door_number": {
-        "building_number": 1,
-        "unit_number": 1,
-        "door_number": 1
-    },
+    "house_address":  "10栋101室",
     "apartment_type": {
         "room": 1,
         "bathroom": 1,

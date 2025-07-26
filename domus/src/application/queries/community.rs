@@ -47,6 +47,9 @@ impl CommunityQueryService {
             // 位置
             lat: Set(event.lat.unwrap()),
             lng: Set(event.lng.unwrap()),
+            // 物业公司
+            property_management_company: Set(event.property_management_company),
+            remark: Set(event.remark),
             ..Default::default()
         };
 
@@ -74,6 +77,10 @@ impl CommunityQueryService {
             // 位置
             lat: event.lat.map_or(NotSet, Set),
             lng: event.lng.map_or(NotSet, Set),
+            // 物业公司
+            property_management_company: Set(event.property_management_company),
+            // 备注
+            remark: Set(event.remark),
             ..Default::default()
         };
 

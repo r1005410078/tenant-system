@@ -24,6 +24,10 @@ pub struct Community {
     pub district: Option<String>,
     // 所属行政区划代码（如“110105”，代表朝阳区）
     pub adcode: Option<String>,
+    // 物业
+    pub property_management_company: Option<String>,
+    // 备注
+    pub remark: Option<String>,
     // 位置
     pub lat: Option<f64>,
     pub lng: Option<f64>,

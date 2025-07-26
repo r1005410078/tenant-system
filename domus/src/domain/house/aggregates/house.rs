@@ -13,7 +13,7 @@ pub struct HouseAggregate {
     // 小区id
     pub community_id: String,
     // 门牌号
-    pub door_number: Option<String>,
+    pub house_address: String,
     // 上架时间
     pub publish_at: Option<DateTimeUtc>,
     // 下架时间
@@ -23,11 +23,11 @@ pub struct HouseAggregate {
 }
 
 impl HouseAggregate {
-    pub fn new(house_id: String, community_id: String, door_number: Option<String>) -> Self {
+    pub fn new(house_id: String, community_id: String, house_address: String) -> Self {
         Self {
             house_id,
             community_id,
-            door_number,
+            house_address,
             deleted_at: None,
             unpublish_at: None,
             publish_at: Some(chrono::Utc::now()),
@@ -45,7 +45,7 @@ impl HouseAggregate {
             HouseAggregate::new(
                 house_id.clone(),
                 house.community_id.clone().unwrap(),
-                house.door_number.as_ref().map(|d| d.to_string()),
+                house.house_address.clone().unwrap(),
             ),
             HouseEvent::Created(house.clone()),
         ))

@@ -215,37 +215,58 @@ mod tests {
     #[test]
     fn test_validate() {
         let json = json!({
-            "owner": {
-                "name": "taosheng rong:本人",
-                "description": "",
-                "phone": "18626891229:本人"
-            },
-            "community": {
-                "id": "B0FFGA9AAU",
-                "name": "东安花园",
-                "address": "华中路与港华路交叉口东北100米",
-                "year_built": "2025-07-10T09:20:15.123Z",
-                "description": "A place for new ideas",
-                "images": ["https://example.com/image1.jpg", "https://example.com/image2.jpg"],
-                "typecode": "residential",
-                "district": "Manhattan",
-                "adcode": "10001",
-                "lat": 40.7128,
-                "lng": -74.006
-            },
+            "title": "皖江华府",
             "purpose": "住宅",
-            "transaction_type": "出售",
-            "house_status": "有效",
-            "sale_price": 12,
-            "sale_low_price": 11,
-            "down_payment": 2,
-            "house_address": "10栋101室",
+            "transaction_type": "出租",
+            "house_status": "在售",
+            "floor_range": {
+                "door_number_from": 1,
+                "door_number_to": 18
+            },
+            "house_address": "11栋104室",
             "apartment_type": {
-                "room": 1,
+                "room": 3,
+                "hall": 2,
                 "bathroom": 1,
                 "kitchen": 1,
-                "balcony": 1
-            }
+                "terrace": 1
+            },
+            "building_area": 143,
+            "house_decoration": "精装修",
+            "rent_price": 1600,
+            "house_type": "住宅",
+            "house_orientation": "南",
+            "tags": [
+                ""
+            ],
+            "stairs": {
+                "stairs": "1",
+                "rooms": "2"
+            },
+            "owner": {
+                "name": "房主",
+                "phone": "13966605120"
+            },
+            "community": {
+                "id": "B0K6R7BRSS",
+                "name": "皖江华府",
+                "address": "规划二路与天柱山西路交叉口南220米",
+                "city": "安庆",
+                "images": [],
+                "typecode": "120302",
+                "lat": 30.545776,
+                "lng": 117.041958,
+                "district": "安徽省安庆市宜秀区",
+                "adcode": "340811",
+                "updated_at": "2025-07-26T05:56:10Z",
+                "property_management_company": "",
+                "remark": "皖江华府"
+            },
+            "source": "上门",
+            "unique_housing": "否",
+            "external_sync": "否",
+            "remark": "爱人电话13866629271杜女士",
+            "images": []
         });
         let data: HouseData = serde_json::from_value(json).unwrap();
 

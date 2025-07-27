@@ -29,11 +29,10 @@ impl SaveHouseService {
 
     pub async fn execute(&self, house_data: HouseData) -> anyhow::Result<()> {
         if house_data.house.is_none() {
-            return Ok(());
+            return Err(anyhow::anyhow!("参数不完整"));
         }
 
         let mut house = house_data.house.unwrap();
-
         // 1.保存小区
         if let Some(community) = house_data.community {
             let community_id = self.save_community_service.execute(community).await?;

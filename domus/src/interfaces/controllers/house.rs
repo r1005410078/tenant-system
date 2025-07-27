@@ -23,6 +23,7 @@ pub async fn save_house(
     let extensions = req.extensions();
     let user = extensions.get::<Claims>();
 
+    println!("11111");
     if user.is_none() {
         return HttpResponse::Forbidden().finish();
     }
@@ -65,9 +66,15 @@ pub async fn list_houses(
     HttpResponse::Ok().json(res)
 }
 
-#[get("/group_by_community")]
-pub async fn group_by_community(house_query_service: web::Data<HouseQueryService>) -> HttpResponse {
-    let res = match house_query_service.group_by_community().await {
+#[post("/group_by_community")]
+pub async fn group_by_community(
+    house_query_service: web::Data<HouseQueryService>,
+    query: web::Json<HouseRequest>,
+) -> HttpResponse {
+    let res = match house_query_service
+        .group_by_community(query.into_inner())
+        .await
+    {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };

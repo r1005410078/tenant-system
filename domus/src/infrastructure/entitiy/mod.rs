@@ -4,8 +4,10 @@ pub mod prelude;
 
 pub mod community_aggregate;
 pub mod community_query;
+pub mod favorite_categories;
 pub mod house_aggregate;
 pub mod house_comments;
 pub mod house_query;
 pub mod owner;
 pub mod owner_query;
+pub mod user_favorites;

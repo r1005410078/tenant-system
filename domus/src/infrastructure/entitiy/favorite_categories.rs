@@ -10,6 +10,7 @@ pub struct Model {
     pub id: i64,
     pub user_id: String,
     pub name: String,
+    pub color: String,
     pub created_at: Option<DateTime>,
 }
 

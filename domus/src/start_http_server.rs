@@ -23,9 +23,10 @@ use crate::{
         },
         services::{
             delete_community::DeleteCommunityService, delete_house::DeleteHouseService,
-            delete_owner::DeleteOwnerService, file_upload_service::FileUploadService,
-            house_comment::HouseCommentService, save_community::SaveCommunityService,
-            save_house::SaveHouseService, save_owner::SaveOwnerService,
+            delete_owner::DeleteOwnerService, favorite::FavoriteService,
+            file_upload_service::FileUploadService, house_comment::HouseCommentService,
+            save_community::SaveCommunityService, save_house::SaveHouseService,
+            save_owner::SaveOwnerService,
         },
     },
     infrastructure::{
@@ -35,6 +36,11 @@ use crate::{
     },
     interfaces::controllers::{
         community::{delete_community, list_community, save_community},
+        favorites::{
+            add_favorite_categories, add_user_favorites, delete_favorite_categories,
+            delete_user_favorites, find_favorite_categories, find_user_favorite,
+            update_favorite_categories,
+        },
         house::{
             apply_upload_url, delete_house, get_house_detail, group_by_community, list_houses,
             save_house,
@@ -67,6 +73,8 @@ pub async fn execute() -> std::io::Result<()> {
         .await
         .unwrap(),
     );
+
+    let favorite_service = web::Data::new(FavoriteService::new(pool.clone()));
 
     // 房源评论
     let hosue_comment_service = web::Data::new(HouseCommentService::new(pool.clone()));
@@ -164,6 +172,7 @@ pub async fn execute() -> std::io::Result<()> {
             .app_data(house_query_service.clone())
             .app_data(file_upload_service.clone())
             .app_data(hosue_comment_service.clone())
+            .app_data(favorite_service.clone())
             .service(
                 web::scope("/api/domus/management")
                     .service(
@@ -186,7 +195,12 @@ pub async fn execute() -> std::io::Result<()> {
                             .service(apply_upload_url)
                             .service(add_comment)
                             .service(update_comment)
-                            .service(delete_comment),
+                            .service(delete_comment)
+                            .service(add_favorite_categories)
+                            .service(update_favorite_categories)
+                            .service(delete_favorite_categories)
+                            .service(add_user_favorites)
+                            .service(delete_user_favorites),
                     ),
             )
             .service(
@@ -199,7 +213,9 @@ pub async fn execute() -> std::io::Result<()> {
                             .service(list_houses)
                             .service(get_house_detail)
                             .service(group_by_community)
-                            .service(get_comments),
+                            .service(get_comments)
+                            .service(find_favorite_categories)
+                            .service(find_user_favorite),
                     ),
             )
             .service(web::scope("/api/domus/house_comment").wrap(auth_middleware.clone()))

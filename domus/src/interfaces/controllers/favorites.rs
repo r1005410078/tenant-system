@@ -32,6 +32,30 @@ async fn add_favorite_categories(
     HttpResponse::Ok().json(res)
 }
 
+#[post("/favorite_categories/update")]
+async fn update_favorite_categories(
+    data: web::Json<FavoriteCategories>,
+    service: web::Data<FavoriteService>,
+    req: HttpRequest,
+) -> HttpResponse {
+    let extensions = req.extensions();
+    let user_id = extensions.get::<Claims>().map(|c| c.user_id.clone());
+
+    if user_id.is_none() || data.id.is_none() {
+        return HttpResponse::Unauthorized().finish();
+    }
+
+    let mut data = data.into_inner();
+    data.user_id = Some(user_id.unwrap());
+
+    let res = match service.update_favorite_categories(data).await {
+        Ok(data) => ResponseBody::success(data),
+        Err(e) => ResponseBody::error(e.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
 #[post("/favorite_categories/delete/{id}")]
 async fn delete_favorite_categories(
     id: web::Path<i64>,
@@ -45,8 +69,8 @@ async fn delete_favorite_categories(
     HttpResponse::Ok().json(res)
 }
 
-#[get("/user_favorites/list")]
-async fn list_user_favorites(
+#[get("/favorite_categories/list")]
+async fn find_favorite_categories(
     service: web::Data<FavoriteService>,
     req: HttpRequest,
 ) -> HttpResponse {
@@ -57,7 +81,7 @@ async fn list_user_favorites(
         return HttpResponse::Unauthorized().finish();
     }
 
-    let res = match service.find_user_favorites(user_id.unwrap()).await {
+    let res = match service.find_favorite_categories(user_id.unwrap()).await {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };

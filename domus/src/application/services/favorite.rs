@@ -13,8 +13,10 @@ use std::sync::Arc;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct FavoriteCategories {
+    pub id: Option<i64>,
     pub user_id: Option<String>,
     pub name: String,
+    pub color: String,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -25,6 +27,7 @@ pub struct UserFavoriteQueryDto {
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UserFavorites {
+    pub id: Option<i64>,
     pub user_id: Option<String>,
     pub house_id: String,
     pub category_id: Option<i64>,
@@ -49,10 +52,27 @@ impl FavoriteService {
         let model = favorite_categories::ActiveModel {
             user_id: Set(data.user_id.unwrap()),
             name: Set(data.name),
+            color: Set(data.color),
             ..Default::default()
         };
 
         let favorite_categories = model.insert(self.pool.as_ref()).await?;
+        Ok(favorite_categories.id.to_string())
+    }
+
+    pub async fn update_favorite_categories(
+        &self,
+        data: FavoriteCategories,
+    ) -> anyhow::Result<String> {
+        let model = favorite_categories::ActiveModel {
+            id: Set(data.id.unwrap()),
+            user_id: Set(data.user_id.unwrap()),
+            name: Set(data.name),
+            color: Set(data.color),
+            ..Default::default()
+        };
+
+        let favorite_categories = model.update(self.pool.as_ref()).await?;
         Ok(favorite_categories.id.to_string())
     }
 
@@ -67,7 +87,7 @@ impl FavoriteService {
     }
 
     // 查询用户收藏夹
-    pub async fn find_user_favorites(
+    pub async fn find_favorite_categories(
         &self,
         user_id: String,
     ) -> anyhow::Result<Vec<favorite_categories::Model>> {
@@ -81,6 +101,20 @@ impl FavoriteService {
     // 房源添加收藏
     pub async fn add_user_favorites(&self, data: UserFavorites) -> anyhow::Result<String> {
         let model = user_favorites::ActiveModel {
+            user_id: Set(data.user_id.unwrap()),
+            house_id: Set(data.house_id),
+            category_id: Set(data.category_id),
+            ..Default::default()
+        };
+
+        let favorite_categories = model.insert(self.pool.as_ref()).await?;
+        Ok(favorite_categories.id.to_string())
+    }
+
+    // 房源更新收藏
+    pub async fn update_user_favorites(&self, data: UserFavorites) -> anyhow::Result<String> {
+        let model = user_favorites::ActiveModel {
+            id: Set(data.id.unwrap()),
             user_id: Set(data.user_id.unwrap()),
             house_id: Set(data.house_id),
             category_id: Set(data.category_id),

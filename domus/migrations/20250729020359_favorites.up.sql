@@ -4,7 +4,8 @@ CREATE TABLE favorite_categories (
   user_id VARCHAR(50) NOT NULL COMMENT '所属用户 ID',
   name VARCHAR(50) NOT NULL COMMENT '分类名称',
   color VARCHAR(50) NOT NULL COMMENT '分类颜色',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  unique index idx_user_id_name (user_id, name)
 ) COMMENT='用户收藏分类表';
 
 CREATE TABLE user_favorites (

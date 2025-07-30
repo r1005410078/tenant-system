@@ -37,9 +37,9 @@ use crate::{
     interfaces::controllers::{
         community::{delete_community, list_community, save_community},
         favorites::{
-            add_favorite_categories, add_user_favorites, delete_favorite_categories,
-            delete_user_favorites, find_favorite_categories, find_user_favorite,
-            update_favorite_categories,
+            add_favorite_categories, add_user_favorites, cancel_user_favorites,
+            check_user_favorites, delete_favorite_categories, find_favorite_categories,
+            find_user_favorite, update_favorite_categories,
         },
         house::{
             apply_upload_url, delete_house, get_house_detail, group_by_community, list_houses,
@@ -200,7 +200,7 @@ pub async fn execute() -> std::io::Result<()> {
                             .service(update_favorite_categories)
                             .service(delete_favorite_categories)
                             .service(add_user_favorites)
-                            .service(delete_user_favorites),
+                            .service(cancel_user_favorites),
                     ),
             )
             .service(
@@ -215,7 +215,8 @@ pub async fn execute() -> std::io::Result<()> {
                             .service(group_by_community)
                             .service(get_comments)
                             .service(find_favorite_categories)
-                            .service(find_user_favorite),
+                            .service(find_user_favorite)
+                            .service(check_user_favorites),
                     ),
             )
             .service(web::scope("/api/domus/house_comment").wrap(auth_middleware.clone()))

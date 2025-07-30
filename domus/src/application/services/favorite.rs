@@ -4,8 +4,8 @@ use crate::infrastructure::entitiy::{
     community_query, favorite_categories, house_query, owner_query, user_favorites,
 };
 use sea_orm::{
-    query, ActiveModelTrait, ColumnTrait, Condition, EntityTrait, JoinType, QueryFilter,
-    QueryOrder, QuerySelect, RelationTrait,
+    query, ActiveModelTrait, ColumnTrait, Condition, EntityOrSelect, EntityTrait, JoinType,
+    PaginatorTrait, QueryFilter, QueryOrder, QuerySelect, RelationTrait,
 };
 use sea_orm::{ActiveValue::Set, DbConn};
 use serde::{Deserialize, Serialize};
@@ -45,10 +45,7 @@ impl FavoriteService {
 
 impl FavoriteService {
     // 给用户添加收藏夹
-    pub async fn add_favorite_categories(
-        &self,
-        data: FavoriteCategories,
-    ) -> anyhow::Result<String> {
+    pub async fn add_favorite_categories(&self, data: FavoriteCategories) -> anyhow::Result<i64> {
         let model = favorite_categories::ActiveModel {
             user_id: Set(data.user_id.unwrap()),
             name: Set(data.name),
@@ -57,7 +54,7 @@ impl FavoriteService {
         };
 
         let favorite_categories = model.insert(self.pool.as_ref()).await?;
-        Ok(favorite_categories.id.to_string())
+        Ok(favorite_categories.id)
     }
 
     pub async fn update_favorite_categories(
@@ -78,6 +75,13 @@ impl FavoriteService {
 
     // 删除收藏夹
     pub async fn delete_favorite_categories(&self, id: i64) -> anyhow::Result<()> {
+        // 删除收藏夹下的房源
+        user_favorites::Entity::delete_many()
+            .filter(user_favorites::Column::CategoryId.eq(id))
+            .exec(self.pool.as_ref())
+            .await?;
+
+        // 删除收藏夹
         favorite_categories::Entity::delete_many()
             .filter(favorite_categories::Column::Id.eq(id))
             .exec(self.pool.as_ref())
@@ -99,7 +103,36 @@ impl FavoriteService {
     }
 
     // 房源添加收藏
-    pub async fn add_user_favorites(&self, data: UserFavorites) -> anyhow::Result<String> {
+    pub async fn add_user_favorites(&self, mut data: UserFavorites) -> anyhow::Result<String> {
+        // 如果不存在收藏家就添加到默认收藏夹
+        data.category_id = if data.category_id.is_none() {
+            let category_id: Option<i64> = favorite_categories::Entity::find()
+                .filter(favorite_categories::Column::Name.eq("我的收藏"))
+                .select()
+                .column(favorite_categories::Column::Id)
+                .into_tuple()
+                .one(self.pool.as_ref())
+                .await?;
+
+            if category_id.is_some() {
+                category_id
+            } else {
+                // 创建默认收藏夹
+                let category_id = self
+                    .add_favorite_categories(FavoriteCategories {
+                        id: None,
+                        user_id: data.user_id.clone(),
+                        name: "我的收藏".to_string(),
+                        color: "#0073ffff".to_string(),
+                    })
+                    .await?;
+
+                Some(category_id)
+            }
+        } else {
+            data.category_id
+        };
+
         let model = user_favorites::ActiveModel {
             user_id: Set(data.user_id.unwrap()),
             house_id: Set(data.house_id),
@@ -109,6 +142,31 @@ impl FavoriteService {
 
         let favorite_categories = model.insert(self.pool.as_ref()).await?;
         Ok(favorite_categories.id.to_string())
+    }
+
+    // 移除收藏
+    pub async fn cancel_user_favorites(&self, data: UserFavorites) -> anyhow::Result<()> {
+        user_favorites::Entity::delete_many()
+            .filter(
+                user_favorites::Column::UserId
+                    .eq(data.user_id.unwrap())
+                    .and(user_favorites::Column::HouseId.eq(data.house_id)),
+            )
+            .exec(self.pool.as_ref())
+            .await?;
+
+        Ok(())
+    }
+
+    // 房源是否收藏
+    pub async fn check_user_favorites(&self, data: UserFavorites) -> anyhow::Result<bool> {
+        let count = user_favorites::Entity::find()
+            .filter(user_favorites::Column::UserId.eq(data.user_id.unwrap()))
+            .filter(user_favorites::Column::HouseId.eq(data.house_id))
+            .count(self.pool.as_ref())
+            .await?;
+
+        Ok(count > 0)
     }
 
     // 房源更新收藏
@@ -123,16 +181,6 @@ impl FavoriteService {
 
         let favorite_categories = model.insert(self.pool.as_ref()).await?;
         Ok(favorite_categories.id.to_string())
-    }
-
-    // 移除收藏
-    pub async fn delete_user_favorites(&self, id: i64) -> anyhow::Result<()> {
-        user_favorites::Entity::delete_many()
-            .filter(user_favorites::Column::Id.eq(id))
-            .exec(self.pool.as_ref())
-            .await?;
-
-        Ok(())
     }
 
     // 查询用户收藏夹

@@ -113,12 +113,23 @@ async fn add_user_favorites(
     HttpResponse::Ok().json(res)
 }
 
-#[post("/user_favorites/delete/{id}")]
-async fn delete_user_favorites(
-    id: web::Path<i64>,
+#[post("/user_favorites/cancel")]
+async fn cancel_user_favorites(
+    data: web::Json<UserFavorites>,
     service: web::Data<FavoriteService>,
+    req: HttpRequest,
 ) -> HttpResponse {
-    let res = match service.delete_user_favorites(id.into_inner()).await {
+    let extensions = req.extensions();
+    let user_id = extensions.get::<Claims>().map(|c| c.user_id.clone());
+
+    if user_id.is_none() {
+        return HttpResponse::Unauthorized().finish();
+    }
+
+    let mut data = data.into_inner();
+    data.user_id = user_id;
+
+    let res = match service.cancel_user_favorites(data).await {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };
@@ -143,6 +154,34 @@ async fn find_user_favorite(
     data.user_id = user_id;
 
     let res = match service.find_user_favorite(data).await {
+        Ok(data) => ResponseBody::success(data),
+        Err(e) => ResponseBody::error(e.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("/user_favorites/check/{house_id}")]
+async fn check_user_favorites(
+    house_id: web::Path<String>,
+    service: web::Data<FavoriteService>,
+    req: HttpRequest,
+) -> HttpResponse {
+    let extensions = req.extensions();
+    let user_id = extensions.get::<Claims>().map(|c| c.user_id.clone());
+
+    if user_id.is_none() {
+        return HttpResponse::Unauthorized().finish();
+    }
+
+    let user_favorites = UserFavorites {
+        id: None,
+        user_id,
+        house_id: house_id.into_inner(),
+        category_id: None,
+    };
+
+    let res = match service.check_user_favorites(user_favorites).await {
         Ok(data) => ResponseBody::success(data),
         Err(e) => ResponseBody::error(e.to_string()),
     };

@@ -5,21 +5,24 @@ use crate::{
     application::repositories::role::RoleRepository,
     domain::roles::aggregates::role::RoleAggregate, infrastructure::entitiy::role_aggregate,
 };
+use casbin::{Enforcer, MgmtApi};
 use sea_orm::ActiveModelTrait;
 use sea_orm::ColumnTrait;
 use sea_orm::Condition;
 use sea_orm::EntityTrait;
 use sea_orm::QueryFilter;
 use sea_orm::{ActiveValue::Set, DbConn};
+use tokio::sync::Mutex;
 use user_system::shared::entitiy::casbin_rules;
 
 pub struct MySqlRoleAggregateRepository {
     pool: Arc<DbConn>,
+    enforcer: Arc<Mutex<Enforcer>>,
 }
 
 impl MySqlRoleAggregateRepository {
-    pub fn new(pool: Arc<DbConn>) -> Self {
-        MySqlRoleAggregateRepository { pool }
+    pub fn new(pool: Arc<DbConn>, enforcer: Arc<Mutex<Enforcer>>) -> Self {
+        MySqlRoleAggregateRepository { pool, enforcer }
     }
 
     async fn get_permissions_by_role_id(&self, role_id: &str) -> anyhow::Result<Vec<Permission>> {
@@ -46,19 +49,14 @@ impl RoleRepository for MySqlRoleAggregateRepository {
         };
 
         let mut result: RoleAggregate = model.insert(self.pool.as_ref()).await?.into();
+        let mut paramss = vec![];
         // 创建权限
         for p in command.permissions.iter() {
             // 创建权限关联
-            let model = casbin_rules::ActiveModel {
-                ptype: Set("p".to_string()),
-                v0: Set(Some(command.id.clone())),
-                v1: Set(Some(p.source.clone())),
-                v2: Set(Some(p.action.clone())),
-                ..Default::default()
-            };
-            model.insert(self.pool.as_ref()).await?;
+            paramss.push(vec![command.id.clone(), p.source.clone(), p.action.clone()]);
         }
 
+        self.enforcer.lock().await.add_policies(paramss).await?;
         result.permissions = self.get_permissions_by_role_id(&command.id).await?;
         Ok(result)
     }
@@ -74,24 +72,36 @@ impl RoleRepository for MySqlRoleAggregateRepository {
 
         let mut result: RoleAggregate = model.update(self.pool.as_ref()).await?.into();
 
-        // 删除旧的权限
-        casbin_rules::Entity::delete_many()
+        let remove_rules = casbin_rules::Entity::find()
             .filter(casbin_rules::Column::V0.eq(command.id.clone()))
-            .exec(self.pool.as_ref())
+            .all(self.pool.as_ref())
             .await?;
 
+        self.enforcer
+            .lock()
+            .await
+            .remove_policies(
+                remove_rules
+                    .iter()
+                    .map(|x| {
+                        vec![
+                            x.v0.clone().unwrap(),
+                            x.v1.clone().unwrap(),
+                            x.v2.clone().unwrap(),
+                        ]
+                    })
+                    .collect::<Vec<Vec<String>>>(),
+            )
+            .await?;
+
+        let mut paramss = vec![];
         // 更新权限
         for p in command.permissions.iter() {
             // 创建权限关联
-            let model = casbin_rules::ActiveModel {
-                ptype: Set("p".to_string()),
-                v0: Set(Some(command.id.to_string())),
-                v1: Set(Some(p.source.clone())),
-                v2: Set(Some(p.action.clone())),
-                ..Default::default()
-            };
-            model.insert(self.pool.as_ref()).await?;
+            paramss.push(vec![command.id.clone(), p.source.clone(), p.action.clone()]);
         }
+
+        self.enforcer.lock().await.add_policies(paramss).await?;
 
         result.permissions = self.get_permissions_by_role_id(&command.id).await?;
         Ok(result)

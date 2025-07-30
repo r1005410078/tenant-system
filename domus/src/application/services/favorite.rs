@@ -107,7 +107,11 @@ impl FavoriteService {
         // 如果不存在收藏家就添加到默认收藏夹
         data.category_id = if data.category_id.is_none() {
             let category_id: Option<i64> = favorite_categories::Entity::find()
-                .filter(favorite_categories::Column::Name.eq("我的收藏"))
+                .filter(
+                    favorite_categories::Column::Name
+                        .eq("我的收藏")
+                        .and(favorite_categories::Column::UserId.eq(data.user_id.clone().unwrap())),
+                )
                 .select()
                 .column(favorite_categories::Column::Id)
                 .into_tuple()

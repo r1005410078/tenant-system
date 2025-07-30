@@ -80,7 +80,10 @@ impl ServiceProvider {
         );
 
         // 角色仓储层
-        let role_repo = Arc::new(MySqlRoleAggregateRepository::new(pool.clone()));
+        let role_repo = Arc::new(MySqlRoleAggregateRepository::new(
+            pool.clone(),
+            enforcer.clone(),
+        ));
         let permission_granted_to_role_command_handler = Arc::new(
             PermissionGrantedToRoleCommandHandler::new(role_repo.clone(), event_bus.clone()),
         );

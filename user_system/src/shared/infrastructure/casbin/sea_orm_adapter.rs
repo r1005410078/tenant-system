@@ -100,14 +100,13 @@ impl Adapter for SeaORMAdapter {
     async fn add_policies(
         &mut self,
         _sec: &str,
-        _ptype: &str,
-        _rules: Vec<Vec<String>>,
+        ptype: &str,
+        rules: Vec<Vec<String>>,
     ) -> Result<bool> {
         use sea_orm::ActiveModelTrait;
 
         // 实现添加多条策略的逻辑
-        for rule in _rules {
-            let ptype = "p"; // 假设所有规则的类型都是 "p"
+        for rule in rules {
             let new_rule = casbin_rules::ActiveModel {
                 ptype: sea_orm::Set(ptype.to_string()),
                 v0: sea_orm::Set(rule.get(0).cloned()),

@@ -55,6 +55,7 @@ impl OwnerQueryService {
         model.update(self.pool.as_ref()).await?;
         Ok(())
     }
+
     // 删除业主
     pub async fn delete(&self, owner_id: &str) -> anyhow::Result<()> {
         let model = owner_query::ActiveModel {

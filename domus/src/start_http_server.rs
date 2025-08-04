@@ -20,6 +20,7 @@ use crate::{
         },
         queries::{
             community::CommunityQueryService, house::HouseQueryService, owner::OwnerQueryService,
+            public_house::PublicHouseQueryService,
         },
         services::{
             delete_community::DeleteCommunityService, delete_house::DeleteHouseService,
@@ -47,6 +48,7 @@ use crate::{
         },
         house_comment::{add_comment, delete_comment, get_comments, update_comment},
         owner::{delete_owner, owner_list, save_owner},
+        public_house,
     },
 };
 
@@ -74,6 +76,10 @@ pub async fn execute() -> std::io::Result<()> {
         .unwrap(),
     );
 
+    // 公开房源信息
+    let public_house_service = web::Data::new(PublicHouseQueryService::new(pool.clone()));
+
+    // 房源仓储
     let favorite_service = web::Data::new(FavoriteService::new(pool.clone()));
 
     // 房源评论
@@ -173,6 +179,7 @@ pub async fn execute() -> std::io::Result<()> {
             .app_data(file_upload_service.clone())
             .app_data(hosue_comment_service.clone())
             .app_data(favorite_service.clone())
+            .app_data(public_house_service.clone())
             .service(
                 web::scope("/api/domus/management")
                     .service(
@@ -220,6 +227,13 @@ pub async fn execute() -> std::io::Result<()> {
                     ),
             )
             .service(web::scope("/api/domus/house_comment").wrap(auth_middleware.clone()))
+            .service(
+                web::scope("/api/domus/public").service(
+                    web::scope("/house")
+                        .service(public_house::list_houses)
+                        .service(public_house::get_house_detail),
+                ),
+            )
     })
     .bind(server_url)?
     .run()

@@ -23,7 +23,6 @@ pub async fn save_house(
     let extensions = req.extensions();
     let user = extensions.get::<Claims>();
 
-    println!("11111");
     if user.is_none() {
         return HttpResponse::Forbidden().finish();
     }

@@ -26,8 +26,8 @@ use crate::{
             delete_community::DeleteCommunityService, delete_house::DeleteHouseService,
             delete_owner::DeleteOwnerService, favorite::FavoriteService,
             file_upload_service::FileUploadService, house_comment::HouseCommentService,
-            save_community::SaveCommunityService, save_house::SaveHouseService,
-            save_owner::SaveOwnerService,
+            house_operation_log, save_community::SaveCommunityService,
+            save_house::SaveHouseService, save_owner::SaveOwnerService,
         },
     },
     infrastructure::{
@@ -74,6 +74,11 @@ pub async fn execute() -> std::io::Result<()> {
         .create_client()
         .await
         .unwrap(),
+    );
+
+    // 房源操作日志服务
+    let house_operation_log_service = web::Data::new(
+        house_operation_log::HouseOperationLogService::new(pool.clone()),
     );
 
     // 公开房源信息
@@ -180,6 +185,7 @@ pub async fn execute() -> std::io::Result<()> {
             .app_data(hosue_comment_service.clone())
             .app_data(favorite_service.clone())
             .app_data(public_house_service.clone())
+            .app_data(house_operation_log_service.clone())
             .service(
                 web::scope("/api/domus/management")
                     .service(

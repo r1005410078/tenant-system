@@ -4470,6 +4470,8 @@ dependencies = [
  "anyhow",
  "aws-config",
  "aws-sdk-s3",
+ "serde",
+ "serde_json",
  "tokio",
  "tracing",
 ]

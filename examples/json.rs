@@ -1,142 +1,81 @@
 use serde::{Deserialize, Serialize};
-use serde_json::json;
+use serde_json::{json, Value};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct House {
-    pub id: Option<String>,
-    pub community_id: Option<String>,
-    pub owner_id: Option<String>,
-    // 房源标题
-    pub title: Option<String>,
-    // 用途
-    pub purpose: Option<String>,
-    // 交易类型
-    pub transaction_type: Option<String>,
-    // 状态
-    pub house_status: Option<String>,
-    // // 楼层
-    // pub floor_range: Option<FloorRange>,
-    // // 门牌号
-    // pub door_number: Option<DoorNumber>,
-    // // 户型
-    // pub apartment_type: Option<ApartmentType>,
-    // 建筑面积
-    pub building_area: Option<f32>,
-    // 装修
-    pub house_decoration: Option<String>,
-    // 满减年限
-    pub discount_year_limit: Option<String>,
-    // // 梯户
-    // pub stairs: Option<Stairs>,
-    // 位置
-    pub location: Option<String>,
-    // 推荐标签
-    pub tags: Option<Vec<String>>,
-    // 车位高度
-    pub car_height: Option<f64>,
-    // 实率
-    pub actual_rate: Option<f64>,
-    // 级别
-    pub level: Option<String>,
-    // 层高
-    pub floor_height: Option<f32>,
-    // 进深
-    pub progress_depth: Option<f64>,
-    // 门宽
-    pub door_width: Option<f64>,
-
-    // 使用面积
-    pub use_area: Option<f32>,
-    // 售价
-    pub sale_price: Option<f64>,
-    // 租价
-    pub rent_price: Option<f64>,
-    // 出租低价
-    pub rent_low_price: Option<f64>,
-    // 首付
-    pub down_payment: Option<f64>,
-    // 出售低价
-    pub sale_low_price: Option<f64>,
-    // 房屋类型
-    pub house_type: Option<String>,
-    // 朝向
-    pub house_orientation: Option<String>,
-
-    // 看房方式
-    pub view_method: Option<String>,
-    // 付款方式
-    pub payment_method: Option<String>,
-    // 房源税费
-    pub property_tax: Option<String>,
-    // 建筑结构
-    pub building_structure: Option<String>,
-    // 建筑年代
-    pub building_year: Option<i32>,
-    // 产权性质
-    pub property_rights: Option<String>,
-    // 产权年限
-    pub property_year_limit: Option<String>,
-    // 产证日期
-    pub certificate_date: Option<String>,
-    // 交房日期
-    pub handover_date: Option<String>,
-    // 学位
-    pub degree: Option<String>,
-    // 户口
-    pub household: Option<String>,
-    // 来源
-    pub source: Option<String>,
-    // 委托编号
-    pub delegate_number: Option<String>,
-    // 唯一住房
-    pub unique_housing: Option<String>,
-    // 全款
-    pub full_payment: Option<String>,
-    // 抵押
-    pub mortgage: Option<String>,
-    // 急切
-    pub urgent: Option<String>,
-    // 配套
-    pub support: Option<String>,
-    // 现状
-    pub present_state: Option<String>,
-    // 外网同步
-    pub external_sync: Option<String>,
-    // 备注
-    pub remark: Option<String>,
-    // // 房源图片
-    // pub images: Option<Vec<FileInfo>>,
+#[derive(Debug, Serialize, Deserialize)]
+struct Address {
+    city: String,
+    street: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct Community {
-    pub name: String,
+struct House {
+    price: Option<u32>,
+    status: Option<String>,
+    address: Option<Address>,
+    tags: Option<Vec<String>>,
+    owner: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct HouseOwner {
-    pub name: String,
+/// 递归比较两个 serde_json::Value
+fn diff_values(before: &Value, after: &Value) -> Value {
+    match (before, after) {
+        // 对象递归比较
+        (Value::Object(b_map), Value::Object(a_map)) => {
+            let mut changes = serde_json::Map::new();
+            for (key, b_val) in b_map {
+                if let Some(a_val) = a_map.get(key) {
+                    let sub_diff = diff_values(b_val, a_val);
+                    if !sub_diff.is_null() {
+                        changes.insert(key.clone(), sub_diff);
+                    }
+                }
+            }
+            if changes.is_empty() {
+                Value::Null
+            } else {
+                Value::Object(changes)
+            }
+        }
+        // 非对象，直接比较
+        _ => {
+            if before != after {
+                json!({ "before": before, "after": after })
+            } else {
+                Value::Null
+            }
+        }
+    }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct HouseData {
-    #[serde(flatten)]
-    pub house: House,
-    pub community: Option<Community>,
-    pub owner: Option<HouseOwner>,
+fn diff_structs<T>(before: &T, after: &T) -> Value
+where
+    T: Serialize,
+{
+    let before_val = serde_json::to_value(before).unwrap();
+    let after_val = serde_json::to_value(after).unwrap();
+    diff_values(&before_val, &after_val)
 }
 
 fn main() {
-    let json = json!({
-          "title": "My House",
-        "community": {
-            "name": "My Community"
-        },
-        "owner": {
-            "name": "My Owner"
-        }
-    });
-    let data: HouseData = serde_json::from_value(json).unwrap();
+    let before = House {
+        price: None,
+        status: None,
+        address: None,
+        tags: None,
+        owner: None,
+    };
 
-    println!("data: {:#?}", data);
+    let after = House {
+        price: Some(1150000),
+        status: Some("on_sale".to_string()),
+        address: Some(Address {
+            city: "Beijing".to_string(), // 改了城市
+            street: "Nanjing Road".to_string(),
+        }),
+        tags: Some(vec!["balcony".to_string()]), // 去掉一个tag
+        owner: None,                             // 删除了 owner
+    };
+
+    let diff = diff_structs(&before, &after);
+    println!("{}", serde_json::to_string_pretty(&diff).unwrap());
 }

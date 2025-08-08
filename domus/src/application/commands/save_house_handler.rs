@@ -25,7 +25,7 @@ impl SaveHouseCommandHandler {
         }
     }
 
-    pub async fn handle(&self, command: SaveHouseCommand) -> anyhow::Result<()> {
+    pub async fn handle(&self, command: SaveHouseCommand) -> anyhow::Result<String> {
         let house = command.into_inner();
         let id = house.id.clone();
 
@@ -43,23 +43,25 @@ impl SaveHouseCommandHandler {
 
         match id {
             Some(id) => {
-                let mut aggreagate = self.house_repository.find_by_id(&id).await?;
-                let events = aggreagate.update(&house)?;
+                let mut aggregate = self.house_repository.find_by_id(&id).await?;
+                let house_id = aggregate.house_id.clone();
+                let events = aggregate.update(&house)?;
 
-                self.house_repository.save(&aggreagate).await?;
+                self.house_repository.save(&aggregate).await?;
                 for event in events {
                     self.event_bus.publish(event).await;
                 }
 
-                Ok(())
+                Ok(house_id)
             }
 
             None => {
                 let (aggregate, event) = HouseAggregate::create(house)?;
+                let house_id = aggregate.house_id.clone();
                 self.house_repository.create(aggregate).await?;
                 self.event_bus.publish(event).await;
 
-                Ok(())
+                Ok(house_id)
             }
         }
     }

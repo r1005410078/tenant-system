@@ -6,7 +6,9 @@ use crate::{
     application::{
         queries::house::{HouseQueryService, HouseRequest},
         services::{
-            delete_house::DeleteHouseService, file_upload_service::FileUploadService,
+            delete_house::DeleteHouseService,
+            file_upload_service::FileUploadService,
+            house_operation_log::{HouseOperationLogDto, HouseOperationLogService},
             save_house::SaveHouseService,
         },
     },
@@ -18,12 +20,12 @@ use crate::{
 pub async fn save_house(
     body: web::Json<HouseData>,
     save_house_service: web::Data<SaveHouseService>,
+    house_operation_log_service: web::Data<HouseOperationLogService>,
     req: HttpRequest,
 ) -> HttpResponse {
     let extensions = req.extensions();
     let user = extensions.get::<Claims>();
 
-    println!("11111");
     if user.is_none() {
         return HttpResponse::Forbidden().finish();
     }
@@ -32,8 +34,35 @@ pub async fn save_house(
     let mut house_command = body.into_inner();
     house_command.update_created_by(user.user_id.clone());
 
+    let ip_address = req
+        .connection_info()
+        .peer_addr()
+        .map(|addr| addr.to_string());
+
+    let user_agent = req
+        .headers()
+        .get("User-Agent")
+        .and_then(|h| h.to_str().ok())
+        .map(|s| s.to_string());
+
     let res = match save_house_service.execute(house_command).await {
-        Ok(data) => ResponseBody::success(data),
+        Ok(house) => {
+            // 记录操作日志
+            if let Err(err) = house_operation_log_service
+                .save_record(HouseOperationLogDto {
+                    operation_type: 0,
+                    operation_content: house.clone(),
+                    operator_id: user.user_id.clone(),
+                    ip_address: ip_address,
+                    user_agent: user_agent,
+                })
+                .await
+            {
+                tracing::error!("记录操作日志失败:{}", err);
+            }
+
+            ResponseBody::success(house)
+        }
         Err(e) => ResponseBody::error(e.to_string()),
     };
 

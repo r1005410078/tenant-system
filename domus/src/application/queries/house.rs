@@ -393,6 +393,27 @@ impl HouseQueryService {
         }
     }
 
+    // 查找最新的房源
+    pub async fn find_latest(&self, id: &str) -> Option<HouseDataDto> {
+        let data = house_query::Entity::find()
+            .filter(house_query::Column::Id.eq(id))
+            .order_by_desc(house_query::Column::UpdatedAt)
+            .join(
+                JoinType::LeftJoin,
+                house_query::Relation::CommunityQuery.def(),
+            )
+            .join(JoinType::LeftJoin, house_query::Relation::OwnerQuery.def())
+            .select_also(community_query::Entity)
+            .select_also(owner_query::Entity)
+            .one(self.pool.as_ref())
+            .await;
+
+        match data {
+            Ok(Some((house, community, owner))) => Some(HouseDataDto::new(house, community, owner)),
+            _ => None,
+        }
+    }
+
     // 发布房源
     pub async fn publish(&self, house_id: &str) -> anyhow::Result<()> {
         let model = house_query::ActiveModel {

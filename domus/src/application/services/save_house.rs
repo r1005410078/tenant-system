@@ -5,7 +5,7 @@ use crate::{
         commands::{save_house::SaveHouseCommand, save_house_handler::SaveHouseCommandHandler},
         services::{save_community::SaveCommunityService, save_owner::SaveOwnerService},
     },
-    domain::house::value_objects::house::HouseData,
+    domain::house::value_objects::house::{House, HouseData},
 };
 
 pub struct SaveHouseService {
@@ -27,7 +27,7 @@ impl SaveHouseService {
         }
     }
 
-    pub async fn execute(&self, house_data: HouseData) -> anyhow::Result<()> {
+    pub async fn execute(&self, house_data: HouseData) -> anyhow::Result<House> {
         if house_data.house.is_none() {
             return Err(anyhow::anyhow!("参数不完整"));
         }
@@ -46,10 +46,13 @@ impl SaveHouseService {
         }
 
         // 创建房屋
-        self.save_house_command_handler
+        let house_id = self
+            .save_house_command_handler
             .handle(SaveHouseCommand::new(house.clone()))
             .await?;
 
-        Ok(())
+        house.id = Some(house_id.clone());
+
+        Ok(house)
     }
 }

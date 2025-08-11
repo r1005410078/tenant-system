@@ -27,7 +27,7 @@ impl HouseData {
 }
 
 #[skip_serializing_none]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct House {
     pub id: Option<String>,
     pub created_by: Option<String>,

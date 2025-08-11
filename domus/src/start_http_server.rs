@@ -43,8 +43,8 @@ use crate::{
             find_user_favorite, update_favorite_categories,
         },
         house::{
-            apply_upload_url, delete_house, get_house_detail, group_by_community, list_houses,
-            save_house,
+            apply_upload_url, delete_house, get_house_detail, group_by_community,
+            list_house_operation_log, list_houses, save_house,
         },
         house_comment::{add_comment, delete_comment, get_comments, update_comment},
         owner::{delete_owner, owner_list, save_owner},
@@ -229,7 +229,8 @@ pub async fn execute() -> std::io::Result<()> {
                             .service(get_comments)
                             .service(find_favorite_categories)
                             .service(find_user_favorite)
-                            .service(check_user_favorites),
+                            .service(check_user_favorites)
+                            .service(list_house_operation_log),
                     ),
             )
             .service(web::scope("/api/domus/house_comment").wrap(auth_middleware.clone()))

@@ -394,6 +394,7 @@ impl HouseQueryService {
     }
 
     // 查找最新的房源
+    #[allow(dead_code)]
     pub async fn find_latest(&self, id: &str) -> Option<HouseDataDto> {
         let data = house_query::Entity::find()
             .filter(house_query::Column::Id.eq(id))

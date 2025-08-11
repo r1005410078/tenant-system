@@ -12,7 +12,7 @@ use crate::{
             save_house::SaveHouseService,
         },
     },
-    domain::house::value_objects::house::HouseData,
+    domain::house::value_objects::house::{House, HouseData},
     interfaces::dtos::response::ResponseBody,
 };
 
@@ -32,33 +32,43 @@ pub async fn save_house(
 
     let user = user.unwrap();
     let mut house_command = body.into_inner();
-    house_command.update_created_by(user.user_id.clone());
+    if house_command.house.clone().map(|h| h.id).is_some() {
+        house_command.update_created_by(user.user_id.clone());
+    }
 
-    let ip_address = req
-        .connection_info()
-        .peer_addr()
-        .map(|addr| addr.to_string());
-
+    let ip_address = req.peer_addr().map(|addr| addr.to_string());
     let user_agent = req
         .headers()
         .get("User-Agent")
         .and_then(|h| h.to_str().ok())
         .map(|s| s.to_string());
 
+    // 记录操作日志
+    let record_operation_log = async |operation_type, operation_content| {
+        if let Err(err) = house_operation_log_service
+            .save_record(HouseOperationLogDto {
+                operation_type,
+                operation_content,
+                operator_id: user.user_id.clone(),
+                ip_address: ip_address.clone(),
+                user_agent: user_agent.clone(),
+            })
+            .await
+        {
+            tracing::error!("记录操作日志失败:{}", err);
+        }
+    };
+
+    // 记录操作日志
+    let input_house = house_command.house.clone();
+    if input_house.clone().map(|h| h.id).is_some() {
+        record_operation_log(2, input_house.clone().unwrap_or_default()).await;
+    }
+
     let res = match save_house_service.execute(house_command).await {
         Ok(house) => {
-            // 记录操作日志
-            if let Err(err) = house_operation_log_service
-                .save_record(HouseOperationLogDto {
-                    operation_type: 0,
-                    operation_content: house.clone(),
-                    operator_id: user.user_id.clone(),
-                    ip_address: ip_address,
-                    user_agent: user_agent,
-                })
-                .await
-            {
-                tracing::error!("记录操作日志失败:{}", err);
+            if input_house.clone().map(|h| h.id).is_none() {
+                record_operation_log(1, house.clone()).await;
             }
 
             ResponseBody::success(house)
@@ -73,9 +83,45 @@ pub async fn save_house(
 pub async fn delete_house(
     path: web::Path<String>,
     delete_house_service: web::Data<DeleteHouseService>,
+    house_operation_log_service: web::Data<HouseOperationLogService>,
+    req: HttpRequest,
 ) -> HttpResponse {
-    let res = match delete_house_service.execute(path.into_inner()).await {
-        Ok(data) => ResponseBody::success(data),
+    let extensions = req.extensions();
+    let user = extensions.get::<Claims>();
+
+    if user.is_none() {
+        return HttpResponse::Forbidden().finish();
+    }
+
+    let user = user.unwrap();
+    let ip_address = req.peer_addr().map(|addr| addr.to_string());
+    let user_agent = req
+        .headers()
+        .get("User-Agent")
+        .and_then(|h| h.to_str().ok())
+        .map(|s| s.to_string());
+
+    let house_id = path.into_inner();
+    let res = match delete_house_service.execute(house_id.clone()).await {
+        Ok(data) => {
+            let mut house = House::default();
+            house.id = Some(house_id);
+
+            if let Err(err) = house_operation_log_service
+                .save_record(HouseOperationLogDto {
+                    operation_type: 3,
+                    operation_content: house,
+                    operator_id: user.user_id.clone(),
+                    ip_address: ip_address.clone(),
+                    user_agent: user_agent.clone(),
+                })
+                .await
+            {
+                tracing::error!("记录操作日志失败:{}", err);
+            }
+
+            ResponseBody::success(data)
+        }
         Err(e) => ResponseBody::error(e.to_string()),
     };
 
@@ -137,6 +183,22 @@ pub async fn apply_upload_url(
 ) -> HttpResponse {
     let res = match file_upload_service
         .generate_put_url(data.directory.as_str(), data.filename.as_str())
+        .await
+    {
+        Ok(data) => ResponseBody::success(data),
+        Err(e) => ResponseBody::error(e.to_string()),
+    };
+
+    HttpResponse::Ok().json(res)
+}
+
+#[get("/house_operation_log/list/{house_id}")]
+pub async fn list_house_operation_log(
+    house_id: web::Path<String>,
+    house_operation_log_service: web::Data<HouseOperationLogService>,
+) -> HttpResponse {
+    let res = match house_operation_log_service
+        .list(&house_id.into_inner())
         .await
     {
         Ok(data) => ResponseBody::success(data),

@@ -1,5 +1,4 @@
 use crate::domain::user::events::login::LoginEvent;
-use crate::infrastructure::dtos::user_query_dto::UserQueryDto;
 use crate::{
     application::repositories::user_aggreate_repository::UserAggregateRepository,
     domain::user::aggregates::user::UserAggregate,

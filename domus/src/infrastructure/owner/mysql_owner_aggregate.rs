@@ -103,11 +103,6 @@ impl OwnerRepositoryAggregate for MySqlOwnerAggregateRepository {
             condition = condition.add(entitiy::owner::Column::OwnerId.ne(id));
         }
 
-        let m = entitiy::owner::Entity::find()
-            .filter(condition.clone())
-            .all(self.pool.as_ref())
-            .await?;
-
         let count = entitiy::owner::Entity::find()
             .filter(condition)
             .count(self.pool.as_ref())

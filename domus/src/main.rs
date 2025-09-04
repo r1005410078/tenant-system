@@ -18,10 +18,6 @@ async fn main() -> std::io::Result<()> {
             init_system::execute().await.unwrap();
             Ok(())
         }
-        None => {
-            // 启动 HTTP 服务
-            println!("启动 HTTP 服务...");
-            start_http_server::execute().await
-        }
+        None => start_http_server::execute().await,
     }
 }

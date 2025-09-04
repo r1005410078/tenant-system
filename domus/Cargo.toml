@@ -29,3 +29,4 @@ user_system = { workspace = true }
 clap = {  workspace = true }
 reqwest = { workspace = true }
 validator = { workspace = true }
+openssl-sys = { workspace = true }

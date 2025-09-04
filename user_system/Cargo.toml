@@ -24,3 +24,4 @@ actix-web  = { workspace = true }
 serde_json = { workspace = true }
 shared_dto = { workspace = true }
 clap = {  workspace = true }
+openssl-sys = { workspace = true }

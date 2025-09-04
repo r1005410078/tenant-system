@@ -13,11 +13,7 @@ use crate::{
         entitiy::{permissions_detail, role_detail_read_model},
     },
 };
-use std::{
-    collections::{HashMap, HashSet},
-    hash::Hash,
-    sync::Arc,
-};
+use std::{collections::HashMap, sync::Arc};
 
 pub struct RoleQueryService {
     pool: Arc<DbConn>,

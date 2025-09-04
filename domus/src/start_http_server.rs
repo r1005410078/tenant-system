@@ -56,13 +56,16 @@ pub async fn execute() -> std::io::Result<()> {
     log::init_tracing();
     dotenvy::dotenv().ok();
 
-    let host = env::var("HOST").expect("HOST is not set in .env file");
-    let port = env::var("DOMUS_PORT").expect("PORT is not set in .env file");
+    let host = env::var("HOST").unwrap_or("0.0.0.0".into());
+    let port = env::var("USER_SYSTEM_PORT").unwrap_or("8091".into());
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));
     let enforcer = Arc::new(Mutex::new(init_casbin().await));
     let auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
+
+    // 启动 HTTP 服务
+    tracing::info!("启动 {server_url} HTTP 服务...");
 
     // minio_client
     let minio_client = Arc::new(

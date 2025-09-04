@@ -1,7 +1,7 @@
 use sea_orm::prelude::DateTimeUtc;
 use serde::{Deserialize, Serialize};
 
-use crate::infrastructure::entitiy::{permissions_detail, role_detail_read_model};
+use crate::infrastructure::entitiy::permissions_detail;
 
 #[derive(Debug, Deserialize, Clone, Serialize)]
 pub struct RoleQueryReadModelDto {

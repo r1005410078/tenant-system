@@ -2,7 +2,7 @@ use crate::{
     application::repositories::user_aggreate_repository::UserAggregateRepository,
     domain::user::aggregates::user::UserAggregate, infrastructure::entitiy,
 };
-use casbin::{CoreApi, MgmtApi};
+use casbin::MgmtApi;
 use sea_orm::*;
 use std::sync::Arc;
 use tokio::sync::Mutex;

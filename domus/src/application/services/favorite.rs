@@ -1,10 +1,9 @@
-use crate::application::listeners::house;
 use crate::infrastructure::dto::house_data_dto::HouseDataDto;
 use crate::infrastructure::entitiy::{
     community_query, favorite_categories, house_query, owner_query, user_favorites,
 };
 use sea_orm::{
-    query, ActiveModelTrait, ColumnTrait, Condition, EntityOrSelect, EntityTrait, JoinType,
+    ActiveModelTrait, ColumnTrait, Condition, EntityOrSelect, EntityTrait, JoinType,
     PaginatorTrait, QueryFilter, QueryOrder, QuerySelect, RelationTrait,
 };
 use sea_orm::{ActiveValue::Set, DbConn};
@@ -174,18 +173,18 @@ impl FavoriteService {
     }
 
     // 房源更新收藏
-    pub async fn update_user_favorites(&self, data: UserFavorites) -> anyhow::Result<String> {
-        let model = user_favorites::ActiveModel {
-            id: Set(data.id.unwrap()),
-            user_id: Set(data.user_id.unwrap()),
-            house_id: Set(data.house_id),
-            category_id: Set(data.category_id),
-            ..Default::default()
-        };
+    // pub async fn update_user_favorites(&self, data: UserFavorites) -> anyhow::Result<String> {
+    //     let model = user_favorites::ActiveModel {
+    //         id: Set(data.id.unwrap()),
+    //         user_id: Set(data.user_id.unwrap()),
+    //         house_id: Set(data.house_id),
+    //         category_id: Set(data.category_id),
+    //         ..Default::default()
+    //     };
 
-        let favorite_categories = model.insert(self.pool.as_ref()).await?;
-        Ok(favorite_categories.id.to_string())
-    }
+    //     let favorite_categories = model.insert(self.pool.as_ref()).await?;
+    //     Ok(favorite_categories.id.to_string())
+    // }
 
     // 查询用户收藏夹
     pub async fn find_user_favorite(

@@ -24,7 +24,7 @@ async fn main() -> std::io::Result<()> {
         }
         None => {
             // 启动 HTTP 服务
-            println!("启动 HTTP 服务...");
+
             start_http_server::run().await
         }
     }

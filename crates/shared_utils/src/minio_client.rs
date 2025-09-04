@@ -26,9 +26,9 @@ impl Minio {
         let url = self
             .url
             .clone()
-            .unwrap_or_else(|| std::env::var("MINIO_URL").unwrap());
+            .unwrap_or_else(|| std::env::var("MINIO_URL").unwrap_or("192.168.1.10:9000".into()));
 
-        let config = aws_config::defaults(BehaviorVersion::v2025_01_17())
+        let config = aws_config::defaults(BehaviorVersion::v2025_08_07())
             .region(Region::new("us-east-1"))
             .endpoint_url(&url)
             .credentials_provider(Credentials::new(

@@ -1,0 +1,32 @@
+version: "3.9"
+
+services:
+  domus-api:
+    image: registry.cn-hangzhou.aliyuncs.com/tongts/domus-service:v2
+    container_name: domus-api
+    environment:
+      DOMUS_DATABASE_URL: "mysql://root:123456@192.168.2.10:3306/domus"
+      CASBIN_DATABASE_URL: "mysql://root:123456@192.168.2.10:3306/meida"
+      DOMUS_PORT: 9002
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 5s
+
+  user-system-api:
+    image: registry.cn-hangzhou.aliyuncs.com/tongts/user_system-service:v2
+    container_name: user-system-api
+    environment:
+      USER_SYSTEM_DATABASE_URL: "mysql://root:123456@192.168.2.10:3306/meida"
+      CASBIN_DATABASE_URL: "mysql://root:123456@192.168.2.10:3306/meida"
+      USER_SYSTEM_PORT: 9001
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 5s

@@ -41,4 +41,4 @@ COPY --from=builder /app/target/${BUILD_TARGET}/release/${NAME} /${NAME}
 COPY --from=builder /app/config ./config
 
 # 指定容器启动命令
-CMD ["/${NAME}"]
+CMD ["/domus"]

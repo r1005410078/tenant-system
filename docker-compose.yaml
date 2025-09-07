@@ -1,0 +1,11 @@
+services:
+  meida_db:
+    image: mysql:8.4
+    container_name: meida_db
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: "meida"
+    ports:
+      - "3306:3306"
+    volumes:
+      - ${HOME}/data/meida/mysql:/var/lib/mysql

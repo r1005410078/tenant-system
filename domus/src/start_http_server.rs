@@ -57,7 +57,7 @@ pub async fn execute() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
 
     let host = env::var("HOST").unwrap_or("0.0.0.0".into());
-    let port = env::var("USER_SYSTEM_PORT").unwrap_or("8091".into());
+    let port = env::var("DOMUS_PORT").unwrap_or("8091".into());
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
     let event_bus = Arc::new(AsyncEventBus::new(Some(pool.clone())));

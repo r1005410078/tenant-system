@@ -1,5 +1,5 @@
 # 默认参数
-TAG ?= latest
+TAG ?= v1
 IMAGE_REGISTRY ?= registry.cn-hangzhou.aliyuncs.com/tongts
 PLATFORM ?= linux/amd64
 

@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     pkg-config \
     perl \
     wget \
+    libssl-dev \
     ca-certificates
 
 RUN rm -rf /var/lib/apt/lists/*
@@ -23,7 +24,7 @@ ARG NAME=domus
 RUN rustup target add $BUILD_TARGET
 
 # 使用 cargo 构建静态二进制
-RUN cargo build --release --target $BUILD_TARGET --bin $NAME
+RUN cargo build --release --target $BUILD_TARGET --bin $NAME 
 
 # ---------- 运行阶段 ----------
 # scratch 是空镜像，最小化镜像体积

@@ -36,4 +36,4 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /${{ secrets.SSH_USER }}/www/user_system
-            docker stack deploy -c docker-stack.yml meida-web
+            docker stack deploy -c docker-stack.yml meida-server

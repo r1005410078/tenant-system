@@ -45,8 +45,6 @@ pub async fn execute(admin_name: String, admin_password: String) -> std::io::Res
         InitSystemCommandHandler::new(pool.clone(), register_user_services, create_role_services);
 
     handler.handle(admin_name, admin_password).await.unwrap();
-    tracing::info!("初始化完成！");
-
     Ok(())
 }
 

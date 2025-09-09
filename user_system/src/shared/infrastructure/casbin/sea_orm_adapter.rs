@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use casbin::Filter;
 use casbin::{error::AdapterError, Adapter, Model, Result, TryIntoAdapter};
-use sea_orm::DatabaseConnection;
-use sea_orm::{ActiveModelTrait, EntityTrait};
+use sea_orm::{ActiveModelTrait, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{Condition, DatabaseConnection};
 
 use crate::shared::infrastructure::entitiy::casbin_rules;
 
@@ -151,21 +151,25 @@ impl Adapter for SeaORMAdapter {
         rules: Vec<Vec<String>>,
     ) -> Result<bool> {
         // 实现移除多条策略的逻辑
+
+        let mut conn = Condition::any();
+
         for rule in rules {
             let ptype = ptype; // 假设所有规则的类型都是 "p"
-            let new_rule = casbin_rules::ActiveModel {
-                ptype: sea_orm::Set(ptype.to_string()),
-                v0: sea_orm::Set(rule.get(0).cloned()),
-                v1: sea_orm::Set(rule.get(1).cloned()),
-                v2: sea_orm::Set(rule.get(2).cloned()),
-                ..Default::default()
-            };
-
-            new_rule
-                .delete(self.db.as_ref())
-                .await
-                .map_err(|e| AdapterError(Box::new(e)))?;
+            conn = conn.add(
+                Condition::all()
+                    .add(casbin_rules::Column::Ptype.eq(ptype.to_string()))
+                    .add(casbin_rules::Column::V0.eq(rule.get(0).cloned()))
+                    .add(casbin_rules::Column::V1.eq(rule.get(1).cloned()))
+                    .add(casbin_rules::Column::V2.eq(rule.get(2).cloned())),
+            );
         }
+
+        casbin_rules::Entity::delete_many()
+            .filter(conn)
+            .exec(self.db.as_ref())
+            .await
+            .map_err(|e| AdapterError(Box::new(e)))?;
 
         Ok(true)
     }

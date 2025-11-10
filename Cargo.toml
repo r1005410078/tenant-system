@@ -40,11 +40,16 @@ reqwest = { workspace = true }
 validator = { workspace = true }
 serde_with = { workspace = true }
 openssl-sys = { workspace = true }
+actix-multipart = { workspace = true }
+minio = { workspace = true }
+bytes = { workspace = true }
 
 [workspace.dependencies]
 serde_with = "3.14.0"
+bytes = "1.4"
 actix-casbin = "1.1.0"
 actix-rt = "2.10.0"
+minio = { version = "0.3.0", features = [] }
 openssl-sys = { version = "0.9.90", features = ["vendored"] }
 casbin = { version = "2.8.0", default-features = false, features = ["runtime-async-std", "logging", "incremental"] }
 chrono = { version = "0.4", features = ["serde"] }
@@ -77,6 +82,7 @@ aws-sdk-s3 = "1.103.0"
 clap = { version = "4.2.7", features = ["derive"] }
 reqwest = { version = "0.12.20", features = ["json"] }
 validator = { version = "0.19", features = ["derive"] }
+actix-multipart = "0.7.2"
 
 [[bin]]
 name = "user_system"
@@ -85,3 +91,9 @@ path = "user_system/src/main.rs"
 [[bin]]
 name = "domus"
 path = "domus/src/main.rs"
+
+[[bin]]
+name = "filestore"
+path = "filestore/src/main.rs"
+
+

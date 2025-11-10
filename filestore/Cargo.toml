@@ -4,6 +4,14 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-minio = { version = "0.3.0", features = [] }
+minio = { workspace = true }
 tokio = { workspace = true }
-bytes = "1.4"
+bytes = { workspace = true }
+anyhow = { workspace = true }
+actix-web  = { workspace = true }
+serde_json = { workspace = true }
+serde = {workspace = true}
+actix-multipart = { workspace = true }
+user_system = { workspace = true }
+log = { workspace = true }
+dotenvy = { workspace = true }

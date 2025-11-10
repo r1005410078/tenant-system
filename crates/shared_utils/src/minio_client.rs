@@ -4,11 +4,11 @@ use aws_config::{BehaviorVersion, Region};
 use aws_sdk_s3::{
     Client,
     config::{
-        Builder, Credentials,
+        Credentials,
         endpoint::{Endpoint, EndpointFuture, Params, ResolveEndpoint},
     },
     presigning::PresigningConfig,
-    primitives::{ByteStream, SdkBody},
+    primitives::ByteStream,
 };
 
 pub struct Minio {
@@ -97,7 +97,7 @@ impl Minio {
 
         let bucket_name = "domus-houses-images";
         // 检查桶是否存在
-        let exists = match client.head_bucket().bucket(bucket_name).send().await {
+        match client.head_bucket().bucket(bucket_name).send().await {
             Ok(_) => true,
             Err(e) => {
                 println!("Bucket {} not found: {:?}", bucket_name, e);
@@ -124,8 +124,7 @@ impl MinioClient {
         expires_in: Duration,
     ) -> anyhow::Result<String> {
         // 如果 bucket 不存在就创建
-        let exists = self.client.head_bucket().bucket(bucket).send().await;
-
+        // let exists = self.client.head_bucket().bucket(bucket).send().await;
         match self.client.head_bucket().bucket(bucket).send().await {
             Ok(_) => println!("Bucket {} exists", bucket),
             Err(_) => {
@@ -141,8 +140,7 @@ impl MinioClient {
             .key(key)
             .presigned(PresigningConfig::expires_in(expires_in).unwrap())
             .await?;
-        println!("2222");
-        tracing::info!("presigned url: {}", req.uri().to_string());
+
         Ok(req.uri().to_string())
     }
 }

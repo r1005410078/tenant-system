@@ -1,0 +1,9 @@
+[package]
+name = "filestore"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+minio = { version = "0.3.0", features = [] }
+tokio = { workspace = true }
+bytes = "1.4"

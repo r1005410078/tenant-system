@@ -1,5 +1,5 @@
 # 默认参数
-TAG ?= latest
+TAG ?= v1
 IMAGE_REGISTRY ?= registry.cn-hangzhou.aliyuncs.com/tongts
 PLATFORM ?= linux/amd64
 
@@ -21,3 +21,8 @@ user_system:
 
 # 一次构建并推送所有服务
 all: domus user_system
+
+# 部署
+docker-deploy:
+	 docker stack deploy -c docker-stack.yml meida
+	

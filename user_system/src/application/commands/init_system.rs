@@ -52,6 +52,7 @@ impl InitSystemCommandHandler {
     pub async fn handle(&self, username: String, password: String) -> anyhow::Result<()> {
         self.add_default_permissions().await?;
 
+        println!("获取所有权限");
         // 获取所有权限
         let permissions: Vec<Permission> = permissions_detail::Entity::find()
             .all(self.pool.as_ref())
@@ -63,6 +64,7 @@ impl InitSystemCommandHandler {
             })
             .collect();
 
+        println!("创建角色");
         // 创建角色
         let role_id = self
             .create_role_service
@@ -73,6 +75,7 @@ impl InitSystemCommandHandler {
             })
             .await?;
 
+        println!("创建超级管理员");
         // 创建超级管理员
         let roles = Some(vec![role_id]);
         self.register_user_service
@@ -84,6 +87,8 @@ impl InitSystemCommandHandler {
                 phone: None,
             })
             .await?;
+
+        println!("初始化完成");
 
         Ok(())
     }

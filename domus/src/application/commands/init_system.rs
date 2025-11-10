@@ -76,7 +76,7 @@ impl InitSystemCommandHandler {
             .await?;
 
         if !res.status().is_success() {
-            println!("创建权限权限数据初始化失败 {}", res.status());
+            println!("创建权限数据初始化失败 {}", res.status());
         }
 
         // 获取所有的权限

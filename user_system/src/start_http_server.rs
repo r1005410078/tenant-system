@@ -42,8 +42,8 @@ pub async fn run() -> std::io::Result<()> {
     log::init_tracing();
     dotenvy::dotenv().ok();
 
-    let host = env::var("HOST").unwrap_or("0.0.0.0".into());
-    let port = env::var("USER_SYSTEM_PORT").unwrap_or("8090".into());
+    let host = env::var("HOST").unwrap_or("127.0.0.1".into());
+    let port = env::var("USER_SYSTEM_PORT").unwrap_or("9001".into());
     let server_url = format!("{host}:{port}");
     let pool = create_mysql_pool().await;
     let enforcer = Arc::new(Mutex::new(init_casbin().await));

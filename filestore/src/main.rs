@@ -1,5 +1,6 @@
 use crate::{
-    api::upload::upload_house_media, service::upload_house_images::UploadHouseMediaResourceService,
+    api::upload::{get_house_media_resource_path, upload_house_media},
+    service::upload_house_images::UploadHouseMediaResourceService,
 };
 use actix_multipart::form::MultipartFormConfig;
 use actix_web::{App, HttpServer, web};
@@ -19,9 +20,11 @@ async fn main() -> std::io::Result<()> {
     let port = env::var("FILE_STORE_PORT").unwrap_or("9003".into());
     let server_url = format!("{host}:{port}");
 
-    let base_url = "http://127.0.0.1:9000".parse::<BaseUrl>().unwrap();
+    let minio_url = env::var("MINIO_URL").unwrap_or("http://127.0.0.1:9000".into());
+    println!("minio_url: {}", minio_url);
+    let minio_url = minio_url.parse::<BaseUrl>().unwrap();
     let static_provider = StaticProvider::new("minioadmin", "minioadmin", None);
-    let client = Client::new(base_url, Some(Box::new(static_provider)), None, None).unwrap();
+    let client = Client::new(minio_url, Some(Box::new(static_provider)), None, None).unwrap();
 
     let upload_house_media_resource_service =
         web::Data::new(UploadHouseMediaResourceService::new(client));
@@ -36,7 +39,8 @@ async fn main() -> std::io::Result<()> {
             .service(
                 web::scope("/api/filestore")
                     // .wrap(auth_middleware.clone())
-                    .service(upload_house_media),
+                    .service(upload_house_media)
+                    .service(get_house_media_resource_path),
             )
     })
     .workers(2)

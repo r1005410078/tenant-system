@@ -1,4 +1,4 @@
-use actix_web::{HttpResponse, Responder, post, web};
+use actix_web::{HttpResponse, Responder, get, post, web};
 
 use crate::{
     api::dtos::response::ResponseBody,
@@ -6,7 +6,7 @@ use crate::{
 };
 use actix_multipart::form::{MultipartForm, json::Json as MpJson, tempfile::TempFile};
 use serde::Deserialize;
-use std::{io::Read, thread};
+use std::{env, io::Read, thread};
 
 #[derive(Debug, Deserialize)]
 struct Metadata {
@@ -46,4 +46,14 @@ pub async fn upload_house_media(
     handle.join().unwrap();
 
     HttpResponse::Ok().json(ResponseBody::success("".to_string()))
+}
+
+// 获取资源路径 bucket
+#[get("/get_house_media_resource_path")]
+pub async fn get_house_media_resource_path() -> impl Responder {
+    let minio_url = env::var("MINIO_URL").unwrap_or("http://127.0.0.1:9000".into());
+    HttpResponse::Ok().json(ResponseBody::success(format!(
+        "{}/domus-houses-images/",
+        minio_url
+    )))
 }

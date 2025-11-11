@@ -7,7 +7,6 @@ use crate::{
         queries::house::{HouseQueryService, HouseRequest},
         services::{
             delete_house::DeleteHouseService,
-            file_upload_service::FileUploadService,
             house_operation_log::{HouseOperationLogDto, HouseOperationLogService},
             save_house::SaveHouseService,
         },
@@ -174,22 +173,6 @@ pub async fn get_house_detail(
 struct UploadUrlRequest {
     directory: String,
     filename: String,
-}
-
-#[post("/apply_upload_url")]
-pub async fn apply_upload_url(
-    data: web::Json<UploadUrlRequest>,
-    file_upload_service: web::Data<FileUploadService>,
-) -> HttpResponse {
-    let res = match file_upload_service
-        .generate_put_url(data.directory.as_str(), data.filename.as_str())
-        .await
-    {
-        Ok(data) => ResponseBody::success(data),
-        Err(e) => ResponseBody::error(e.to_string()),
-    };
-
-    HttpResponse::Ok().json(res)
 }
 
 #[get("/house_operation_log/list/{house_id}")]

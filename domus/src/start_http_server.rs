@@ -2,7 +2,6 @@ use std::{env, sync::Arc};
 
 use actix_web::{web, App, HttpServer};
 use event_bus::{AsyncEventBus, EventListener};
-use shared_utils::minio_client::Minio;
 use tokio::sync::Mutex;
 use user_system::shared::{auth_middleware::AuthMiddleware, casbin::init_casbin::init_casbin};
 
@@ -25,9 +24,9 @@ use crate::{
         services::{
             delete_community::DeleteCommunityService, delete_house::DeleteHouseService,
             delete_owner::DeleteOwnerService, favorite::FavoriteService,
-            file_upload_service::FileUploadService, house_comment::HouseCommentService,
-            house_operation_log, save_community::SaveCommunityService,
-            save_house::SaveHouseService, save_owner::SaveOwnerService,
+            house_comment::HouseCommentService, house_operation_log,
+            save_community::SaveCommunityService, save_house::SaveHouseService,
+            save_owner::SaveOwnerService,
         },
     },
     infrastructure::{
@@ -43,8 +42,8 @@ use crate::{
             find_user_favorite, update_favorite_categories,
         },
         house::{
-            apply_upload_url, delete_house, get_house_detail, group_by_community,
-            list_house_operation_log, list_houses, save_house,
+            delete_house, get_house_detail, group_by_community, list_house_operation_log,
+            list_houses, save_house,
         },
         house_comment::{add_comment, delete_comment, get_comments, update_comment},
         owner::{delete_owner, owner_list, save_owner},
@@ -67,18 +66,6 @@ pub async fn execute() -> std::io::Result<()> {
     // 启动 HTTP 服务
     tracing::info!("启动 {server_url} HTTP 服务...");
 
-    // minio_client
-    let minio_client = Arc::new(
-        Minio::new(
-            Some("http://192.168.1.243:9000".to_string()),
-            "minioadmin",
-            "minioadmin",
-        )
-        .create_client()
-        .await
-        .unwrap(),
-    );
-
     // 房源操作日志服务
     let house_operation_log_service = web::Data::new(
         house_operation_log::HouseOperationLogService::new(pool.clone()),
@@ -92,9 +79,6 @@ pub async fn execute() -> std::io::Result<()> {
 
     // 房源评论
     let hosue_comment_service = web::Data::new(HouseCommentService::new(pool.clone()));
-
-    // 上传文件服务
-    let file_upload_service = web::Data::new(FileUploadService::new(minio_client.clone()));
 
     // 创建小区仓储
     let community_repo = Arc::new(MySqlCommunityAggregateRepository::new(pool.clone()));
@@ -184,7 +168,6 @@ pub async fn execute() -> std::io::Result<()> {
             .app_data(community_query_service.clone())
             .app_data(owner_query_service.clone())
             .app_data(house_query_service.clone())
-            .app_data(file_upload_service.clone())
             .app_data(hosue_comment_service.clone())
             .app_data(favorite_service.clone())
             .app_data(public_house_service.clone())
@@ -208,7 +191,6 @@ pub async fn execute() -> std::io::Result<()> {
                             .wrap(auth_middleware.clone())
                             .service(save_house)
                             .service(delete_house)
-                            .service(apply_upload_url)
                             .service(add_comment)
                             .service(update_comment)
                             .service(delete_comment)

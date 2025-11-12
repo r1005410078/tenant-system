@@ -35,6 +35,23 @@ services:
         parallelism: 1
         delay: 5s
 
+  filestore-api:
+    image: registry.cn-hangzhou.aliyuncs.com/tongts/filestore-service:v1
+    networks:
+      - shared
+    container_name: filestore-api
+    environment:
+      MINIO_ACCESS_KEY: admin
+      MINIO_SECRET_KEY: rts2778205
+      MINIO_URL: http://home.rongts.tech:9000
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 5s
+
 networks:
   shared:
     external: true

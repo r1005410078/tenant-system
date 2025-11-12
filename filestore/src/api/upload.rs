@@ -38,7 +38,9 @@ pub async fn upload_house_media(
 
         // 在 runtime 上 block_on 运行 async 任务
         rt.block_on(async {
-            service.upload(contents, filename).await.unwrap();
+            if let Err(err) = service.upload(contents, filename).await {
+                println!("上传失败 {}", err);
+            }
         })
     });
 

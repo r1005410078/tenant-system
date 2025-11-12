@@ -20,10 +20,14 @@ async fn main() -> std::io::Result<()> {
     let port = env::var("FILE_STORE_PORT").unwrap_or("9003".into());
     let server_url = format!("{host}:{port}");
 
+    let access_key = env::var("MINIO_ACCESS_KEY").unwrap_or("minioadmin".into());
+    let secret_key = env::var("MINIO_SECRET_KEY").unwrap_or("minio123".into());
+
     let minio_url = env::var("MINIO_URL").unwrap_or("http://127.0.0.1:9000".into());
     println!("minio_url: {}", minio_url);
     let minio_url = minio_url.parse::<BaseUrl>().unwrap();
-    let static_provider = StaticProvider::new("minioadmin", "minioadmin", None);
+
+    let static_provider = StaticProvider::new(&access_key, &secret_key, None);
     let client = Client::new(minio_url, Some(Box::new(static_provider)), None, None).unwrap();
 
     let upload_house_media_resource_service =

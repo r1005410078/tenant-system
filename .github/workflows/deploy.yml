@@ -27,6 +27,7 @@ jobs:
         run: |
           docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKER_REGISTRY }}/tongts/domus-service:v1 --push -f domus/Dockerfile .
           docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKER_REGISTRY }}/tongts/user_system-service:v1 --push -f user_system/Dockerfile .
+          docker buildx build --platform linux/amd64 -t ${{ secrets.DOCKER_REGISTRY }}/tongts/filestore-service:v1 --push -f filestore/Dockerfile .
 
       - name: Deploy to Swarm
         uses: appleboy/ssh-action@v1.2.0

@@ -3,7 +3,7 @@ use crate::{
     service::upload_house_images::UploadHouseMediaResourceService,
 };
 use actix_multipart::form::MultipartFormConfig;
-use actix_web::{App, HttpServer, web};
+use actix_web::{App, HttpServer, middleware::Logger, web};
 use minio::s3::{Client, creds::StaticProvider, http::BaseUrl};
 use std::env;
 // use user_system::shared::{auth_middleware::AuthMiddleware, casbin::init_casbin::init_casbin};
@@ -38,6 +38,7 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Logger::default())
             .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024))
             .app_data(upload_house_media_resource_service.clone())
             .service(

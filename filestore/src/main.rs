@@ -24,9 +24,10 @@ async fn main() -> std::io::Result<()> {
     let secret_key = env::var("MINIO_SECRET_KEY").unwrap_or("minio123".into());
 
     let minio_url = env::var("MINIO_URL").unwrap_or("http://127.0.0.1:9000".into());
-    println!("minio_url: {}", minio_url);
-    let minio_url = minio_url.parse::<BaseUrl>().unwrap();
 
+    tracing::info!("minio_url: {}", minio_url);
+
+    let minio_url = minio_url.parse::<BaseUrl>().unwrap();
     let static_provider = StaticProvider::new(&access_key, &secret_key, None);
     let client = Client::new(minio_url, Some(Box::new(static_provider)), None, None).unwrap();
 
@@ -36,17 +37,20 @@ async fn main() -> std::io::Result<()> {
     // let enforcer = Arc::new(Mutex::new(init_casbin().await));
     // let auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
 
+    tracing::info!("启动 {server_url} HTTP 服务...");
+
     HttpServer::new(move || {
         App::new()
-            .wrap(Logger::default())
-            .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024))
-            .app_data(upload_house_media_resource_service.clone())
             .service(
                 web::scope("/api/filestore")
                     // .wrap(auth_middleware.clone())
                     .service(upload_house_media)
                     .service(get_house_media_resource_path),
             )
+            .wrap(Logger::default())
+            .app_data(upload_house_media_resource_service.clone())
+            // Also increase the global total limit to 100MiB.
+            .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024))
     })
     .workers(2)
     .bind(server_url)?

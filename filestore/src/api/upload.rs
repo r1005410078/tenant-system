@@ -4,7 +4,11 @@ use crate::{
     api::dtos::response::ResponseBody,
     service::upload_house_images::UploadHouseMediaResourceService,
 };
-use actix_multipart::form::{MultipartForm, json::Json as MpJson, tempfile::TempFile};
+
+use actix_multipart::form::{
+    MultipartForm, MultipartFormConfig, json::Json as MpJson, tempfile::TempFile,
+};
+
 use serde::Deserialize;
 use std::{env, io::Read, thread};
 
@@ -25,16 +29,19 @@ pub async fn upload_house_media(
     service: web::Data<UploadHouseMediaResourceService>,
     MultipartForm(mut form): MultipartForm<UploadForm>,
 ) -> impl Responder {
+    tracing::info!("upload_house_media start");
+
     let mut contents = vec![];
-    form.file.file.read_to_end(&mut contents).unwrap();
+    if let Err(err) = form.file.file.read_to_end(&mut contents) {
+        tracing::error!("upload_house_media read error {}", err);
+    }
 
     let service = service.into_inner().clone();
-
     let filename = form.json.name.clone();
 
     let handle = thread::spawn(move || {
         // 创建一个单线程或多线程的 Tokio runtime
-        let rt = tokio::runtime::Runtime::new().unwrap();
+        let rt = tokio::runtime::Runtime::new().expect("创建 runtime 失败");
 
         // 在 runtime 上 block_on 运行 async 任务
         rt.block_on(async {

@@ -5,10 +5,7 @@ use crate::{
     service::upload_house_images::UploadHouseMediaResourceService,
 };
 
-use actix_multipart::form::{
-    MultipartForm, MultipartFormConfig, json::Json as MpJson, tempfile::TempFile,
-};
-
+use actix_multipart::form::{MultipartForm, json::Json as MpJson, tempfile::TempFile};
 use serde::Deserialize;
 use std::{env, io::Read, thread};
 

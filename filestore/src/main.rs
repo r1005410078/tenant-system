@@ -2,7 +2,7 @@ use crate::{
     api::upload::{get_house_media_resource_path, upload_house_media},
     service::upload_house_images::UploadHouseMediaResourceService,
 };
-use actix_multipart::form::MultipartFormConfig;
+use actix_multipart::form::{MultipartFormConfig, tempfile::TempFileConfig};
 use actix_web::{App, HttpServer, middleware::Logger, web};
 use minio::s3::{Client, creds::StaticProvider, http::BaseUrl};
 use std::env;
@@ -37,6 +37,8 @@ async fn main() -> std::io::Result<()> {
     // let enforcer = Arc::new(Mutex::new(init_casbin().await));
     // let auth_middleware = Arc::new(AuthMiddleware::new(enforcer.clone()));
 
+    let temp_file_config = web::Data::new(TempFileConfig::default().directory("/app"));
+
     tracing::info!("启动 {server_url} HTTP 服务...");
 
     HttpServer::new(move || {
@@ -48,6 +50,7 @@ async fn main() -> std::io::Result<()> {
                     .service(get_house_media_resource_path),
             )
             .wrap(Logger::default())
+            .app_data(temp_file_config.clone())
             .app_data(upload_house_media_resource_service.clone())
             // Also increase the global total limit to 100MiB.
             .app_data(MultipartFormConfig::default().total_limit(100 * 1024 * 1024))
